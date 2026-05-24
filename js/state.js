@@ -77,7 +77,7 @@ const State = (() => {
       multilateralUsed: false,
       playerMilitaryVsUS: 0,
       gameOver: null,
-      sim: { active: false, paused: false, speed: 1 }
+      sim: { active: false, paused: false, speed: 1, cascadeScale: 1.0 }
     };
     return world;
   }

@@ -312,19 +312,21 @@ const Cascades = (() => {
 
   function applySystemicThresholds(world, log) {
     const powers = Object.values(world.powers);
+    const scale = world.sim?.cascadeScale ?? 1.0;
 
     // Financial fragmentation threshold
     const sanctionedCount = world.crises.filter(c => c.domain === 'economic' && c.escalationLevel >= 3).length;
     if (sanctionedCount >= 3 && !world.activeSystemicEvents.includes('financial_fragmentation')) {
       world.activeSystemicEvents.push('financial_fragmentation');
+      const delta = Math.round(-15 * scale);
       for (const p of powers) {
-        State.applyStatDelta(p.id, 'economic', -15);
+        State.applyStatDelta(p.id, 'economic', delta);
       }
       log.push({
         order: 4,
         confidence: 'CONFIRMED',
         actor: 'SYSTEM',
-        text: `[4th order SYSTEMIC] Global clearing network fragmentation triggered. All power economies hit -15.`,
+        text: `[4th order SYSTEMIC] Global clearing network fragmentation triggered. All power economies hit ${delta}.`,
         type: 'systemic_event'
       });
     }
@@ -333,14 +335,15 @@ const Cascades = (() => {
     const collapsingCount = powers.filter(p => p.trueState.domestic < 30).length;
     if (collapsingCount >= 2 && !world.activeSystemicEvents.includes('domestic_fragility_cascade')) {
       world.activeSystemicEvents.push('domestic_fragility_cascade');
+      const delta = Math.round(-8 * scale);
       for (const p of powers) {
-        State.applyStatDelta(p.id, 'domestic', -8);
+        State.applyStatDelta(p.id, 'domestic', delta);
       }
       log.push({
         order: 4,
         confidence: 'CONFIRMED',
         actor: 'SYSTEM',
-        text: `[4th order SYSTEMIC] Mass displacement and domestic fragility cascade. Climate migration overwhelming border controls. All powers domestic -8.`,
+        text: `[4th order SYSTEMIC] Mass displacement and domestic fragility cascade. Climate migration overwhelming border controls. All powers domestic ${delta}.`,
         type: 'systemic_event'
       });
     }

@@ -88,6 +88,7 @@ const BoP = (() => {
    *   doctrine?:        string   doctrine id
    *   player?:          string   override which power the player controls (e.g. 'CN')
    *   seed?:            number   RNG seed (enables reproducibility)
+   *   cascadeScale?:    number   multiplier on systemic event deltas (0 = off, 1 = default)
    *   paramOverrides?:  { [powerId]: { riskTolerance?, patience?, trueState?, relationships? } }
    *   crisisOverrides?: { [crisisId]: { escalationLevel? } }
    * @returns {object} WorldSnapshot
@@ -103,6 +104,10 @@ const BoP = (() => {
 
     if (options.player && world.powers[options.player]) {
       world.player = options.player;
+    }
+
+    if (options.cascadeScale != null) {
+      world.sim.cascadeScale = options.cascadeScale;
     }
 
     if (options.paramOverrides) {

@@ -78,6 +78,7 @@ for (let i = 0; i < args.length; i++) {
   else if (arg === '--out') opts.out = val();
   else if (arg === '--max-turns') opts.maxTurns = parseInt(val());
   else if (arg === '--player') opts.player = val().toUpperCase();
+  else if (arg === '--cascade-scale') opts.cascadeScale = parseFloat(val());
   else {
     // --<powerId>-risk or --<powerId>-patience  e.g. --cn-risk 0.9
     const m = arg.match(/^--([a-z]+)-(risk|patience)$/);
@@ -109,7 +110,8 @@ const results = BoP.runBatch({
   seeds,
   initOptions: {
     paramOverrides: Object.keys(opts.paramOverrides).length ? opts.paramOverrides : undefined,
-    player: opts.player || undefined
+    player: opts.player || undefined,
+    cascadeScale: opts.cascadeScale != null ? opts.cascadeScale : undefined
   },
   runOptions: { maxTurns: opts.maxTurns },
   onProgress: (done, total) => {
