@@ -2,7 +2,7 @@
 
 ## What this model is
 
-BoP2026 is a stylized, rule-based simulation of great-power competition during acute crisis. It is designed for structured exploration of plausible causal mechanisms — not for forecasting, and not as a substitute for empirical analysis. Think of it the way economists use Cournot duopoly models: the point is to trace out implications of stated assumptions, not to claim the assumptions are literally true.
+BoP2026 is a stylized, rule-based simulation of great-power competition during acute crisis. It is designed for structured exploration of plausible causal mechanisms, not for forecasting and not as a substitute for empirical analysis. Think of it the way economists use Cournot duopoly models: the point is to trace out implications of stated assumptions, not to claim the assumptions are literally true.
 
 Appropriate uses:
 - Illustrating cascade dynamics in a crisis management seminar
@@ -20,13 +20,13 @@ Inappropriate uses:
 ## Theoretical anchors
 
 ### Balance of power realism
-Powers maintain an `economic`, `military`, and `space` stat that represents their relative capability. No power can sustain high-cost action indefinitely without domestic or economic cost. The engine does not enforce a structural balance (no automatic balancing coalition) — that emergent behavior depends on AI behavior and scenario design.
+Powers maintain an `economic`, `military`, and `space` stat that represents their relative capability. No power can sustain high-cost action indefinitely without domestic or economic cost. The engine does not enforce a structural balance (no automatic balancing coalition); that emergent behavior depends on AI behavior and scenario design.
 
 ### Crisis bargaining (Fearon 1995)
 Each crisis has an escalation level (0–5). Powers choose whether to escalate (costly signal), de-escalate (concession), or take lower-cost actions. The epistemic model (perceived vs. true state, per-dyad intelligence quality) creates the information asymmetry that is central to Fearon's crisis bargaining framework. Powers may act on perceived state, not true state, producing misperception-driven escalation.
 
 ### Deterrence theory
-Nuclear posture (the `nuclear` stat) raises the cost of confrontation for all parties. At level 5, the system terminates — nuclear exchange ends the game. The model treats nuclear weapons as existential deterrents, not usable instruments; there are no "limited nuclear war" mechanics.
+Nuclear posture (the `nuclear` stat) raises the cost of confrontation for all parties. At level 5, the system terminates. Nuclear exchange ends the game. The model treats nuclear weapons as existential deterrents, not usable instruments; there are no "limited nuclear war" mechanics.
 
 ### Epistemic model (Jervis 1976, misperception)
 Each power maintains a `perceivedBy` object: every other power's view of its stats, distorted by intelligence quality (0–1 per dyad) and updated each turn via `Epistemic.update()`. Low intel quality means perceptions drift further from truth. This can cause an actor to respond to a capability gap that doesn't exist, or fail to respond to one that does.
@@ -35,7 +35,7 @@ Each power maintains a `perceivedBy` object: every other power's view of its sta
 
 ## Parameter calibration
 
-Parameters are set for **face validity** — they produce outcomes that an IR scholar familiar with the scenarios would find plausible. They are not regression-estimated from historical data.
+Parameters are set for **face validity**: they produce outcomes that an IR scholar familiar with the scenarios would find plausible. They are not regression-estimated from historical data.
 
 ### AI personality values
 
@@ -57,7 +57,7 @@ These values can be overridden at run time via `paramOverrides`. Sensitivity ana
 
 ### Cascade effect weights
 
-First-order effects (e.g. `deploy_forces`: self military +5, target military -3) represent the direct capability and signaling consequences of an action. The magnitudes are small by design: no single action should dominate a run. Second-order probabilities (0.2–0.7) represent the range from "this sometimes happens" to "this usually happens" — they are not empirically estimated.
+First-order effects (e.g. `deploy_forces`: self military +5, target military -3) represent the direct capability and signaling consequences of an action. The magnitudes are small by design: no single action should dominate a run. Second-order probabilities (0.2–0.7) represent the range from "this sometimes happens" to "this usually happens"; they are not empirically estimated.
 
 The most consequential cascade thresholds:
 - Financial fragmentation: 3+ economic crises at escalation ≥ 3 → all powers economic -15
@@ -90,7 +90,7 @@ These systemic events are designed to represent non-linear tipping dynamics that
 
 **Compared to RAND STRAT**: BoP2026 is open-source, runs in a browser, and is designed for public pedagogical use rather than classified wargaming.
 
-**Compared to tabletop wargames (e.g. GMT's Twilight Struggle)**: BoP2026 is computationally tractable — you can run 1000 replications in minutes and compare outcome distributions. Tabletop games offer richer historical narrative but not systematic sensitivity analysis.
+**Compared to tabletop wargames (e.g. GMT's Twilight Struggle)**: BoP2026 is computationally tractable: you can run 1000 replications in minutes and compare outcome distributions. Tabletop games offer richer historical narrative but not systematic sensitivity analysis.
 
 **Compared to agent-based models (e.g. Schelling segregation)**: BoP2026 has explicitly designed action catalogs and scenario content grounded in current IR cases, making outputs more interpretable to policy audiences than generic ABM outputs.
 

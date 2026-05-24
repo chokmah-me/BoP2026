@@ -10,8 +10,8 @@ BoP2026 models great-power competition across six domains (military, economic, c
 
 The engine is designed for two uses:
 
-1. **Classroom / wargame** — play as the United States through the Taiwan Strait or Iran Nuclear scenarios in a browser, no install required.
-2. **Research companion** — run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
+1. **Classroom / wargame**: play as the United States through the Taiwan Strait or Iran Nuclear scenarios in a browser, no install required.
+2. **Research companion**: run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
 
 This is a **stylized model**, not an empirically fitted one. Parameters are calibrated for face validity against open-source IR literature, not regression-estimated from historical data. See [docs/model-notes.md](docs/model-notes.md) for assumptions and limitations.
 
@@ -142,7 +142,7 @@ Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-o
 
 Key findings from the baseline:
 
-- **Taiwan** ends fast (avg 6 turns) and converges tightly (σ 0.5). Nearly every run triggers the sanctions financial clearing systemic event and the domestic fragility cascade. Nuclear escalation is rare (1%) — the Taiwan scenario ends in a managed-loss before reaching nuclear threshold.
+- **Taiwan** ends fast (avg 6 turns) and converges tightly (σ 0.5). Nearly every run triggers the sanctions financial clearing systemic event and the domestic fragility cascade. Nuclear escalation is rare (1%); the Taiwan scenario ends in a managed-loss before reaching nuclear threshold.
 - **Iran** is much more volatile (σ 2.2 turns, σ 11.6 stability). 73% of runs reach nuclear escalation, reflecting Iran's high riskTolerance (0.70) and the scenario's four interlocking crises. 64% of runs see the compound "Gulf of Fire" crisis emerge from the Hormuz + nuclear crisis merge. Stability distribution is bimodal: runs either collapse quickly (~20s) or stay elevated (~50s) before nuclear termination.
 - In both scenarios, EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
 
@@ -181,7 +181,7 @@ See [CLAUDE.md](CLAUDE.md) for full architecture notes.
 ## Limitations
 
 - Parameters (cascade weights, AI personality values) are calibrated for plausibility, not fit to historical data.
-- No leader-level agents — powers act as unitary actors.
+- No leader-level agents. Powers act as unitary actors.
 - Domestic politics is a single scalar, not a structured political system.
 - No arms race dynamics or technology development curves.
 - Nuclear threshold (crisis level 5) ends the game; actual nuclear use mechanics are not modeled.
