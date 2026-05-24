@@ -135,10 +135,18 @@ const results = BoP.runBatch({
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
-| Taiwan Strait 2026 | ? | ? | ? | ? |
-| Iran Nuclear 2026 | ? | ? | ? | ? |
+| Taiwan Strait 2026 | 0% | 1% | 25.8 (σ 3.6) | 5.9 (σ 0.5) |
+| Iran Nuclear 2026 | 0% | 73% | 41.3 (σ 11.6) | 4.0 (σ 2.2) |
 
-Generate these numbers:
+Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all 200 runs ended in loss, reflecting how difficult crisis management is under default conditions. Both scenarios are designed to be hard.
+
+Key findings from the baseline:
+
+- **Taiwan** ends fast (avg 6 turns) and converges tightly (σ 0.5). Nearly every run triggers the sanctions financial clearing systemic event and the domestic fragility cascade. Nuclear escalation is rare (1%) — the Taiwan scenario ends in a managed-loss before reaching nuclear threshold.
+- **Iran** is much more volatile (σ 2.2 turns, σ 11.6 stability). 73% of runs reach nuclear escalation, reflecting Iran's high riskTolerance (0.70) and the scenario's four interlocking crises. 64% of runs see the compound "Gulf of Fire" crisis emerge from the Hormuz + nuclear crisis merge. Stability distribution is bimodal: runs either collapse quickly (~20s) or stay elevated (~50s) before nuclear termination.
+- In both scenarios, EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
+
+Reproduce:
 
 ```bash
 node scripts/run-bop.js --scenario taiwan_strait_2026 --runs 100 --seed 0 --out docs/taiwan-baseline.json
