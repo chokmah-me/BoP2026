@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balance of Power 2026</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="css/panels.css">
+</head>
+<body>
+
+<!-- scenario selection screen -->
+<div id="scenario-select">
+  <div id="scenario-header">
+    <div id="scenario-title">BALANCE OF POWER 2026</div>
+    <div id="scenario-subtitle">A multipolar crisis management simulation</div>
+  </div>
+  <div id="scenario-grid"></div>
+  <div id="scenario-footer">Default player: United States. Every decision cascades. Power-neutral runs available via Oracle API.</div>
+</div>
+
+<div id="app" style="display:none">
+
+  <!-- header -->
+  <header id="header">
+    <span id="game-title">BALANCE OF POWER 2026</span>
+    <div id="header-info"></div>
+    <button id="research-btn" onclick="ResearchUI.open()" title="Open Research / Oracle Mode">&#9678; Research</button>
+  </header>
+
+  <!-- main: map -->
+  <main id="main-area">
+    <svg id="world-map" viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg">
+      <rect class="map-bg" width="900" height="480"/>
+
+      <!-- ── non-aligned landmasses (decorative) ──────────────────────────────── -->
+
+      <!-- Greenland -->
+      <path class="landmass"
+        d="M 325,77 L 308,37 L 362,19 L 405,40 L 395,77 Z"/>
+
+      <!-- South America -->
+      <path class="landmass"
+        d="M 258,208 L 365,222 L 368,302 L 332,332 L 282,390 L 267,350 L 248,253 Z"/>
+
+      <!-- Africa -->
+      <path class="landmass"
+        d="M 437,147 L 482,152 L 537,181 L 578,210 L 550,288 L 495,335 L 478,318 L 405,205 Z"/>
+
+      <!-- Australia -->
+      <path class="landmass"
+        d="M 755,285 L 778,270 L 815,268 L 832,312 L 820,342 L 793,338 L 737,325 Z"/>
+
+      <!-- Japan (small) -->
+      <path class="landmass"
+        d="M 800,130 L 808,142 L 812,158 L 804,165 L 796,155 L 793,140 Z"/>
+
+      <!-- Taiwan (small dot) -->
+      <circle cx="750" cy="180" r="3" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="0.8"/>
+
+      <!-- British Isles -->
+      <path class="landmass"
+        d="M 437,93 L 446,88 L 450,105 L 443,113 L 437,108 Z"/>
+
+      <!-- ── great-power regions (interactive) ────────────────────────────────── -->
+
+      <!-- US (North America) -->
+      <path class="map-region" data-power="US"
+        d="M 30,64 L 62,53 L 225,46 L 317,115 L 282,123 L 262,147 L 250,173 L 225,160 L 207,171 L 155,155 L 145,115 L 97,80 Z"
+        fill="#1a3a6b"/>
+      <text class="map-label" x="185" y="118">🇺🇸 US</text>
+
+      <!-- EU (Western Europe) -->
+      <path class="map-region" data-power="EU"
+        d="M 437,80 L 485,51 L 520,51 L 520,85 L 508,118 L 503,140 L 495,152 L 480,154 L 465,150 L 448,152 L 435,148 L 423,142 L 425,128 L 430,118 L 440,108 L 442,95 Z"
+        fill="#003399"/>
+      <text class="map-label" x="473" y="115">🇪🇺 EU</text>
+
+      <!-- Russia -->
+      <path class="map-region" data-power="RU"
+        d="M 525,55 L 600,45 L 700,44 L 805,48 L 862,58 L 868,95 L 808,118 L 782,128 L 730,138 L 668,138 L 602,125 L 558,105 L 528,80 Z"
+        fill="#5c3a1e"/>
+      <text class="map-label" x="695" y="82">🇷🇺 RU</text>
+
+      <!-- China -->
+      <path class="map-region" data-power="CN"
+        d="M 632,110 L 700,107 L 770,101 L 788,118 L 790,165 L 757,182 L 726,192 L 698,183 L 648,162 L 633,128 Z"
+        fill="#8b0000"/>
+      <text class="map-label" x="712" y="148">🇨🇳 CN</text>
+
+      <!-- India -->
+      <path class="map-region" data-power="IN"
+        d="M 620,148 L 652,152 L 680,168 L 665,215 L 643,222 L 630,213 L 618,179 Z"
+        fill="#FF9933"/>
+      <text class="map-label" x="648" y="185">🇮🇳 IN</text>
+
+      <!-- Gulf Bloc (Middle East / Arabian Peninsula) -->
+      <path class="map-region" data-power="GB"
+        d="M 528,145 L 562,143 L 578,157 L 595,173 L 598,184 L 575,210 L 558,210 L 548,198 L 528,163 Z"
+        fill="#c8a400"/>
+      <text class="map-label" x="563" y="178">🏴 Gulf</text>
+
+      <!-- crisis markers (rendered dynamically by ui.js) -->
+      <g id="crisis-markers"></g>
+
+      <!-- compass decoration -->
+      <text x="855" y="460" style="font-size:8px;fill:#1e2535;font-family:monospace">BoP 2026</text>
+    </svg>
+
+    <!-- log overlay on map -->
+    <div id="log-panel">
+      <div id="game-log"></div>
+    </div>
+  </main>
+
+  <!-- side panel: crises + advisor -->
+  <aside id="side-panel">
+    <div class="panel-section" style="flex:1.2">
+      <div class="panel-title">Active Crises</div>
+      <div id="crisis-list"></div>
+    </div>
+    <div class="panel-section" style="flex:1">
+      <div class="panel-title">Advisor Briefing</div>
+      <div id="advisor-log"></div>
+    </div>
+  </aside>
+
+  <!-- bottom: action panel + player stats -->
+  <div id="bottom-panel">
+    <div id="bottom-left">
+      <div id="sim-controls"></div>
+      <div id="action-panel"></div>
+    </div>
+    <div id="bottom-right">
+      <div id="player-stats-panel">
+        <div class="panel-title" id="player-stats-title">🇺🇸 United States</div>
+        <div id="player-stats"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<!-- overlays -->
+<div id="target-modal"></div>
+<div id="message-bar"></div>
+
+<!-- data: inline globals, no server/fetch needed -->
+<script src="data/powers-data.js"></script>
+<script src="data/scenarios-data.js"></script>
+<script src="data/doctrines-data.js"></script>
+<script src="data/events-data.js"></script>
+
+<!-- scripts: order matters (no module bundler) -->
+<script src="js/state.js"></script>
+<script src="js/domains.js"></script>
+<script src="js/cascades.js"></script>
+<script src="js/epistemic.js"></script>
+<script src="js/events.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/turn.js"></script>
+<script src="js/oracle.js"></script>
+<script src="js/research-ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

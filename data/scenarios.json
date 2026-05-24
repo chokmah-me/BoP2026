@@ -1,0 +1,85 @@
+{
+  "taiwan_strait_2026": {
+    "id": "taiwan_strait_2026",
+    "name": "Taiwan Strait, 2026",
+    "description": "China escalates military pressure on Taiwan. The US must navigate between deterrence and conflict. Meanwhile, Russia probes NATO's eastern flank, and India watches from the sidelines.",
+    "startYear": 2026,
+    "player": "US",
+    "crises": [
+      {
+        "id": "taiwan_military",
+        "name": "Taiwan Strait Military Escalation",
+        "domain": "military",
+        "involved": ["CN", "US"],
+        "escalationLevel": 2,
+        "description": "PLA naval exercises have moved from scheduled to continuous. Taiwan's air identification zone has been violated 14 times this month.",
+        "age": 0,
+        "cascadeLog": []
+      },
+      {
+        "id": "us_china_trade",
+        "name": "US-China Trade War",
+        "domain": "economic",
+        "involved": ["US", "CN"],
+        "escalationLevel": 3,
+        "description": "Semiconductor export controls have expanded to include EUV equipment and advanced packaging. China's retaliatory rare earth restrictions are hitting US defense production.",
+        "age": 3,
+        "cascadeLog": []
+      },
+      {
+        "id": "baltic_cyber",
+        "name": "Baltic Infrastructure Probe",
+        "domain": "cyber",
+        "involved": ["RU", "EU"],
+        "escalationLevel": 1,
+        "description": "Coordinated probes on Estonian, Latvian, and Lithuanian power grid SCADA systems. Attribution is 70% confident to GRU Unit 74455.",
+        "age": 1,
+        "cascadeLog": []
+      }
+    ],
+    "intelQuality": {
+      "US": {
+        "CN": 0.65,
+        "EU": 0.85,
+        "IN": 0.55,
+        "RU": 0.60,
+        "GB": 0.70
+      },
+      "CN": {
+        "US": 0.70,
+        "EU": 0.50,
+        "IN": 0.55,
+        "RU": 0.75,
+        "GB": 0.60
+      },
+      "EU": {
+        "US": 0.80,
+        "CN": 0.45,
+        "IN": 0.40,
+        "RU": 0.65,
+        "GB": 0.50
+      },
+      "IN": {
+        "US": 0.50,
+        "CN": 0.60,
+        "EU": 0.45,
+        "RU": 0.40,
+        "GB": 0.55
+      },
+      "RU": {
+        "US": 0.65,
+        "CN": 0.70,
+        "EU": 0.60,
+        "IN": 0.40,
+        "GB": 0.45
+      },
+      "GB": {
+        "US": 0.65,
+        "CN": 0.60,
+        "EU": 0.55,
+        "IN": 0.50,
+        "RU": 0.45
+      }
+    }
+  }
+}
