@@ -19,6 +19,9 @@ const Cascades = (() => {
     // 3.5 order: cross-domain crisis merging
     applyCrisisMerging(world, log);
 
+    // 3.75 order: crisis natural decay
+    applyCrisisDecay(pendingActions, world, log);
+
     // 4th+ order: systemic thresholds
     applySystemicThresholds(world, log);
 
@@ -91,7 +94,6 @@ const Cascades = (() => {
     const def = Domains.getById(action.actionId);
     if (!def || !def.effects2nd) return;
 
-    const actor = State.getPower(action.actor);
     const target = action.target ? State.getPower(action.target) : null;
 
     for (const effect of def.effects2nd) {
@@ -103,66 +105,43 @@ const Cascades = (() => {
         for (const [stat, delta] of Object.entries(effect.effect.self)) {
           State.applyStatDelta(action.actor, stat, delta);
         }
-        log.push({
-          order: 2,
-          confidence,
-          actor: action.actor,
-          text: `[2nd order] ${effect.label}`,
-          type: 'cascade'
-        });
+        log.push({ order: 2, confidence, actor: action.actor,
+          text: `[2nd order] ${effect.label}`, type: 'cascade' });
       }
 
       if (effect.effect.target && target) {
         for (const [stat, delta] of Object.entries(effect.effect.target)) {
           State.applyStatDelta(action.target, stat, delta);
         }
-        log.push({
-          order: 2,
-          confidence,
-          actor: action.actor,
-          text: `[2nd order] ${effect.label}`,
-          type: 'cascade'
-        });
+        log.push({ order: 2, confidence, actor: action.actor,
+          text: `[2nd order] ${effect.label}`, type: 'cascade' });
       }
 
       if (effect.effect.crisis_escalation !== undefined) {
         const crisis = findRelevantCrisis(action, world);
         if (crisis) {
           State.adjustCrisisEscalation(crisis.id, effect.effect.crisis_escalation);
-          log.push({
-            order: 2,
-            confidence,
-            actor: action.actor,
-            text: `[2nd order] ${effect.label} → ${crisis.name} escalation shifted`,
-            type: 'escalation'
-          });
+          log.push({ order: 2, confidence, actor: action.actor,
+            text: `[2nd order] ${effect.label} → ${crisis.name} escalation shifted`, type: 'escalation' });
         }
       }
 
       if (effect.effect.relationship_target && target) {
         State.adjustRelationship(action.actor, action.target, effect.effect.relationship_target);
-        log.push({
-          order: 2,
-          confidence,
-          actor: action.actor,
-          text: `[2nd order] ${effect.label}`,
-          type: 'relationship'
-        });
+        log.push({ order: 2, confidence, actor: action.actor,
+          text: `[2nd order] ${effect.label}`, type: 'relationship' });
       }
 
-      if (effect.effect.ally_relationships) {
+      // ally_relationships / ally_relationship / relationship_ally are all the same intent
+      const allyDelta = effect.effect.ally_relationships ?? effect.effect.ally_relationship ?? effect.effect.relationship_ally;
+      if (allyDelta !== undefined) {
         const allies = getAlliesOf(action.actor, world);
         for (const ally of allies) {
-          State.adjustRelationship(action.actor, ally, effect.effect.ally_relationships);
+          State.adjustRelationship(action.actor, ally, allyDelta);
         }
         if (allies.length > 0) {
-          log.push({
-            order: 2,
-            confidence,
-            actor: action.actor,
-            text: `[2nd order] ${effect.label}`,
-            type: 'relationship'
-          });
+          log.push({ order: 2, confidence, actor: action.actor,
+            text: `[2nd order] ${effect.label}`, type: 'relationship' });
         }
       }
 
@@ -172,10 +151,8 @@ const Cascades = (() => {
 
       if (effect.effect.adversary_cyber && target) {
         State.applyStatDelta(action.target, 'cyber', effect.effect.adversary_cyber);
-        log.push({
-          order: 2, confidence, actor: action.actor,
-          text: `[2nd order] ${effect.label}`, type: 'cascade'
-        });
+        log.push({ order: 2, confidence, actor: action.actor,
+          text: `[2nd order] ${effect.label}`, type: 'cascade' });
       }
 
       if (effect.effect.third_party_hostility) {
@@ -184,44 +161,72 @@ const Cascades = (() => {
           State.adjustRelationship(b, action.actor, -effect.effect.third_party_hostility);
         }
         if (bystanders.length > 0) {
-          log.push({
-            order: 2,
-            confidence,
-            actor: action.actor,
-            text: `[2nd order] ${effect.label}: regional powers grow wary`,
-            type: 'relationship'
-          });
+          log.push({ order: 2, confidence, actor: action.actor,
+            text: `[2nd order] ${effect.label}: regional powers grow wary`, type: 'relationship' });
         }
+      }
+
+      // systemic_risk: push pressure marker so threshold logic can fire later
+      if (effect.effect.systemic_risk) {
+        const marker = effect.effect.systemic_risk + '_pressure';
+        if (!world.activeSystemicEvents.includes(marker)) {
+          world.activeSystemicEvents.push(marker);
+        }
+        log.push({ order: 2, confidence, actor: action.actor,
+          text: `[2nd order] ${effect.label} — systemic pressure building: ${effect.effect.systemic_risk}`,
+          type: 'systemic_warning' });
+      }
+
+      // target_perception_distorted: plant disinformation via Epistemic
+      if (effect.effect.target_perception_distorted && target) {
+        const stats = Object.keys(target.trueState).filter(s => s !== 'nuclear');
+        const stat = stats[Math.floor(Math.random() * stats.length)];
+        const trueVal = target.trueState[stat];
+        const sign = Math.random() < 0.5 ? -1 : 1;
+        const distortion = sign * Math.round(trueVal * 0.25 + 5);
+        const falseVal = Math.max(0, Math.min(100, trueVal + distortion));
+        Epistemic.applyDisinformation(action.actor, action.target, stat, falseVal, world);
+        log.push({ order: 2, confidence, actor: action.actor,
+          text: `[2nd order] ${effect.label}`, type: 'epistemic' });
       }
     }
   }
 
   function apply3rdOrder(actions, world, log) {
-    // Sanctions stacking check
+    const scale = world.sim?.cascadeScale ?? 1.0;
+
+    // Sanctions stacking: push pressure marker for threshold
     const sanctionsCount = actions.filter(a => a.actionId === 'sanctions' || a.actionId === 'financial_pressure').length;
     if (sanctionsCount >= 2) {
-      log.push({
-        order: 3,
-        confidence: 'POSSIBLE (40%)',
-        actor: 'SYSTEM',
+      const marker = 'financial_fragmentation_pressure';
+      if (!world.activeSystemicEvents.includes(marker)) {
+        world.activeSystemicEvents.push(marker);
+      }
+      log.push({ order: 3, confidence: 'POSSIBLE (40%)', actor: 'SYSTEM',
         text: `[3rd order] Multiple simultaneous sanctions — financial clearing network stress building. Fragmentation risk elevated.`,
-        type: 'systemic_warning'
-      });
+        type: 'systemic_warning' });
     }
 
-    // Multi-cyber probe check
+    // Multi-cyber probe: push internet_balkanization and apply immediate stat hit
     const cyberProbes = actions.filter(a => a.actionId === 'cyber_infrastructure_probe').length;
     if (cyberProbes >= 2) {
-      log.push({
-        order: 3,
-        confidence: 'POSSIBLE (40%)',
-        actor: 'SYSTEM',
-        text: `[3rd order] Simultaneous cyber probes across multiple actors — internet balkanization pressure rising.`,
-        type: 'systemic_warning'
-      });
+      if (!world.activeSystemicEvents.includes('internet_balkanization')) {
+        world.activeSystemicEvents.push('internet_balkanization');
+        const delta = Math.round(-6 * scale);
+        for (const p of Object.values(world.powers)) {
+          State.applyStatDelta(p.id, 'cyber', delta);
+        }
+        log.push({ order: 3, confidence: 'CONFIRMED', actor: 'SYSTEM',
+          text: `[3rd order] Simultaneous cyber probes — internet balkanization threshold crossed. All powers cyber ${delta}.`,
+          type: 'systemic_event' });
+      } else {
+        log.push({ order: 3, confidence: 'POSSIBLE (40%)', actor: 'SYSTEM',
+          text: `[3rd order] Simultaneous cyber probes — internet balkanization pressure intensifying.`,
+          type: 'systemic_warning' });
+      }
     }
 
-    // Third-party entanglement: if two powers both target the same third
+    // Third-party entanglement: multiple powers targeting the same actor
     const targetCounts = {};
     for (const action of actions) {
       if (action.target) {
@@ -237,13 +242,9 @@ const Cascades = (() => {
           State.applyStatDelta(b, 'domestic', -3);
         }
         if (bystanders.length > 0) {
-          log.push({
-            order: 3,
-            confidence: 'LIKELY (65%)',
-            actor: 'SYSTEM',
+          log.push({ order: 3, confidence: 'LIKELY (65%)', actor: 'SYSTEM',
             text: `[3rd order] ${target.name} targeted by multiple powers simultaneously — neutral actors drawn in, domestic pressure rises.`,
-            type: 'entanglement'
-          });
+            type: 'entanglement' });
         }
       }
     }
@@ -310,28 +311,50 @@ const Cascades = (() => {
     }
   }
 
+  function applyCrisisDecay(pendingActions, world, log) {
+    // Build set of crisis IDs that saw action this turn
+    const activeCrisisIds = new Set();
+    for (const action of pendingActions) {
+      const crisis = findRelevantCrisis(action, world);
+      if (crisis) activeCrisisIds.add(crisis.id);
+    }
+    // Crises with no relevant actions this turn have a 15% chance to de-escalate
+    for (const crisis of world.crises) {
+      if (activeCrisisIds.has(crisis.id)) continue;
+      if (crisis.escalationLevel < 1) continue;
+      if (Math.random() < 0.15) {
+        const prev = crisis.escalationLevel;
+        State.adjustCrisisEscalation(crisis.id, -1);
+        log.push({
+          order: 3, confidence: 'CONFIRMED', actor: 'SYSTEM',
+          text: `[Crisis Decay] ${crisis.name}: no activity this turn. Tensions ease slightly (${prev} → ${crisis.escalationLevel}).`,
+          type: 'crisis_decay'
+        });
+      }
+    }
+  }
+
   function applySystemicThresholds(world, log) {
     const powers = Object.values(world.powers);
     const scale = world.sim?.cascadeScale ?? 1.0;
 
-    // Financial fragmentation threshold
-    const sanctionedCount = world.crises.filter(c => c.domain === 'economic' && c.escalationLevel >= 3).length;
-    if (sanctionedCount >= 3 && !world.activeSystemicEvents.includes('financial_fragmentation')) {
+    // Financial fragmentation: sustained economic warfare collapses clearing networks
+    const lowEconCount = powers.filter(p => p.trueState.economic < 40).length;
+    const hasPressureMarker = world.activeSystemicEvents.includes('financial_fragmentation_pressure');
+    if ((lowEconCount >= 3 || hasPressureMarker) && !world.activeSystemicEvents.includes('financial_fragmentation')) {
       world.activeSystemicEvents.push('financial_fragmentation');
       const delta = Math.round(-15 * scale);
       for (const p of powers) {
         State.applyStatDelta(p.id, 'economic', delta);
       }
       log.push({
-        order: 4,
-        confidence: 'CONFIRMED',
-        actor: 'SYSTEM',
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
         text: `[4th order SYSTEMIC] Global clearing network fragmentation triggered. All power economies hit ${delta}.`,
         type: 'systemic_event'
       });
     }
 
-    // Domestic fragility cascade
+    // Domestic fragility cascade: state failures spread
     const collapsingCount = powers.filter(p => p.trueState.domestic < 30).length;
     if (collapsingCount >= 2 && !world.activeSystemicEvents.includes('domestic_fragility_cascade')) {
       world.activeSystemicEvents.push('domestic_fragility_cascade');
@@ -340,10 +363,75 @@ const Cascades = (() => {
         State.applyStatDelta(p.id, 'domestic', delta);
       }
       log.push({
-        order: 4,
-        confidence: 'CONFIRMED',
-        actor: 'SYSTEM',
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
         text: `[4th order SYSTEMIC] Mass displacement and domestic fragility cascade. Climate migration overwhelming border controls. All powers domestic ${delta}.`,
+        type: 'systemic_event'
+      });
+    }
+
+    // Epistemic cascade: info warfare collapses shared reality
+    const lowInfoCount = powers.filter(p => p.trueState.info < 30).length;
+    if (lowInfoCount >= 3 && !world.activeSystemicEvents.includes('epistemic_cascade')) {
+      world.activeSystemicEvents.push('epistemic_cascade');
+      for (const [viewerId, viewer] of Object.entries(world.powers)) {
+        for (const [targetId, target] of Object.entries(world.powers)) {
+          if (viewerId === targetId) continue;
+          const perceived = viewer.perceivedBy?.[targetId];
+          if (!perceived) continue;
+          const quality = world.intelQuality[viewerId]?.[targetId] ?? 0.5;
+          for (const stat of Object.keys(target.trueState)) {
+            if (stat === 'nuclear') continue;
+            const noise = Math.round((Math.random() * 2 - 1) * (1 - quality) * 15);
+            perceived[stat] = Math.max(0, Math.min(100, (perceived[stat] || target.trueState[stat]) + noise));
+          }
+        }
+      }
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] Epistemic cascade: information warfare fractures global sensemaking. All perception matrices destabilized.`,
+        type: 'systemic_event'
+      });
+    }
+
+    // Communications blackout: cyber collapse severs C4ISR globally
+    const lowCyberCount = powers.filter(p => p.trueState.cyber < 20).length;
+    if (lowCyberCount >= 2 && !world.activeSystemicEvents.includes('communications_blackout')) {
+      world.activeSystemicEvents.push('communications_blackout');
+      const militaryDelta = Math.round(-8 * scale);
+      const infoDelta = Math.round(-6 * scale);
+      for (const p of powers) {
+        State.applyStatDelta(p.id, 'military', militaryDelta);
+        State.applyStatDelta(p.id, 'info', infoDelta);
+      }
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] Communications blackout: C4ISR degraded. All powers military ${militaryDelta}, info ${infoDelta}.`,
+        type: 'systemic_event'
+      });
+    }
+
+    // Nuclear hair-trigger: critical crisis involving nuclear-armed powers
+    const criticalCrises = world.crises.filter(c => c.escalationLevel >= 4);
+    const nuclearPowerIds = powers.filter(p => p.trueState.nuclear >= 2).map(p => p.id);
+    const touchesNuclearPower = criticalCrises.some(c =>
+      c.involved.some(id => nuclearPowerIds.includes(id))
+    );
+    if (touchesNuclearPower && !world.activeSystemicEvents.includes('nuclear_hair_trigger')) {
+      world.activeSystemicEvents.push('nuclear_hair_trigger');
+      for (const crisis of criticalCrises) {
+        if (crisis.involved.some(id => nuclearPowerIds.includes(id)) && crisis.escalationLevel < 5) {
+          State.adjustCrisisEscalation(crisis.id, 1);
+        }
+      }
+      for (let i = 0; i < nuclearPowerIds.length; i++) {
+        for (let j = i + 1; j < nuclearPowerIds.length; j++) {
+          State.adjustRelationship(nuclearPowerIds[i], nuclearPowerIds[j], -15);
+          State.adjustRelationship(nuclearPowerIds[j], nuclearPowerIds[i], -15);
+        }
+      }
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] Nuclear hair-trigger: critical crisis involving nuclear-armed powers. Forces go on high alert. Nuclear power relationships deteriorate.`,
         type: 'systemic_event'
       });
     }
@@ -358,7 +446,7 @@ const Cascades = (() => {
       (c.involved.includes(action.actor) || c.involved.includes(action.target))
     ) || world.crises.find(c =>
       c.involved.includes(action.actor) || c.involved.includes(action.target)
-    ) || world.crises[0];
+    ) || null;
   }
 
   function getAlliesOf(powerId, world) {
