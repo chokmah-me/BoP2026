@@ -20,11 +20,14 @@ BoP2026 lets you explore these modern problems. You can run many simulations. Yo
 
 ## The Original Game
 
-*Balance of Power* from 1985 is still worth playing. It was ahead of its time. You can run it today with an Amiga emulator.
+*Balance of Power* from 1985 is still worth playing. It was ahead of its time.
 
-**Good options:**
-- FS-UAE (free emulator that works on most computers)
-- Internet Archive has a browser version you can try right away: https://archive.org/details/BoP1985
+You can play it today using an Amiga emulator. Here is the easiest way:
+
+1. Download the game from My Abandonware: https://www.myabandonware.com/game/balance-of-power-3j
+2. Use the free emulator **FS-UAE** (available for Windows, Mac, and Linux): https://fs-uae.net/
+
+FS-UAE is simple to set up and runs the original game well.
 
 ## A Note
 
