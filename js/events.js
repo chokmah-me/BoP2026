@@ -22,15 +22,29 @@ const Events = (() => {
   function conditionsMet(event, world) {
     if (!event.conditions || event.conditions.length === 0) return true;
     for (const cond of event.conditions) {
+      if (cond.minTurn !== undefined && (world.turn ?? 0) < cond.minTurn) return false;
+
+      if (cond.crisisMinCount !== undefined) {
+        const minEsc = cond.minEscalation ?? 1;
+        const count = world.crises.filter(c => c.escalationLevel >= minEsc).length;
+        if (count < cond.crisisMinCount) return false;
+      }
+
       if (cond.crisis) {
         const crisis = world.crises.find(c => c.id === cond.crisis);
         if (!crisis) return false;
         if (cond.minEscalation && crisis.escalationLevel < cond.minEscalation) return false;
       }
+
       if (cond.power && cond.stat && cond.maxValue !== undefined) {
-        const power = world.powers[cond.power];
-        if (!power) return false;
-        if (power.trueState[cond.stat] > cond.maxValue) return false;
+        const powers = Object.values(world.powers);
+        if (cond.power === 'any') {
+          if (!powers.some(p => p.trueState[cond.stat] <= cond.maxValue)) return false;
+        } else {
+          const power = world.powers[cond.power];
+          if (!power) return false;
+          if (power.trueState[cond.stat] > cond.maxValue) return false;
+        }
       }
     }
     return true;

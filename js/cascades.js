@@ -226,6 +226,54 @@ const Cascades = (() => {
       }
     }
 
+    // Force + sanctions combo: coordinated military + economic pressure on one target
+    const combinedPressure = {};
+    for (const action of actions) {
+      if (!action.target) continue;
+      if (!combinedPressure[action.target]) combinedPressure[action.target] = { military: 0, economic: 0 };
+      const def = Domains.getById(action.actionId);
+      if (!def) continue;
+      if (def.domain === 'military') combinedPressure[action.target].military++;
+      if (def.domain === 'economic') combinedPressure[action.target].economic++;
+    }
+    for (const [targetId, counts] of Object.entries(combinedPressure)) {
+      if (counts.military >= 1 && counts.economic >= 1) {
+        const delta = Math.round(-8 * scale);
+        State.applyStatDelta(targetId, 'domestic', delta);
+        State.applyStatDelta(targetId, 'military', delta);
+        log.push({ order: 3, confidence: 'LIKELY (65%)', actor: 'SYSTEM',
+          text: `[3rd order] Coordinated military + economic pressure on ${State.getPower(targetId).name} — compounding domestic strain. domestic ${delta}, military ${delta}.`,
+          type: 'compound_pressure' });
+      }
+    }
+
+    // Emergency powers spiral: two or more powers invoke emergency powers same turn
+    const emergencyCount = actions.filter(a => a.actionId === 'emergency_powers').length;
+    if (emergencyCount >= 2 && !world.activeSystemicEvents.includes('emergency_powers_spiral')) {
+      world.activeSystemicEvents.push('emergency_powers_spiral');
+      for (const action of actions.filter(a => a.actionId === 'emergency_powers')) {
+        State.applyStatDelta(action.actor, 'domestic', Math.round(-6 * scale));
+        State.adjustRelationship(action.actor,
+          Object.keys(world.powers).find(id => id !== action.actor), -5);
+      }
+      log.push({ order: 3, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[3rd order] Multiple powers declare emergency powers simultaneously — allies alarmed, international legitimacy erodes.`,
+        type: 'systemic_warning' });
+    }
+
+    // Information war feedback: simultaneous counter-narrative + plant_leak triggers epistemic noise
+    const infoWarCount = actions.filter(a => a.actionId === 'counter_narrative' || a.actionId === 'plant_leak').length;
+    if (infoWarCount >= 2 && !world.activeSystemicEvents.includes('infowar_saturation')) {
+      world.activeSystemicEvents.push('infowar_saturation');
+      const delta = Math.round(-7 * scale);
+      for (const p of Object.values(world.powers)) {
+        State.applyStatDelta(p.id, 'info', delta);
+      }
+      log.push({ order: 3, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[3rd order] Simultaneous information operations — global epistemic environment saturated. All powers info ${delta}.`,
+        type: 'systemic_event' });
+    }
+
     // Third-party entanglement: multiple powers targeting the same actor
     const targetCounts = {};
     for (const action of actions) {
