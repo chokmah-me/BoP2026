@@ -22,8 +22,8 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 | 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | New **EMP Attacks** domain                         | **High**         |
 | 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | New **Biological Epidemic** domain                 | **High**         |
 | 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | New **AI Warfare** + **UCAV/Drone Swarms** domains | **High**         |
-| 5 | The War for Space                     | Attacks on satellites and space assets          | Future v1.2 (Space domain)                         | Medium           |
-| 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Future v1.2 (Urban Operations)                     | Medium           |
+| 5 | The War for Space                     | Attacks on satellites and space assets          | Planned for v1.2 (Space domain)                    | Medium           |
+| 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Planned for v1.2 (Urban Operations)                | Medium           |
 | 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via existing **Economic** + new **Supply Chain** domains | Medium           |
 
 ---
@@ -52,7 +52,7 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 
 ## Documentation & Community Goals
 
-- Add `docs/ROADMAP.md` (this file)
+- Maintain `docs/ROADMAP.md` (this file)
 - Create `CONTRIBUTING.md` and contributor guidelines
 - Publish 2–3 tutorial videos (Taiwan scenario + sensitivity analysis walkthrough)
 - Release synthetic dataset from v1.1 baseline runs for academic use
@@ -61,9 +61,9 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 
 ## Success Metrics for v1.1
 
-- 20%+ increase in outcome variance through domestic factions and new domains
-- Successful modeling of at least 3 compound crises (e.g., Supply Chain + Biological + EMP)
-- Positive feedback from IR/war studies pilot users
+- Achieve 20%+ increase in outcome variance through domestic factions and new domains
+- Successfully model at least 3 compound crises (e.g., Supply Chain + Biological + EMP)
+- Receive positive feedback from IR and war studies pilot users
 
 ---
 
