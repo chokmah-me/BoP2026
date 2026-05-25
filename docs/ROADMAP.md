@@ -14,6 +14,20 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 
 ---
 
+## Krepinevich’s 7 Deadly Scenarios — Mapping to BoP2026 v1.1
+
+| # | Scenario                              | Core Threat                                      | Relevance to BoP2026 v1.1                          | Priority in v1.1 |
+|---|---------------------------------------|--------------------------------------------------|----------------------------------------------------|------------------|
+| 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | New **Supply Chain Disruption** domain             | **High**         |
+| 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | New **EMP Attacks** domain                         | **High**         |
+| 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | New **Biological Epidemic** domain                 | **High**         |
+| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | New **AI Warfare** + **UCAV/Drone Swarms** domains | **High**         |
+| 5 | The War for Space                     | Attacks on satellites and space assets          | Future v1.2 (Space domain)                         | Medium           |
+| 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Future v1.2 (Urban Operations)                     | Medium           |
+| 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via existing **Economic** + new **Supply Chain** domains | Medium           |
+
+---
+
 ## v1.1 High-Priority Additions
 
 ### New Domains & Mechanics (Inspired by Krepinevich + User Input)
