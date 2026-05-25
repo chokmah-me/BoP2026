@@ -1,7 +1,7 @@
 # Balance of Power 2026
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20370930-blue)](https://doi.org/10.5281/zenodo.20370930)  
-**Roadmap:** [v1.1 Development Plan](docs/ROADMAP.md)  
+**Roadmap:** [Development Plan](docs/ROADMAP.md)  
 **Background:** [The Story Behind BoP2026](docs/BACKGROUND.md)  
 **Quickstart:** [Get analysis-ready data in 10 minutes](docs/QUICKSTART.md)  
 **Oracle reference:** [Headless simulation, full API, output schema](docs/ORACLE.md)
@@ -70,6 +70,7 @@ node scripts/analyze-results.js results.json
 | `--out <path>` | `bop-results.json` | Output JSON file (`bop2026-analytics-v1` format) |
 | `--max-turns <n>` | `20` | Turn limit per run |
 | `--player <id>` | `US` | Which power the AI controls as "player" |
+| `--cascade-scale <f>` | `1.0` | Multiplier on systemic event deltas (0 = off) |
 | `--<power>-risk <f>` | persona default | Override riskTolerance (0–1). E.g. `--cn-risk 0.9` |
 | `--<power>-patience <f>` | persona default | Override patience (0–1). E.g. `--ru-patience 0.2` |
 
@@ -228,7 +229,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v1.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

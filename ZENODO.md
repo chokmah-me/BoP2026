@@ -33,7 +33,7 @@ All parameters are calibrated for **face validity** against open-source IR liter
 
 Please cite as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v1.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Versioning Note
 
