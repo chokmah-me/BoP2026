@@ -3,7 +3,7 @@
 **Permanent DOI:** [To be inserted after Zenodo record creation]  
 **Deposit Date:** 24 May 2026  
 **License:** MIT  
-**Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah-me  
+**Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914
 
 ## Intended Use
@@ -41,7 +41,7 @@ Future releases (v1.1+) will be deposited as new Zenodo versions. This v1.0 repr
 
 ## Contact & Repository
 
-**Principal:** Daniyel Yaacov Bilar, Chokmah-me  
+**Principal:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914  
 GitHub: https://github.com/chokmah-me/BoP2026  
 Issues and pull requests welcome for new scenarios, actions, or domain extensions.
