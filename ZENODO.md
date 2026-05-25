@@ -1,6 +1,6 @@
 # Zenodo Deposit — Balance of Power 2026 v1.0
 
-**Permanent DOI:** [To be inserted after Zenodo record creation]  
+**Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
 **Deposit Date:** 24 May 2026  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
@@ -33,7 +33,7 @@ All parameters are calibrated for **face validity** against open-source IR liter
 
 Please cite as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v1.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Zenodo. https://doi.org/[INSERT DOI]
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v1.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Versioning Note
 
