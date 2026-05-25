@@ -24,7 +24,7 @@ BoP2026 lets you explore these modern problems. You can run many simulations. Yo
 
 You can play it today using an Amiga emulator. Here is the easiest way:
 
-1. Download Balance of Power from My Abandonware: https://www.myabandonware.com/game/balance-of-power-5e
+1. Download *Balance of Power* from My Abandonware: https://www.myabandonware.com/game/balance-of-power-5e
 2. Use the free emulator **FS-UAE** (available for Windows, Mac, and Linux): https://fs-uae.net/
 
 FS-UAE is simple to set up and runs the original game well.
