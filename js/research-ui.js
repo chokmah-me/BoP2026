@@ -239,7 +239,8 @@ const ResearchUI = (() => {
 
   function _downloadJSON() {
     if (!_lastResults) return;
-    _download('bop-results.json', JSON.stringify(_lastResults, null, 2), 'application/json');
+    const analytics = BoP.exportBatchAnalytics(_lastResults);
+    _download('bop-analytics.json', JSON.stringify(analytics, null, 2), 'application/json');
   }
 
   function _downloadCSV() {

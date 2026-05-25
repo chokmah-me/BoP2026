@@ -111,10 +111,11 @@
     <!-- log overlay on map -->
     <div id="log-panel">
       <div id="game-log"></div>
+      <button id="save-log-btn" onclick="UI.saveLog()" title="Export game log as JSON">&#8659; Save Log</button>
     </div>
   </main>
 
-  <!-- side panel: crises + advisor -->
+  <!-- side panel: crises + advisor + relationship matrix -->
   <aside id="side-panel">
     <div class="panel-section" style="flex:1.2">
       <div class="panel-title">Active Crises</div>
@@ -123,6 +124,12 @@
     <div class="panel-section" style="flex:1">
       <div class="panel-title">Advisor Briefing</div>
       <div id="advisor-log"></div>
+    </div>
+    <div class="panel-section rel-matrix-section" id="rel-matrix-section">
+      <div class="panel-title panel-toggle" onclick="UI.toggleRelMatrix()">
+        Relations <span id="rel-matrix-arrow">▶</span>
+      </div>
+      <div id="rel-matrix" style="display:none"></div>
     </div>
   </aside>
 

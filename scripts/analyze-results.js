@@ -23,8 +23,13 @@ if (!inputFile) {
 
 const raw = JSON.parse(fs.readFileSync(path.resolve(inputFile), 'utf8'));
 
-// Normalize: run-bop.js wraps each run in { runId, seed, params, result }
-const runs = raw.map(r => r.result || r).filter(Boolean);
+// Normalize: supports both legacy { runId, seed, result: SimResult }
+// and current { runId, seed, analytics: AnalyticsObject } formats.
+const runs = raw.map(r => {
+  const a = r.analytics || r.result || r;
+  if (a && a.schema === 'bop2026-analytics-v1') return a;
+  return a;
+}).filter(r => r && r.outcome);
 
 if (runs.length === 0) {
   console.error('No valid runs found in input.');

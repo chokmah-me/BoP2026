@@ -37,7 +37,9 @@ Please cite as:
 
 ## Versioning Note
 
-Future releases (v1.1+) will be deposited as new Zenodo versions. This v1.0 represents the baseline personality vectors, cascade weights, and scenario content as of May 2026.
+This v1.0 deposit represents the baseline personality vectors, cascade weights, and scenario content as of May 2026.
+
+**v2.0.0 (2026-05-25):** Breaking change to output format. `run-bop.js --out` now writes `bop2026-analytics-v1` JSON with per-turn `stateDeltas`, `initialState`, and compact power/crisis summaries. New Oracle API methods `exportAnalytics()` / `exportBatchAnalytics()`. Browser Save Log button. New docs: `docs/ORACLE.md`, `docs/QUICKSTART.md`. New test suite: `scripts/test-analytics.js` (8 tests). A new Zenodo version deposit for v2.0.0 is pending.
 
 ## Contact & Repository
 

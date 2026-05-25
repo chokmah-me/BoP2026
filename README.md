@@ -2,7 +2,9 @@
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20370930-blue)](https://doi.org/10.5281/zenodo.20370930)  
 **Roadmap:** [v1.1 Development Plan](docs/ROADMAP.md)  
-**Background:** [The Story Behind BoP2026](docs/BACKGROUND.md)
+**Background:** [The Story Behind BoP2026](docs/BACKGROUND.md)  
+**Quickstart:** [Get analysis-ready data in 10 minutes](docs/QUICKSTART.md)  
+**Oracle reference:** [Headless simulation, full API, output schema](docs/ORACLE.md)
 
 A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Runs in the browser as a playable game and headless via Node.js for batch simulation and parameter sensitivity analysis.
 
@@ -35,7 +37,7 @@ start index.html
 open index.html
 ```
 
-Select a scenario and doctrine on the opening screen. Click **End Turn** to advance. The **Research** button in the top-right opens the in-browser batch runner.
+Select a scenario and doctrine on the opening screen. Click **End Turn** to advance. The **Research** button in the top-right opens the in-browser batch runner. A **Save Log** button in the event log panel exports the current game state and event history as JSON.
 
 ### Node.js (headless research runs)
 
@@ -65,7 +67,7 @@ node scripts/analyze-results.js results.json
 | `--scenario <id>` | `taiwan_strait_2026` | Scenario to run. Also: `iran_nuclear_2026` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
-| `--out <path>` | `bop-results.json` | Output JSON file |
+| `--out <path>` | `bop-results.json` | Output JSON file (`bop2026-analytics-v1` format) |
 | `--max-turns <n>` | `20` | Turn limit per run |
 | `--player <id>` | `US` | Which power the AI controls as "player" |
 | `--<power>-risk <f>` | persona default | Override riskTolerance (0–1). E.g. `--cn-risk 0.9` |
@@ -113,6 +115,11 @@ const results = BoP.runBatch({
     CN: { riskTolerance: [0.3, 0.5, 0.7, 0.9] }
   }
 });
+
+// Export analytics-ready JSON (schema: bop2026-analytics-v1)
+const analytics = BoP.exportAnalytics(result);
+// or for batch:
+const batch = BoP.exportBatchAnalytics(results);
 ```
 
 **SimResult shape:**
@@ -120,14 +127,37 @@ const results = BoP.runBatch({
 ```js
 {
   scenarioId: string,
+  initialState: WorldSnapshot,  // pre-game state, before turn 1
   outcome: {
     result: 'win' | 'lose' | 'incomplete',
     reason: string,
     stabilityIndex: number,   // 0–100
     turnsPlayed: number
   },
-  turns: TurnResult[],        // per-turn cascade logs, actions, events
+  turns: TurnResult[],        // per-turn cascade logs, actions, events, deltas
   finalState: WorldSnapshot
+}
+```
+
+**TurnResult shape:**
+
+```js
+{
+  turn: number,
+  year: number,
+  actions: {
+    player: ActionObject[],
+    npc: ActionObject[]
+  },
+  cascadeLog: CascadeEntry[],
+  events: EventObject[],
+  stateDeltas: {
+    stats:         { [powerId]: { [stat]: { before, after, delta } } },
+    relationships: { ["A->B"]:  { before, after, delta } },
+    crises:        { [crisisId]: { escalationLevel: { before, after, delta } } }
+  },
+  stateSnapshot: WorldSnapshot,  // full world state after this turn
+  gameOver: null | { result: string, reason: string }
 }
 ```
 

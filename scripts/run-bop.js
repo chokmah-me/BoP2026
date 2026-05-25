@@ -143,5 +143,6 @@ console.log('─'.repeat(40));
 
 // ── Write output ─────────────────────────────────────────────────────────────
 const outPath = path.isAbsolute(opts.out) ? opts.out : path.join(process.cwd(), opts.out);
-fs.writeFileSync(outPath, JSON.stringify(results, null, 2));
-console.log(`\n  Output written: ${outPath}\n`);
+const analytics = BoP.exportBatchAnalytics(results);
+fs.writeFileSync(outPath, JSON.stringify(analytics, null, 2));
+console.log(`\n  Output written: ${outPath}  (schema: bop2026-analytics-v1)\n`);

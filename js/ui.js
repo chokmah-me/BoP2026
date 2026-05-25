@@ -1,5 +1,7 @@
 const UI = (() => {
 
+  let _prevRels = {};
+
   // ── top-level render ────────────────────────────────────────────────────────
 
   function render() {
@@ -12,6 +14,7 @@ const UI = (() => {
     renderActionPanel();
     renderPlayerStats();
     renderLog();
+    renderRelationshipMatrix(world);
   }
 
   function renderHeader(world) {
@@ -322,7 +325,8 @@ const UI = (() => {
       warning: 'log-warning',
       epistemic: 'log-epistemic',
       systemic_warning: 'log-systemic',
-      systemic_event: 'log-systemic'
+      systemic_event: 'log-systemic',
+      relationship: 'log-relationship'
     }[type] || '';
   }
 
@@ -411,6 +415,64 @@ const UI = (() => {
     `;
   }
 
+  // ── relationship matrix ──────────────────────────────────────────────────────
+
+  function renderRelationshipMatrix(world) {
+    const el = document.getElementById('rel-matrix');
+    if (!el || el.style.display === 'none') return;
+
+    const ids = Object.keys(world.powers);
+    const flags = ids.map(id => world.powers[id].flag || id);
+
+    const headerCells = ['<th class="rmat-corner"></th>']
+      .concat(flags.map(f => `<th class="rmat-th">${f}</th>`))
+      .join('');
+
+    const rows = ids.map((rowId, ri) => {
+      const rels = world.powers[rowId].relationships || {};
+      const cells = ids.map((colId, ci) => {
+        if (rowId === colId) return '<td class="rmat-self"></td>';
+        const val = rels[colId] || 0;
+        const prev = (_prevRels[rowId] || {})[colId];
+        const trend = prev === undefined ? '' : val > prev ? '↑' : val < prev ? '↓' : '';
+        const trendCls = trend === '↑' ? 'rmat-up' : trend === '↓' ? 'rmat-dn' : '';
+        const bg = relMatColor(val);
+        const label = `${world.powers[rowId].name} → ${world.powers[colId].name}: ${val > 0 ? '+' : ''}${val}${trend ? ' ' + trend : ''}`;
+        return `<td class="rmat-cell" style="background:${bg}" title="${label}">
+          <span class="rmat-val">${val > 0 ? '+' : ''}${val}</span>
+          ${trend ? `<span class="${trendCls}">${trend}</span>` : ''}
+        </td>`;
+      }).join('');
+      return `<tr><th class="rmat-th rmat-row">${flags[ri]}</th>${cells}</tr>`;
+    }).join('');
+
+    el.innerHTML = `<table class="rmat-table"><thead><tr>${headerCells}</tr></thead><tbody>${rows}</tbody></table>`;
+
+    // snapshot current rels for next render
+    _prevRels = {};
+    for (const id of ids) {
+      _prevRels[id] = Object.assign({}, world.powers[id].relationships || {});
+    }
+  }
+
+  function relMatColor(val) {
+    if (val <= -60) return '#5a0a0a';
+    if (val <= -30) return '#8b1a1a';
+    if (val < 20)   return '#1e2535';
+    if (val < 50)   return '#1a3a28';
+    return '#0d5c2a';
+  }
+
+  function toggleRelMatrix() {
+    const el = document.getElementById('rel-matrix');
+    const arrow = document.getElementById('rel-matrix-arrow');
+    if (!el) return;
+    const open = el.style.display !== 'none';
+    el.style.display = open ? 'none' : 'block';
+    if (arrow) arrow.textContent = open ? '▶' : '▼';
+    if (!open) renderRelationshipMatrix(State.get());
+  }
+
   // ── misc ─────────────────────────────────────────────────────────────────────
 
   function showPhaseIndicator(text) {
@@ -453,9 +515,55 @@ const UI = (() => {
     return Domains.getDomainIcon(domain);
   }
 
+  // ── log export ───────────────────────────────────────────────────────────────
+
+  function saveLog() {
+    const world = State.get();
+
+    const powers = {};
+    for (const [id, pw] of Object.entries(world.powers)) {
+      powers[id] = {
+        name: pw.name,
+        trueState: { ...pw.trueState },
+        relationships: { ...pw.relationships },
+        riskTolerance: pw.riskTolerance,
+        patience: pw.patience
+      };
+    }
+
+    const crises = world.crises.map(c => ({
+      id: c.id,
+      name: c.name,
+      domain: c.domain,
+      involved: c.involved,
+      escalationLevel: c.escalationLevel
+    }));
+
+    const payload = {
+      schema: 'bop2026-analytics-v1',
+      exportedAt: new Date().toISOString(),
+      scenarioId: world.scenarioId,
+      player: world.player,
+      doctrine: world.doctrine?.id || null,
+      note: 'interactive-snapshot — stateDeltas not available; see world.log for turn-by-turn events',
+      outcome: world.gameOver || { result: 'incomplete', reason: 'game in progress', turnsPlayed: world.turn - 1 },
+      log: world.log.slice().reverse(),
+      finalState: { powers, crises }
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `bop-log-turn${world.turn - 1}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
   return {
     render, renderHeader, renderMap, renderCrisisPanel, renderAdvisorPanel,
     renderSimControls, renderActionPanel, renderPlayerStats, renderLog,
-    showAdvisorWarnings, showDossier, showPhaseIndicator, showMessage, showGameOver
+    renderRelationshipMatrix, toggleRelMatrix,
+    showAdvisorWarnings, showDossier, showPhaseIndicator, showMessage, showGameOver,
+    saveLog
   };
 })();

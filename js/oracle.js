@@ -43,10 +43,55 @@ const BoP = (() => {
     return window[key];
   }
 
+  // ── State snapshot helpers ───────────────────────────────────────────────
+
+  function _snapshotForDelta(world) {
+    const snap = { stats: {}, relationships: {}, crises: {} };
+    for (const [id, pw] of Object.entries(world.powers)) {
+      snap.stats[id] = { ...pw.trueState };
+      snap.relationships[id] = { ...pw.relationships };
+    }
+    for (const c of world.crises) {
+      snap.crises[c.id] = c.escalationLevel;
+    }
+    return snap;
+  }
+
+  function _computeDeltas(before, world) {
+    const deltas = { stats: {}, relationships: {}, crises: {} };
+
+    for (const [id, pw] of Object.entries(world.powers)) {
+      for (const [stat, after] of Object.entries(pw.trueState)) {
+        const bv = before.stats[id]?.[stat];
+        if (bv != null && bv !== after) {
+          if (!deltas.stats[id]) deltas.stats[id] = {};
+          deltas.stats[id][stat] = { before: bv, after, delta: after - bv };
+        }
+      }
+      for (const [otherId, after] of Object.entries(pw.relationships)) {
+        const bv = before.relationships[id]?.[otherId];
+        if (bv != null && bv !== after) {
+          deltas.relationships[`${id}->${otherId}`] = { before: bv, after, delta: after - bv };
+        }
+      }
+    }
+
+    for (const c of world.crises) {
+      const bv = before.crises[c.id];
+      if (bv != null && bv !== c.escalationLevel) {
+        deltas.crises[c.id] = { escalationLevel: { before: bv, after: c.escalationLevel, delta: c.escalationLevel - bv } };
+      }
+    }
+
+    return deltas;
+  }
+
   // ── Headless turn executor ───────────────────────────────────────────────
   // No UI calls, no sleeps. Returns raw turn data.
   function _executeTurn(playerActionsOverride) {
     const world = State.get();
+    const beforeSnap = _snapshotForDelta(world);
+
     State.clearPendingActions();
     for (const p of Object.values(world.powers)) p.actionPointsRemaining = p.actionPoints;
 
@@ -76,7 +121,9 @@ const BoP = (() => {
     State.advanceTurn();
     const over = State.checkGameOver();
 
-    return { turnNum, yearNum, playerActions, npcActions, cascadeLog, events, over };
+    const stateDeltas = _computeDeltas(beforeSnap, State.get());
+
+    return { turnNum, yearNum, playerActions, npcActions, cascadeLog, events, over, stateDeltas };
   }
 
   // ── Public API ───────────────────────────────────────────────────────────
@@ -145,6 +192,7 @@ const BoP = (() => {
       npcActions: r.npcActions,
       cascadeLog: r.cascadeLog,
       events: r.events,
+      stateDeltas: r.stateDeltas,
       stateSnapshot: getState(),
       gameOver: r.over ? State.get().gameOver : null
     };
@@ -159,6 +207,7 @@ const BoP = (() => {
     const world = State.get();
     const scenarioId = world.scenarioId;
     const maxTurns = options.maxTurns || 20;
+    const initialState = getState();
     const turns = [];
 
     while (!State.get().gameOver && State.get().turn <= maxTurns) {
@@ -170,6 +219,7 @@ const BoP = (() => {
     const fw = State.get();
     return {
       scenarioId,
+      initialState,
       outcome: {
         result: fw.gameOver?.result || 'incomplete',
         reason: fw.gameOver?.reason || '',
@@ -256,7 +306,87 @@ const BoP = (() => {
     _overrides = {};
   }
 
-  const api = { init, step, run, runBatch, getState, setState, setNPCOverride, clearOverrides };
+  // ── Analytics export ─────────────────────────────────────────────────────
+
+  function _powerSummary(powers) {
+    const out = {};
+    for (const [id, pw] of Object.entries(powers)) {
+      out[id] = {
+        name: pw.name,
+        trueState: { ...pw.trueState },
+        relationships: { ...pw.relationships },
+        riskTolerance: pw.riskTolerance,
+        patience: pw.patience
+      };
+    }
+    return out;
+  }
+
+  function _crisesSummary(crises) {
+    return crises.map(c => ({
+      id: c.id,
+      name: c.name,
+      domain: c.domain,
+      involved: c.involved,
+      escalationLevel: c.escalationLevel
+    }));
+  }
+
+  /**
+   * Convert a SimResult (from BoP.run()) to a clean analytics object.
+   * Strips raw stateSnapshot from each turn — use initialState/finalState instead.
+   */
+  function exportAnalytics(simResult, meta = {}) {
+    const turns = simResult.turns.map(t => ({
+      turn: t.turn,
+      year: t.year,
+      actions: {
+        player: t.playerActions,
+        npc: t.npcActions
+      },
+      cascades: t.cascadeLog,
+      events: t.events.map(e => ({ id: e.id, name: e.name, description: e.description })),
+      stateDeltas: t.stateDeltas || {},
+      gameOver: t.gameOver
+    }));
+
+    const initial = simResult.initialState || simResult.turns[0]?.stateSnapshot || simResult.finalState;
+
+    return {
+      schema: 'bop2026-analytics-v1',
+      exportedAt: new Date().toISOString(),
+      scenarioId: simResult.scenarioId,
+      player: simResult.finalState.player,
+      doctrine: simResult.finalState.doctrine?.id || null,
+      paramOverrides: meta.paramOverrides || {},
+      seed: meta.seed != null ? meta.seed : null,
+      outcome: simResult.outcome,
+      initialState: {
+        powers: _powerSummary(initial.powers),
+        crises: _crisesSummary(initial.crises)
+      },
+      turns,
+      finalState: {
+        powers: _powerSummary(simResult.finalState.powers),
+        crises: _crisesSummary(simResult.finalState.crises)
+      }
+    };
+  }
+
+  /**
+   * Convert runBatch() output to an array of analytics objects.
+   */
+  function exportBatchAnalytics(batchResults) {
+    return batchResults.map(r => ({
+      runId: r.runId,
+      seed: r.seed,
+      analytics: r.result
+        ? exportAnalytics(r.result, { paramOverrides: r.params, seed: r.seed })
+        : { error: r.error }
+    }));
+  }
+
+  const api = { init, step, run, runBatch, getState, setState, setNPCOverride, clearOverrides, exportAnalytics, exportBatchAnalytics };
 
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = api;
