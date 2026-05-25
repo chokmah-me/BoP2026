@@ -19,7 +19,7 @@ type: software
 authors:
   - family-names: "Bilar"
     given-names: "Daniyel Yaacov"
-    affiliation: "Chokmah-me"
+    affiliation: "Chokmah LLC"
     orcid: "0000-0002-9040-6914"
 preferred-citation:
   type: software
@@ -27,7 +27,7 @@ preferred-citation:
   authors:
     - family-names: "Bilar"
       given-names: "Daniyel Yaacov"
-      affiliation: "Chokmah-me"
+      affiliation: "Chokmah LLC"
       orcid: "0000-0002-9040-6914"
   version: "1.0.0"
   year: 2026
