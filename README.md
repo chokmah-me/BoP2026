@@ -1,5 +1,8 @@
 # Balance of Power 2026
 
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20370930-blue)](https://doi.org/10.5281/zenodo.20370930)  
+**Roadmap:** [v1.1 Development Plan](docs/ROADMAP.md)
+
 A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Runs in the browser as a playable game and headless via Node.js for batch simulation and parameter sensitivity analysis.
 
 ---
