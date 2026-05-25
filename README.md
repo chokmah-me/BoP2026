@@ -194,7 +194,8 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> *Balance of Power 2026* (2026). Open-source multipolar crisis simulation. [GitHub repository URL].
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v1.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/[INSERT DOI]
+> GitHub: https://github.com/chokmah-me/BoP2026
 
 ---
 
