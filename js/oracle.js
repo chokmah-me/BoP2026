@@ -88,6 +88,43 @@ const BoP = (() => {
 
   // ── Headless turn executor ───────────────────────────────────────────────
   // No UI calls, no sleeps. Returns raw turn data.
+
+  // Async variant — awaits NPC overrides so LLM backends can be injected.
+  async function _executeTurnAsync(playerActionsOverride) {
+    const world = State.get();
+    const beforeSnap = _snapshotForDelta(world);
+
+    State.clearPendingActions();
+    for (const p of Object.values(world.powers)) p.actionPointsRemaining = p.actionPoints;
+
+    const playerActions = playerActionsOverride != null
+      ? playerActionsOverride
+      : AI.decideTurn(world.player, world);
+    for (const a of playerActions) State.queueAction(a);
+
+    const allActions = [...world.pendingActions];
+    const npcActions = [];
+    for (const npcId of Object.keys(world.powers).filter(id => id !== world.player)) {
+      const acts = _overrides[npcId]
+        ? await _overrides[npcId](npcId, world)
+        : AI.decideTurn(npcId, world);
+      for (const a of acts) { allActions.push(a); npcActions.push(a); }
+    }
+
+    const cascadeLog = Cascades.resolve(allActions, world);
+    Epistemic.update(world);
+    const events = Events.drawEvents(world);
+
+    const turnNum = world.turn;
+    const yearNum = world.year;
+    State.advanceTurn();
+    const over = State.checkGameOver();
+
+    const stateDeltas = _computeDeltas(beforeSnap, State.get());
+
+    return { turnNum, yearNum, playerActions, npcActions, cascadeLog, events, over, stateDeltas };
+  }
+
   function _executeTurn(playerActionsOverride) {
     const world = State.get();
     const beforeSnap = _snapshotForDelta(world);
@@ -213,6 +250,59 @@ const BoP = (() => {
 
     while (!State.get().gameOver && State.get().turn <= maxTurns) {
       const t = step();
+      turns.push(t);
+      if (t.gameOver) break;
+    }
+
+    const fw = State.get();
+    return {
+      scenarioId,
+      initialState,
+      outcome: {
+        result: fw.gameOver?.result || 'incomplete',
+        reason: fw.gameOver?.reason || '',
+        stabilityIndex: State.getGlobalStabilityIndex(),
+        turnsPlayed: turns.length
+      },
+      turns,
+      finalState: getState()
+    };
+  }
+
+  /**
+   * Async variant of step() — awaits NPC overrides (needed for LLM backends).
+   * @param {Array?} playerActions
+   * @returns {Promise<TurnResult>}
+   */
+  async function stepAsync(playerActions) {
+    const r = await _executeTurnAsync(playerActions != null ? playerActions : null);
+    return {
+      turn: r.turnNum,
+      year: r.yearNum,
+      playerActions: r.playerActions,
+      npcActions: r.npcActions,
+      cascadeLog: r.cascadeLog,
+      events: r.events,
+      stateDeltas: r.stateDeltas,
+      stateSnapshot: getState(),
+      gameOver: r.over ? State.get().gameOver : null
+    };
+  }
+
+  /**
+   * Async variant of run() — awaits NPC overrides each turn.
+   * @param {object} options  { maxTurns?: number }
+   * @returns {Promise<SimResult>}
+   */
+  async function runAsync(options = {}) {
+    const world = State.get();
+    const scenarioId = world.scenarioId;
+    const maxTurns = options.maxTurns || 20;
+    const initialState = getState();
+    const turns = [];
+
+    while (!State.get().gameOver && State.get().turn <= maxTurns) {
+      const t = await stepAsync();
       turns.push(t);
       if (t.gameOver) break;
     }
@@ -387,7 +477,7 @@ const BoP = (() => {
     }));
   }
 
-  const api = { init, step, run, runBatch, getState, setState, setNPCOverride, clearOverrides, exportAnalytics, exportBatchAnalytics };
+  const api = { init, step, stepAsync, run, runAsync, runBatch, getState, setState, setNPCOverride, clearOverrides, exportAnalytics, exportBatchAnalytics };
 
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = api;
