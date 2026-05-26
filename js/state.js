@@ -68,6 +68,7 @@ const State = (() => {
       log: [],
       phase: 'player_action',
       pendingActions: [],
+      pendingDelayedEffects: [],
       activeSystemicEvents: [],
       intelQuality: intel,
       scenarioId: scenario.id,

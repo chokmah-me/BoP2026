@@ -347,7 +347,7 @@ const Domains = (() => {
         { prob: 0.25, effect: { self: { economic: -5 } }, label: 'Concessions to coalition partners cost resources' }
       ],
       effects3rd: [],
-      tooltip: 'Restores action points next turn if domestic < 50.'
+      tooltip: 'Unifies domestic factions. NPC powers favor this when domestic support is below 50.'
     },
     {
       id: 'emergency_powers',
@@ -451,7 +451,7 @@ const Domains = (() => {
       ],
       effects3rd: [],
       domains: ['supply_chain'],
-      tooltip: 'Slow burn. Pays off after turn 5.'
+      tooltip: 'Short-term economic cost. Some early gains possible; allies may warm to a stable supply partner.'
     },
 
     // ── AUTONOMOUS ────────────────────────────────────────────────────────────

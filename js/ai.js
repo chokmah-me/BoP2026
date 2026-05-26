@@ -130,6 +130,12 @@ const AI = (() => {
     const involvedCrises = world.crises.filter(c => c.involved.includes(powerId));
     const crisisLevel = involvedCrises.reduce((m, c) => Math.max(m, c.escalationLevel), 0);
 
+    // patience-based AP hoarding: patient powers conserve AP in low-stakes turns
+    if (persona.patience > 0.65 && crisisLevel < 3) {
+      apRemaining = Math.floor(apRemaining * (1 - persona.patience * 0.3));
+      if (apRemaining < 1) apRemaining = 1;
+    }
+
     let actionPool = selectActionPool(powerId, persona, activeCrisis, threatSource, domesticConstrained, world);
 
     while (apRemaining > 0 && actionPool.length > 0) {
@@ -248,10 +254,14 @@ const AI = (() => {
     // mild repeat-avoidance for non-posture actions
     if (lastActions.includes(action.id) && prevActions.includes(action.id)) score -= 8;
 
-    // prefer defensive actions if stat is low
-    if (action.id === 'cyber_defense_hardening' && power.trueState.cyber < 50) score += 20;
-    if (action.id === 'grid_stabilization' && power.trueState.domestic < 45) score += 25;
-    if (action.id === 'coalition_shoring' && power.trueState.domestic < 50) score += 15;
+    // prefer actions that heal critically low stats
+    if (action.effects1st?.self) {
+      for (const [stat, delta] of Object.entries(action.effects1st.self)) {
+        if (delta > 0 && power.trueState[stat] !== undefined && power.trueState[stat] < 45) {
+          score += 15;
+        }
+      }
+    }
 
     // noise inversely proportional to crisis severity
     const maxNoise = Math.max(2, 10 - crisisLevel * 2);

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-05-26 (v2.0.5)
+
+### Fixed
+- **Misleading tooltips** (`js/domains.js`): `coalition_shoring` no longer claims AP restoration (it never existed). `reshoring_investment` no longer promises a turn-5 payoff (delayed effect was unimplemented).
+
+### Improved
+- **Patience governs AP spending** (`js/ai.js`): NPCs with patience > 0.65 now cap AP expenditure to ~73% in low-crisis turns (crisisLevel < 3). China (patience 0.9) conserves ~1 AP per turn during peacetime; EU and US (patience ≤ 0.5) unchanged.
+- **Generalized stat-health scoring** (`js/ai.js`): replaced three hardcoded action-ID checks with a general rule — any action that boosts a stat currently below 45 gets +15 score. NPCs now prefer healing all critical stats, not just cyber and domestic.
+- **Delayed effects queue** (`js/cascades.js`, `js/state.js`): `effects2nd` entries with a `delay` field now queue to `world.pendingDelayedEffects` and fire in the correct future turn. `reshoring_supply_chain`'s delayed +8 economic payoff now works. New field initialized in `State.init()`.
+- **Pressure marker expiry** (`js/cascades.js`): `*_pressure` markers in `activeSystemicEvents` are cleared at the start of each `Cascades.resolve()` and re-added only if conditions still hold that turn. Markers no longer accumulate for the entire game.
+
+### Calibration note
+- Patience AP hoarding and pressure marker expiry may shift baseline numbers slightly. Prior baseline (v2.0.2, 100-run seed 0–99) remains directionally valid; re-calibration recommended before next formal release.
+
 ## 2026-05-26 (v2.0.3)
 
 ### Fixed

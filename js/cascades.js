@@ -1,7 +1,33 @@
 const Cascades = (() => {
 
+  function drainDelayedEffects(world, log) {
+    if (!world.pendingDelayedEffects || world.pendingDelayedEffects.length === 0) return;
+    const ready = world.pendingDelayedEffects.filter(e => e.fireOnTurn <= world.turn);
+    world.pendingDelayedEffects = world.pendingDelayedEffects.filter(e => e.fireOnTurn > world.turn);
+    for (const e of ready) {
+      if (e.effect.self) {
+        for (const [stat, delta] of Object.entries(e.effect.self)) {
+          State.applyStatDelta(e.actor, stat, delta);
+        }
+      }
+      if (e.effect.target && e.target) {
+        for (const [stat, delta] of Object.entries(e.effect.target)) {
+          State.applyStatDelta(e.target, stat, delta);
+        }
+      }
+      log.push({ order: 2, confidence: 'CONFIRMED', actor: e.actor,
+        text: `[delayed] ${e.label}`, type: 'cascade' });
+    }
+  }
+
   function resolve(pendingActions, world) {
     const log = [];
+
+    // drain queued delayed effects from prior turns
+    drainDelayedEffects(world, log);
+
+    // expire pressure markers so they re-evaluate each turn
+    world.activeSystemicEvents = world.activeSystemicEvents.filter(e => !e.endsWith('_pressure'));
 
     // 1st order: apply all direct effects simultaneously
     for (const action of pendingActions) {
@@ -100,6 +126,20 @@ const Cascades = (() => {
       if (Math.random() > effect.prob) continue;
 
       const confidence = probToConfidence(effect.prob);
+
+      if (effect.delay) {
+        if (!world.pendingDelayedEffects) world.pendingDelayedEffects = [];
+        world.pendingDelayedEffects.push({
+          actor: action.actor,
+          target: action.target,
+          effect: effect.effect,
+          label: effect.label,
+          fireOnTurn: world.turn + effect.delay
+        });
+        log.push({ order: 2, confidence, actor: action.actor,
+          text: `[2nd order +${effect.delay}t] ${effect.label}`, type: 'cascade' });
+        continue;
+      }
 
       if (effect.effect.self) {
         for (const [stat, delta] of Object.entries(effect.effect.self)) {

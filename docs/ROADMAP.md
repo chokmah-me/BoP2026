@@ -2,7 +2,7 @@
 
 **Target Release Window:** Q3–Q4 2026  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
-**Status:** In progress (v2.0.2 delivered Iran proxy network events + headless event engine fix; v2.0.1 delivered supply_chain + autonomous domains + South China Sea scenario)
+**Status:** In progress (v2.0.5 AI audit — patience, stat-health scoring, delayed effects, pressure marker expiry; v2.0.4 posture system + stance persistence; v2.0.3 log save/auto-save; v2.0.2 Iran proxy events + headless fix; v2.0.1 supply_chain + autonomous + SCS)
 
 ---
 

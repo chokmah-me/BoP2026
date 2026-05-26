@@ -166,7 +166,7 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-100-run baseline (seed 0–99, default parameters, v2.0.2 — events now fire in headless runs):
+100-run baseline (seed 0–99, default parameters, v2.0.2 — see Calibration note in CHANGELOG for v2.0.5 AI changes):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
@@ -184,6 +184,8 @@ Key findings from the baseline:
 - **Iran** is the most volatile scenario (σ 1.6 turns, σ 13.4 stability). 79% of runs reach nuclear escalation, driven by Iran's high riskTolerance (0.70) and four interlocking crises. With proxy events now firing, Hezbollah and Houthi pressure accelerates the collapse — avg turns dropped from 4.0 (pre-v2.0.2) to 3.0. Stability is bimodal: runs either collapse quickly (~20s) or hold elevated (~50s) before nuclear termination.
 - **SCS** sits between them: 9% nuclear rate, wider stability spread (σ 9.7). The autonomous engagement and semiconductor chokepoint crises create divergent trajectories depending on whether early actions escalate or contain.
 - EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
+
+As of v2.0.5: patient powers (China, India) conserve AP in low-stakes turns and prioritize repairing critical stats. Pressure markers (financial fragmentation warning, etc.) now expire each turn and re-trigger only when conditions hold.
 
 Reproduce:
 
