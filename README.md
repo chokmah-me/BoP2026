@@ -166,21 +166,24 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-100-run baseline (seed 0–99, default parameters):
+100-run baseline (seed 0–99, default parameters, v2.0.2 — events now fire in headless runs):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
-| Taiwan Strait 2026 | 0% | 1% | 25.8 (σ 3.6) | 5.9 (σ 0.5) |
-| Iran Nuclear 2026 | 0% | 73% | 41.3 (σ 11.6) | 4.0 (σ 2.2) |
-| South China Sea 2026 | 0% | 9% | 25.2 (σ 8.8) | 5.2 (σ 1.4) |
+| Taiwan Strait 2026 | 0% | 1% | 20.4 (σ 4.5) | 4.9 (σ 0.9) |
+| Iran Nuclear 2026 | 0% | 79% | 36.2 (σ 13.4) | 3.0 (σ 1.6) |
+| South China Sea 2026 | 0% | 9% | 22.2 (σ 9.7) | 4.5 (σ 1.3) |
 
-Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all 200 runs ended in loss, reflecting how difficult crisis management is under default conditions. Both scenarios are designed to be hard.
+Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all 300 runs ended in loss, reflecting how difficult crisis management is under default conditions. All scenarios are designed to be hard.
+
+Note: prior to v2.0.2, `Events.init()` was not called in headless runs, so stochastic world events never fired during batch simulation. Numbers above reflect events firing correctly.
 
 Key findings from the baseline:
 
-- **Taiwan** ends fast (avg 6 turns) and converges tightly (σ 0.5). Nearly every run triggers the sanctions financial clearing systemic event and the domestic fragility cascade. Nuclear escalation is rare (1%); the Taiwan scenario ends in a managed-loss before reaching nuclear threshold.
-- **Iran** is much more volatile (σ 2.2 turns, σ 11.6 stability). 73% of runs reach nuclear escalation, reflecting Iran's high riskTolerance (0.70) and the scenario's four interlocking crises. 64% of runs see the compound "Gulf of Fire" crisis emerge from the Hormuz + nuclear crisis merge. Stability distribution is bimodal: runs either collapse quickly (~20s) or stay elevated (~50s) before nuclear termination.
-- In both scenarios, EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
+- **Taiwan** ends fast (avg 5 turns) and converges tightly (σ 0.9). Nearly every run triggers the sanctions financial clearing systemic event and the domestic fragility cascade. Nuclear escalation is rare (1%); the Taiwan scenario ends in a managed-loss before reaching nuclear threshold.
+- **Iran** is the most volatile scenario (σ 1.6 turns, σ 13.4 stability). 79% of runs reach nuclear escalation, driven by Iran's high riskTolerance (0.70) and four interlocking crises. With proxy events now firing, Hezbollah and Houthi pressure accelerates the collapse — avg turns dropped from 4.0 (pre-v2.0.2) to 3.0. Stability is bimodal: runs either collapse quickly (~20s) or hold elevated (~50s) before nuclear termination.
+- **SCS** sits between them: 9% nuclear rate, wider stability spread (σ 9.7). The autonomous engagement and semiconductor chokepoint crises create divergent trajectories depending on whether early actions escalate or contain.
+- EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
 
 Reproduce:
 
@@ -190,6 +193,9 @@ node scripts/analyze-results.js docs/taiwan-baseline.json
 
 node scripts/run-bop.js --scenario iran_nuclear_2026 --runs 100 --seed 0 --out docs/iran-baseline.json
 node scripts/analyze-results.js docs/iran-baseline.json
+
+node scripts/run-bop.js --scenario south_china_sea_2026 --runs 100 --seed 0 --out docs/scs-baseline.json
+node scripts/analyze-results.js docs/scs-baseline.json
 ```
 
 ---
@@ -200,7 +206,7 @@ node scripts/analyze-results.js docs/iran-baseline.json
 PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active crises at start: Taiwan military escalation (level 2), US-China trade war (level 3), Baltic cyber probe (level 1). Seven powers active.
 
 ### Iran Nuclear Threshold, 2026
-Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 2), Hormuz closure threat (level 1), Iran proxy network (level 2), Gulf Bloc fracture (level 1).
+Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 2), Hormuz closure threat (level 1), Iran proxy network (level 2), Gulf Bloc fracture (level 1). Six scenario-specific stochastic events model the proxy branches: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, and Gulf Bloc alignment choices (US alignment vs. China hedging).
 
 ### South China Sea, 2026
 China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the three scenarios — 9% baseline nuclear rate vs. 1% for Taiwan.
@@ -233,7 +239,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.1). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

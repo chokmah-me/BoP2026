@@ -205,6 +205,49 @@ test('8. same seed produces identical turn-1 stateDeltas', () => {
   assert(d1 === d2, 'stateDeltas differ between identical seeds');
 });
 
+// 7. minValue condition
+test('9. minValue condition blocks below threshold and passes above', () => {
+  BoP.init('iran_nuclear_2026', { seed: 1 });
+  const world = BoP.getState();
+  // hezbollah_degraded: minTurn 3, crisis iran_proxy_escalation minEsc 2, US.military minValue 55
+  world.turn = 5; // satisfy minTurn
+  world.powers['US'].trueState.military = 40; // below threshold
+  let firedBelow = false;
+  for (let i = 0; i < 100; i++) {
+    if (ctx.Events.drawEvents(world).some(e => e.id === 'hezbollah_degraded')) firedBelow = true;
+  }
+  assert(!firedBelow, 'hezbollah_degraded fired with US.military below minValue threshold');
+
+  world.powers['US'].trueState.military = 60; // above threshold
+  let firedAbove = false;
+  for (let i = 0; i < 300; i++) {
+    if (ctx.Events.drawEvents(world).some(e => e.id === 'hezbollah_degraded')) { firedAbove = true; break; }
+  }
+  assert(firedAbove, 'hezbollah_degraded never fired with US.military above minValue threshold');
+});
+
+// 8. Iran proxy events fire in headless batch
+test('10. Iran proxy events fire in headless batch (Events.init fix)', () => {
+  const results = BoP.runBatch({
+    scenarioId: 'iran_nuclear_2026',
+    runs: 5,
+    seeds: [10, 11, 12, 13, 14],
+    runOptions: { maxTurns: 20 }
+  });
+  const batch = BoP.exportBatchAnalytics(results);
+  const proxyIds = new Set(['hezbollah_surge', 'hezbollah_degraded',
+    'houthi_red_sea_escalation', 'houthi_degraded',
+    'gulf_bloc_aligns_us', 'gulf_bloc_hedges_china']);
+  let found = false;
+  for (const r of batch) {
+    for (const t of r.analytics.turns) {
+      if ((t.events || []).some(e => proxyIds.has(e.id))) { found = true; break; }
+    }
+    if (found) break;
+  }
+  assert(found, 'No Iran proxy events fired in 5-run batch — Events.init may be missing');
+});
+
 // ── Summary ──────────────────────────────────────────────────────────────────
 
 console.log('');

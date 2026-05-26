@@ -46,6 +46,12 @@ const Events = (() => {
           if (power.trueState[cond.stat] > cond.maxValue) return false;
         }
       }
+
+      if (cond.power && cond.stat && cond.minValue !== undefined) {
+        const power = world.powers[cond.power];
+        if (!power) return false;
+        if (power.trueState[cond.stat] < cond.minValue) return false;
+      }
     }
     return true;
   }

@@ -224,6 +224,77 @@ window.EVENT_TABLE = {
       "effects": { "targets": ["EU", "IN"], "statDeltas": { "info": -8, "economic": -5 } },
       "advisorText": "Epistemic fog is thickening. We are losing the information environment in real time.",
       "cascadeRisk": "epistemic_breakdown"
+    },
+    {
+      "id": "hezbollah_surge", "name": "Hezbollah Operational Surge",
+      "description": "Hezbollah maintains launch tempo through Iranian resupply corridors. Rocket barrages on northern Israel and US forward positions intensify.",
+      "probability": 0.30,
+      "conditions": [{ "crisis": "iran_proxy_escalation", "minEscalation": 2 }, { "minTurn": 2 }],
+      "effects": { "targets": ["US", "EU", "GB"], "statDeltas": { "military": -4, "economic": -3 } },
+      "advisorText": "Hezbollah maintaining operational tempo via Iranian resupply networks. Iron Dome intercept rates holding but stockpile draw is significant.",
+      "cascadeRisk": "regional_spillover"
+    },
+    {
+      "id": "hezbollah_degraded", "name": "Hezbollah Stockpile Depletion",
+      "description": "Sustained Israeli airstrikes and interdiction of IRGC supply lines cut Hezbollah's launch rate by half. Precision munitions running short.",
+      "probability": 0.14,
+      "conditions": [
+        { "crisis": "iran_proxy_escalation", "minEscalation": 2 },
+        { "minTurn": 3 },
+        { "power": "US", "stat": "military", "minValue": 55 }
+      ],
+      "effects": { "targets": ["IR"], "statDeltas": { "military": -8, "info": -5 } },
+      "advisorText": "Israeli strikes reducing Hezbollah launch rate. Stockpile depletion confirmed. Iranian reconstitution will take 6-12 months.",
+      "cascadeRisk": null
+    },
+    {
+      "id": "houthi_red_sea_escalation", "name": "Houthi Red Sea Blockade",
+      "description": "Houthi drone-ASBM attacks cut Suez throughput 15-30%. Container shipping reroutes around the Cape, adding 12-14 days and $1M per transit.",
+      "probability": 0.25,
+      "conditions": [{ "crisis": "hormuz_blockade_threat", "minEscalation": 1 }, { "minTurn": 1 }],
+      "effects": { "targets": ["EU", "IN", "GB"], "statDeltas": { "economic": -7 } },
+      "advisorText": "Houthi drone-ASBM attacks cutting Suez throughput 15-30%. Insurance rates spiking. Indian energy imports taking a direct hit.",
+      "cascadeRisk": "supply_chain_shock"
+    },
+    {
+      "id": "houthi_degraded", "name": "Houthi Launch Infrastructure Degraded",
+      "description": "US/UK-Saudi coalition strikes destroy Houthi radar sites and missile storage. Attack rate halved. Iranian technicians confirmed killed.",
+      "probability": 0.15,
+      "conditions": [
+        { "crisis": "hormuz_blockade_threat", "minEscalation": 1 },
+        { "minTurn": 2 },
+        { "power": "US", "stat": "military", "minValue": 55 }
+      ],
+      "effects": { "targets": ["IR", "GB"], "statDeltas": { "military": -6, "economic": 4 } },
+      "advisorText": "US/UK-Saudi coalition degraded Houthi launch infrastructure. Attack rate halved for now. Gulf Bloc shipping relief temporary.",
+      "cascadeRisk": null
+    },
+    {
+      "id": "gulf_bloc_aligns_us", "name": "Gulf Bloc Accelerates US Alignment",
+      "description": "Saudi Arabia and UAE accelerate integrated air and missile defense cooperation with Washington. F-35 transfer talks resume. Iran reads this as escalatory.",
+      "probability": 0.20,
+      "conditions": [
+        { "crisis": "gulf_bloc_fracture" },
+        { "power": "GB", "stat": "military", "maxValue": 55 }
+      ],
+      "effects": {
+        "targets": ["GB"],
+        "statDeltas": { "military": 8 },
+        "perceptionDelta": { "source": "GB", "stat": "military", "delta": 8 }
+      },
+      "advisorText": "Gulf Bloc accelerating joint missile defense. Iranian cyber retaliation on Gulf energy infrastructure expected within 2 turns.",
+      "cascadeRisk": "iranian_retaliation"
+    },
+    {
+      "id": "gulf_bloc_hedges_china", "name": "Gulf Bloc Deepens China Hedging",
+      "description": "Gulf sovereign wealth funds expand BRI capital flows. Saudi Aramco signs yuan-denominated contracts. Washington credibility cost rising.",
+      "probability": 0.18,
+      "conditions": [
+        { "crisis": "gulf_bloc_fracture" }
+      ],
+      "effects": { "targets": ["GB"], "statDeltas": { "economic": 6 } },
+      "advisorText": "Gulf sovereign wealth funds deepening BRI capital flows. Washington's credibility window in the Gulf is narrowing.",
+      "cascadeRisk": "financial_fragmentation"
     }
   ]
 };

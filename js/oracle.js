@@ -146,6 +146,7 @@ const BoP = (() => {
     if (!scenario) throw new Error(`Unknown scenario: "${scenarioId}". Available: ${Object.keys(scenarios).join(', ')}`);
 
     State.init(_data('POWERS_DATA'), scenario, options.doctrine || null);
+    Events.init(_data('EVENT_TABLE'));
 
     const world = State.get();
 

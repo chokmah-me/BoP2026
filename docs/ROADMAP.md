@@ -2,7 +2,7 @@
 
 **Target Release Window:** Q3–Q4 2026  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
-**Status:** In progress (v2.0.1 delivered supply_chain + autonomous domains + South China Sea scenario)
+**Status:** In progress (v2.0.2 delivered Iran proxy network events + headless event engine fix; v2.0.1 delivered supply_chain + autonomous domains + South China Sea scenario)
 
 ---
 
@@ -45,6 +45,8 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 - **Domestic Faction System** — Replace unitary actor model with hardliner vs. moderate factions
 - **Enhanced Epistemic Model** — Perception drift + intelligence quality decay
 - **New Scenario: South China Sea 2026** — Contested sea lanes, island seizure, force projection costs **(v2.0.1 ✓)**
+- **Iran proxy network events** — Hezbollah/Houthi probabilistic branches, Gulf Bloc alignment choices, `minValue` condition support **(v2.0.2 ✓)**
+- **Headless event engine** — `Events.init()` wired into `BoP.init()`; stochastic events now fire in all batch/Oracle runs **(v2.0.2 ✓)**
 - **Technology Development Track** — R&D investment with delayed capability gains
 - **Arms Race Dynamics** — Military stat growth curves based on sustained spending
 
