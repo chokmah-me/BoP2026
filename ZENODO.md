@@ -1,43 +1,78 @@
-# Zenodo Deposit — Balance of Power 2026 v1.0
+# Zenodo Deposit — Balance of Power 2026 v2.0.6
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
-**Deposit Date:** 24 May 2026  
+**Deposit Date:** 24 May 2026 (updated 26 May 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914
 
-## Intended Use
+## Description
 
-BoP2026 is a **stylized, rule-based multipolar crisis simulation** designed for:
+Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Seven great powers (US, China, EU, Russia, India, Gulf Bloc, Iran) compete across eight domains: military, economic, cyber, information, diplomatic, domestic, supply chain, and autonomous systems. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
+
+Three playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, and South China Sea 2026. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema: per-turn state deltas, relationship shifts, and crisis escalation levels, ready for analysis in Python or R.
+
+Calibrated for face validity against open-source IR literature. Not intended for forecasting or policy prescription.
+
+## Intended Use
 
 - IR and war-studies pedagogy (classroom wargaming)
 - Parameter sensitivity analysis and counterfactual exploration
 - Generation of synthetic cascade data for method development
 
-**It is explicitly NOT intended for:**
+**Not intended for:**
 - Forecasting real-world crises
 - Policy prescription or validation
 - Empirical testing of historical cases
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v1.0)
+## Files Included in This Deposit (v2.0.6)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
-- Complete documentation (`README.md`, `docs/model-notes.md`)
-- 100-run baseline results for both scenarios (Taiwan Strait 2026 & Iran Nuclear 2026)
+- Complete documentation (`README.md`, `docs/`)
+- 100-run baseline results for all three scenarios
 - Model assumptions and known limitations
+
+## Release Notes — v2.0.6
+
+**What is this?**
+
+BoP2026 is a crisis simulation you can play in a browser or run headless from the command line to generate synthetic geopolitical data. This release (v2.0.6) is the first stable version after a significant AI overhaul.
+
+**The big change: the AI stopped being reckless**
+
+In earlier versions the AI opponents made decisions with a lot of random noise and no memory of what they'd just done. A power could decide to deploy forces one turn and withdraw them the next, creating flip-flop cycles that drove crises to nuclear threshold almost by accident. Iran ran to nuclear exchange 79% of the time — not because the scenario is designed that way, but because the AI was thrashing.
+
+v2.0.4 replaced that with a posture system. At the start of each turn, a power reads its situation and picks an intent: escalate, hold, de-escalate, or consolidate. If two crises in the same region are both heating up (a precursor to a compound crisis merge), it automatically shifts to de-escalate. If any crisis hits level 4, escalating actions are locked out entirely. Flip-flopping is penalized directly in the action-scoring. Random noise shrinks as crises get worse, so the AI gets more decisive under pressure, not more erratic.
+
+Result: Iran nuclear rate dropped from 79% to 0%. SCS dropped from 9% to 4%. Taiwan was already low and stayed there. Average run length extended from 3 turns to 4.7 across all scenarios — games now play out rather than collapsing in the first few turns.
+
+**Other improvements (v2.0.2–v2.0.5)**
+
+- *Patient powers save resources.* China and India (high patience) now hold back action points in quiet turns instead of spending everything every turn. They prioritize repairing weak stats rather than always pushing offense.
+- *Delayed effects actually work.* The reshoring investment action always promised an economic payoff a few turns later. That queue was never implemented — it silently discarded the delayed effect. Fixed.
+- *Pressure warnings don't stack forever.* Systemic warnings (financial fragmentation, domestic fragility) used to accumulate turn after turn even if conditions had improved. They now clear each turn and only re-fire if the conditions still hold.
+- *Headless runs now include random events.* A bug meant stochastic world events (Hezbollah pressure, Gulf Bloc alignment shifts, SCS drone incidents) never fired during batch simulations. They were browser-only. Fixed — headless runs now see the same event draws as interactive play.
+- *Save and auto-save.* The game now downloads a timestamped JSON log automatically when it ends. You can also click Save Log at any point. The CLI defaults output to a `logs/` folder with a date-stamped filename.
+- *South China Sea scenario.* Third playable scenario added: contested reef seizure, drone swarm engagement, semiconductor chokepoint. Two new action domains — supply chain and autonomous systems — ship with it.
+
+**Baseline (100 runs, seed 0–99, v2.0.6)**
+
+| Scenario | Nuclear % | Avg stability | Avg turns |
+|---|---|---|---|
+| Taiwan Strait 2026 | 0% | 22.5 (σ 2.8) | 4.7 (σ 0.8) |
+| Iran Nuclear 2026 | 0% | 21.2 (σ 3.2) | 4.7 (σ 0.9) |
+| South China Sea 2026 | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
+
+All scenarios end in loss under default conditions — they are designed to be hard. Win conditions require active crisis management the AI-controlled player does not attempt.
 
 ## Recommended Citation
 
-Please cite as:
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.6). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Zenodo. https://doi.org/10.5281/zenodo.20370930
-
-## Versioning Note
-
-This v1.0 deposit represents the baseline personality vectors, cascade weights, and scenario content as of May 2026.
+## Version History
 
 **v2.0.0 (2026-05-25):** Breaking change to output format. `run-bop.js --out` now writes `bop2026-analytics-v1` JSON with per-turn `stateDeltas`, `initialState`, and compact power/crisis summaries. New Oracle API methods `exportAnalytics()` / `exportBatchAnalytics()`. Browser Save Log button. New docs: `docs/ORACLE.md`, `docs/QUICKSTART.md`. New test suite: `scripts/test-analytics.js` (8 tests).
 
@@ -51,7 +86,7 @@ This v1.0 deposit represents the baseline personality vectors, cascade weights, 
 
 **v2.0.5 (2026-05-26):** AI audit — patience governs AP spending (patient powers conserve AP in low-crisis turns), generalized stat-health scoring (any stat below 45 prioritized, not just cyber/domestic), delayed effects queue now works (`reshoring_investment` +8 payoff fires in the correct future turn), pressure marker expiry (markers clear each turn and re-trigger only if conditions still hold).
 
-**v2.0.6 (2026-05-26):** Docs only. `ORACLE.md` schema corrected — `TurnResult` split into raw vs. analytics-export shapes, stale field references removed. `GROK_PROJECT.md` updated to reflect accurate doc state.
+**v2.0.6 (2026-05-26):** Docs only. `ORACLE.md` schema corrected — `TurnResult` split into raw vs. analytics-export shapes, stale field references removed. `GROK_PROJECT.md` updated to reflect accurate doc state. Baseline re-run; all version refs updated to v2.0.6.
 
 ## Contact & Repository
 
