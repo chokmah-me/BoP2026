@@ -36,7 +36,7 @@ scripts/
   test-cascades.js      Cascade logic unit tests
 
 docs/
-  ORACLE.md             API reference (partially outdated — see corrections below)
+  ORACLE.md             API reference
   model-notes.md        Theoretical grounding and limitations
   QUICKSTART.md         Browser setup
   findings.md           Research findings log
@@ -540,4 +540,4 @@ data/powers-data.js → data/scenarios-data.js → data/doctrines-data.js → da
 - Powers are unitary actors — no leader-level or domestic-coalition modeling.
 - `stabilityIndex` is the mean domestic stat across all powers — a rough aggregate, not a validated metric.
 - Epistemic noise is stochastic per run; two runs with the same seed but different turn counts will diverge as perception drift accumulates differently.
-- `ORACLE.md` has a stale `TurnResult` schema (shows `t.actions.player/npc` — actual fields are `t.playerActions` / `t.npcActions`). The analytics export format does use `actions.player/npc`.
+
