@@ -166,26 +166,22 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-100-run baseline (seed 0–99, default parameters, v2.0.2 — see v2.0.4 and v2.0.5 calibration notes in CHANGELOG for AI behavior changes):
+100-run baseline (seed 0–99, default parameters, v2.0.6):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
-| Taiwan Strait 2026 | 0% | 1% | 20.4 (σ 4.5) | 4.9 (σ 0.9) |
-| Iran Nuclear 2026 | 0% | 79% | 36.2 (σ 13.4) | 3.0 (σ 1.6) |
-| South China Sea 2026 | 0% | 9% | 22.2 (σ 9.7) | 4.5 (σ 1.3) |
+| Taiwan Strait 2026 | 0% | 0% | 22.5 (σ 2.8) | 4.7 (σ 0.8) |
+| Iran Nuclear 2026 | 0% | 0% | 21.2 (σ 3.2) | 4.7 (σ 0.9) |
+| South China Sea 2026 | 0% | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
 
 Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all 300 runs ended in loss, reflecting how difficult crisis management is under default conditions. All scenarios are designed to be hard.
 
-Note: prior to v2.0.2, `Events.init()` was not called in headless runs, so stochastic world events never fired during batch simulation. Numbers above reflect events firing correctly.
-
 Key findings from the baseline:
 
-- **Taiwan** ends fast (avg 5 turns) and converges tightly (σ 0.9). Nearly every run triggers the sanctions financial clearing systemic event and the domestic fragility cascade. Nuclear escalation is rare (1%); the Taiwan scenario ends in a managed-loss before reaching nuclear threshold.
-- **Iran** is the most volatile scenario (σ 1.6 turns, σ 13.4 stability). 79% of runs reach nuclear escalation, driven by Iran's high riskTolerance (0.70) and four interlocking crises. With proxy events now firing, Hezbollah and Houthi pressure accelerates the collapse — avg turns dropped from 4.0 (pre-v2.0.2) to 3.0. Stability is bimodal: runs either collapse quickly (~20s) or hold elevated (~50s) before nuclear termination.
-- **SCS** sits between them: 9% nuclear rate, wider stability spread (σ 9.7). The autonomous engagement and semiconductor chokepoint crises create divergent trajectories depending on whether early actions escalate or contain.
+- **Taiwan** is now the tightest scenario (σ 2.8 stability, σ 0.8 turns). Nuclear escalation dropped to 0% — the v2.0.4 posture system de-escalates at crisis level 4+, which consistently prevents Taiwan from reaching nuclear threshold.
+- **Iran** nuclear rate dropped from 79% (v2.0.2) to 0%. The strategic posture system (v2.0.4) triggers de-escalation before the four interlocking crises reach nuclear threshold. Average run length extended from 3.0 to 4.7 turns as a result. Stability distribution tightened considerably (σ 3.2 vs. σ 13.4 prior).
+- **SCS** retains the highest nuclear rate at 4%, reflecting the direct US-China military confrontation dynamic. Stability spread (σ 6.4) is still the widest of the three, driven by the autonomous engagement and semiconductor chokepoint crises creating divergent trajectories.
 - EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
-
-As of v2.0.5: patient powers (China, India) conserve AP in low-stakes turns and prioritize repairing critical stats. Pressure markers (financial fragmentation warning, etc.) now expire each turn and re-trigger only when conditions hold.
 
 Reproduce:
 
