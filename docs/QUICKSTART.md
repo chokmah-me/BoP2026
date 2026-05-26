@@ -149,7 +149,7 @@ The **Research** button (top-right) runs batch simulations in the browser with a
 node scripts/test-analytics.js
 ```
 
-8 assertions, covering schema, delta reconstruction, determinism. Exit 0 = pass.
+10 assertions, covering schema, delta reconstruction, determinism, post-mortem filename, and saveLog payload. Exit 0 = pass.
 
 ---
 

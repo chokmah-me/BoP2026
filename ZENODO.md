@@ -43,6 +43,16 @@ This v1.0 deposit represents the baseline personality vectors, cascade weights, 
 
 **v2.0.1 (2026-05-25):** Two new domains — `supply_chain` (4 actions: critical minerals deal, chokepoint seizure, tech export ban, industrial reshoring) and `autonomous` (4 actions: drone swarm deployment, autonomous defense net, counter-swarm ops, AI surveillance grid). New playable scenario: South China Sea 2026 with 4 crises across both new domains, a compound crisis (`south_seas_blockade`), and 4 SCS-specific events. No engine changes. Baseline nuclear rate: 9% (vs. 1% Taiwan, 73% Iran).
 
+**v2.0.2 (2026-05-25):** Iran proxy event branches (6 events: Hezbollah surge/degraded, Houthi Red Sea escalation/degraded, Gulf Bloc US-alignment/China-hedging). `Events.init()` wired into `BoP.init()` — stochastic events now fire in all headless/Oracle runs (were silently skipped before). Iran nuclear rate rises to 79%, avg turns drops to 3.0.
+
+**v2.0.3 (2026-05-26):** Save Log button unblocked (CSS `pointer-events` fix). Auto-save on game over — log downloads before game-over modal. Date-stamped filenames (`bop-{scenario}-{date}-t{turn}-{result}.json`). CLI defaults output to `logs/`. Tests 9–10 added (post-mortem filename shape, saveLog payload).
+
+**v2.0.4 (2026-05-25):** Strategic posture system and merge-risk detection in `js/ai.js`. Stance persistence and flip-flop penalties. Noise scaling with crisis level. Iran nuclear rate drops to ~0%; avg run length 2 → 4.6 turns.
+
+**v2.0.5 (2026-05-26):** AI audit — patience governs AP spending (patient powers conserve AP in low-crisis turns), generalized stat-health scoring (any stat below 45 prioritized, not just cyber/domestic), delayed effects queue now works (`reshoring_investment` +8 payoff fires in the correct future turn), pressure marker expiry (markers clear each turn and re-trigger only if conditions still hold).
+
+**v2.0.6 (2026-05-26):** Docs only. `ORACLE.md` schema corrected — `TurnResult` split into raw vs. analytics-export shapes, stale field references removed. `GROK_PROJECT.md` updated to reflect accurate doc state.
+
 ## Contact & Repository
 
 **Principal:** Daniyel Yaacov Bilar, Chokmah LLC  

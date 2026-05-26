@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-05-26 (v2.0.6)
+
+### Fixed
+- **ORACLE.md schema** (`docs/ORACLE.md`): split `TurnResult` into raw vs. analytics-export schemas; removed stale field references that no longer matched the actual output.
+- **GROK_PROJECT.md** (`docs/GROK_PROJECT.md`): removed "partially outdated" label and Known Limitations bullet that flagged the now-resolved ORACLE.md doc gap.
+
 ## 2026-05-26 (v2.0.5)
 
 ### Fixed
@@ -13,6 +19,17 @@
 
 ### Calibration note
 - Patience AP hoarding and pressure marker expiry may shift baseline numbers slightly. Prior baseline (v2.0.2, 100-run seed 0–99) remains directionally valid; re-calibration recommended before next formal release.
+
+## 2026-05-25 (v2.0.4)
+
+### Improved
+- **Strategic posture system** (`js/ai.js`): `getStrategicPosture()` derives a turn-level intent (escalate / hold / de-escalate / consolidate) from active crisis levels, merge risk, persona `riskTolerance`, and domestic stats. De-escalate posture hard-excludes actions that raise crisis level to 4+.
+- **Merge-risk detection** (`js/ai.js`): `getMergeRisk()` detects when a power faces two crises in the same region at level 2+ — a precursor to compound-crisis merges — and triggers de-escalate posture.
+- **Stance persistence / flip-flop penalty** (`js/ai.js`): `power.memory` is now read, not just written. Deploy/withdraw flip-flops within two turns penalized -35/-40; repeating the same action in consecutive turns gets -8.
+- **Noise scaling** (`js/ai.js`): random score noise shrinks with crisis level (±5 at level 0, ±1 at level 4), making AI choices more deterministic under pressure.
+
+### Calibration note
+- Iran Nuclear nuclear rate drops from ~73% (v2.0.2 baseline) to ~0%; avg run length increases from ~2 to ~4.6 turns. Taiwan Strait shows similar stabilization.
 
 ## 2026-05-26 (v2.0.3)
 
