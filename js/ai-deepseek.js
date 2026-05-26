@@ -12,6 +12,9 @@
 
 const fs = require('fs');
 
+// Bump when prompt structure changes so logged runs stay comparable across experiments.
+const PROMPT_VERSION = 'v1.0';
+
 // Pricing per 1M tokens (deepseek-chat / deepseek-v4-flash, non-thinking)
 const PRICE_INPUT = 0.14;
 const PRICE_OUTPUT = 0.28;
@@ -77,6 +80,7 @@ class DeepSeekBackend {
 
       if (this.logPrompts && this.logFile) {
         const entry = JSON.stringify({
+          promptVersion: PROMPT_VERSION,
           powerId, turn: world.turn, model: this.model,
           systemMsg, userMsg, response: responseText, usage
         }) + '\n';
@@ -159,6 +163,7 @@ ${actionLines}`;
     const priceOut = isThinking ? PRICE_OUTPUT_THINK : PRICE_OUTPUT;
     const cost = (this._inputTokens / 1e6) * priceIn + (this._outputTokens / 1e6) * priceOut;
     return {
+      promptVersion: PROMPT_VERSION,
       model: this.model,
       inputTokens: this._inputTokens,
       outputTokens: this._outputTokens,

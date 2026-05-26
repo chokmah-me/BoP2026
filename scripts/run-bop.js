@@ -76,7 +76,8 @@ const opts = {
   aiBackend: 'heuristic',
   aiPowers: 'all',
   logPrompts: false,
-  thinking: false
+  thinking: false,
+  dryRun: false
 };
 
 for (let i = 0; i < args.length; i++) {
@@ -94,6 +95,7 @@ for (let i = 0; i < args.length; i++) {
   else if (arg === '--ai-powers') opts.aiPowers = val();
   else if (arg === '--log-prompts') opts.logPrompts = true;
   else if (arg === '--thinking') opts.thinking = true;
+  else if (arg === '--dry-run') opts.dryRun = true;
   else {
     // --<powerId>-risk or --<powerId>-patience  e.g. --cn-risk 0.9
     const m = arg.match(/^--([a-z]+)-(risk|patience)$/);
@@ -124,9 +126,50 @@ if (Object.keys(opts.paramOverrides).length) {
 console.log('');
 
 // ── Validate DeepSeek config ──────────────────────────────────────────────────
-if (opts.aiBackend === 'deepseek' && !process.env.DEEPSEEK_API_KEY) {
+if (opts.aiBackend === 'deepseek' && !process.env.DEEPSEEK_API_KEY && !opts.dryRun) {
   console.error('ERROR: --ai-backend deepseek requires DEEPSEEK_API_KEY env var.');
   process.exit(1);
+}
+
+// ── Dry-run cost estimate (no API calls) ──────────────────────────────────────
+if (opts.dryRun) {
+  if (opts.aiBackend !== 'deepseek') {
+    console.log('--dry-run only applies to --ai-backend deepseek. Nothing to estimate.\n');
+    process.exit(0);
+  }
+  const isThinking = opts.thinking;
+  const model = isThinking ? 'deepseek-reasoner' : 'deepseek-chat';
+  // Conservative estimates per NPC per turn (system ~200t, user ~600t, output ~150t)
+  const AVG_INPUT = 800;
+  const AVG_OUTPUT = isThinking ? 2000 : 150;
+  const PRICE_IN = isThinking ? 0.55 : 0.14;
+  const PRICE_OUT = isThinking ? 2.19 : 0.28;
+
+  const world0 = (() => {
+    BoP.init(opts.scenario, {});
+    return BoP.getState();
+  })();
+  const npcCount = opts.aiPowers === 'all'
+    ? Object.keys(world0.powers).length - 1
+    : opts.aiPowers.split(',').length;
+
+  const totalCalls = npcCount * opts.runs * opts.maxTurns;
+  const totalIn = totalCalls * AVG_INPUT;
+  const totalOut = totalCalls * AVG_OUTPUT;
+  const cost = (totalIn / 1e6) * PRICE_IN + (totalOut / 1e6) * PRICE_OUT;
+
+  console.log(`\nDry-run estimate — no API calls made`);
+  console.log('─'.repeat(44));
+  console.log(`  Model          : ${model}`);
+  console.log(`  NPCs using LLM : ${npcCount}`);
+  console.log(`  Runs x turns   : ${opts.runs} x ${opts.maxTurns} = ${opts.runs * opts.maxTurns}`);
+  console.log(`  Total API calls: ${totalCalls.toLocaleString()}`);
+  console.log(`  Est. input tok : ${totalIn.toLocaleString()} (~${AVG_INPUT}/call)`);
+  console.log(`  Est. output tok: ${totalOut.toLocaleString()} (~${AVG_OUTPUT}/call)`);
+  console.log(`  Est. cost (USD): $${cost.toFixed(4)}`);
+  console.log('─'.repeat(44));
+  console.log('  Note: actual costs depend on crisis state and prompt caching.\n');
+  process.exit(0);
 }
 
 const seeds = [];
