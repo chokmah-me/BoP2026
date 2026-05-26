@@ -2,3 +2,4 @@
 node_modules/
 bop-results.json
 docs/*-baseline.json
+logs/

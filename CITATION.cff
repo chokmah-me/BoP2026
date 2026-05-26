@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this simulation in research or teaching, please cite it using the following metadata."
 title: "Balance of Power 2026"
 abstract: "A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Models great-power competition across eight domains with seven major actors using stylized, rule-based AI and cascade dynamics."
-version: "2.0.2"
-date-released: "2026-05-25"
+version: "2.0.3"
+date-released: "2026-05-26"
 license: "MIT"
 repository-code: "https://github.com/chokmah-me/BoP2026"
 keywords:

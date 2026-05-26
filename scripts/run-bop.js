@@ -63,7 +63,7 @@ const opts = {
   scenario: 'taiwan_strait_2026',
   runs: 10,
   seed: null,
-  out: 'bop-results.json',
+  out: null,
   maxTurns: 20,
   paramOverrides: {}
 };
@@ -90,6 +90,14 @@ for (let i = 0; i < args.length; i++) {
     }
   }
 }
+
+// ── Resolve output path ───────────────────────────────────────────────────────
+if (!opts.out) {
+  const date = new Date().toISOString().slice(0, 10);
+  const seedTag = opts.seed != null ? opts.seed : 'rnd';
+  opts.out = `logs/bop-${opts.scenario}-${date}-s${seedTag}-x${opts.runs}.json`;
+}
+fs.mkdirSync(path.join(process.cwd(), path.dirname(opts.out)), { recursive: true });
 
 // ── Run ─────────────────────────────────────────────────────────────────────
 console.log(`\nBoP2026 Oracle — ${opts.scenario}`);

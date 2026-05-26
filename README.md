@@ -37,7 +37,7 @@ start index.html
 open index.html
 ```
 
-Select a scenario and doctrine on the opening screen. Click **End Turn** to advance. The **Research** button in the top-right opens the in-browser batch runner. A **Save Log** button in the event log panel exports the current game state and event history as JSON.
+Select a scenario and doctrine on the opening screen. Click **End Turn** to advance. The **Research** button in the top-right opens the in-browser batch runner. A **Save Log** button in the event log panel exports the current game state and event history as JSON. The log also downloads automatically when the game ends (nuclear exchange, collapse, doctrine failure) as a post-mortem file named `bop-{scenario}-{date}-t{turn}-{result}.json`.
 
 ### Node.js (headless research runs)
 
@@ -67,7 +67,7 @@ node scripts/analyze-results.js results.json
 | `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
-| `--out <path>` | `bop-results.json` | Output JSON file (`bop2026-analytics-v1` format) |
+| `--out <path>` | `logs/bop-{scenario}-{date}-s{seed}-x{runs}.json` | Output file (`bop2026-analytics-v1`). `logs/` dir created automatically. |
 | `--max-turns <n>` | `20` | Turn limit per run |
 | `--player <id>` | `US` | Which power the AI controls as "player" |
 | `--cascade-scale <f>` | `1.0` | Multiplier on systemic event deltas (0 = off) |

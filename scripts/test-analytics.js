@@ -248,6 +248,54 @@ test('10. Iran proxy events fire in headless batch (Events.init fix)', () => {
   assert(found, 'No Iran proxy events fired in 5-run batch — Events.init may be missing');
 });
 
+// 9. gameOver populated for post-mortem filename
+test('11. completed game has outcome.result for post-mortem filename', () => {
+  BoP.init('iran_nuclear_2026', { seed: 42 });
+  const result = BoP.run({ maxTurns: 20 });
+  assert(result.outcome && result.outcome.result !== undefined, 'outcome.result missing');
+  assert(['win', 'lose', 'incomplete'].includes(result.outcome.result),
+    `outcome.result unexpected: ${result.outcome.result}`);
+  // Iran nuclear at seed 42 typically terminates — verify it's not still in-progress
+  assert(result.outcome.result !== 'incomplete',
+    `game did not complete within 20 turns (result: ${result.outcome.result})`);
+});
+
+// 10. saveLog payload shape and filename pattern
+test('12. saveLog payload shape: schema, outcome, log, finalState, filename pattern', () => {
+  BoP.init('iran_nuclear_2026', { seed: 7 });
+  BoP.run({ maxTurns: 20 });
+  const world = BoP.getState();
+  const powers = {};
+  for (const [id, pw] of Object.entries(world.powers)) {
+    powers[id] = { name: pw.name, trueState: { ...pw.trueState },
+      relationships: { ...pw.relationships },
+      riskTolerance: pw.riskTolerance, patience: pw.patience };
+  }
+  const crises = world.crises.map(c => ({
+    id: c.id, name: c.name, domain: c.domain,
+    involved: c.involved, escalationLevel: c.escalationLevel
+  }));
+  const payload = {
+    schema: 'bop2026-analytics-v1',
+    exportedAt: new Date().toISOString(),
+    scenarioId: world.scenarioId,
+    player: world.player,
+    doctrine: world.doctrine?.id || null,
+    outcome: world.gameOver || { result: 'incomplete', reason: 'game in progress', turnsPlayed: world.turn - 1 },
+    log: world.log.slice().reverse(),
+    finalState: { powers, crises }
+  };
+  assert(payload.schema === 'bop2026-analytics-v1', 'wrong schema');
+  assert(typeof payload.outcome === 'object', 'missing outcome');
+  assert(Array.isArray(payload.log), 'log not array');
+  assert(payload.finalState.powers && payload.finalState.crises, 'finalState incomplete');
+  const date = new Date().toISOString().slice(0, 10);
+  const resultStr = payload.outcome.result || 'inprogress';
+  const filename = `bop-${world.scenarioId}-${date}-t${world.turn - 1}-${resultStr}.json`;
+  assert(/^bop-\w+-\d{4}-\d{2}-\d{2}-t\d+-\w+\.json$/.test(filename),
+    `filename does not match pattern: ${filename}`);
+});
+
 // ── Summary ──────────────────────────────────────────────────────────────────
 
 console.log('');

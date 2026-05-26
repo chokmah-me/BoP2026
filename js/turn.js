@@ -103,6 +103,7 @@ const Turn = (() => {
 
     const over = State.checkGameOver();
     if (over) {
+      UI.saveLog();
       UI.showGameOver(world.gameOver);
       return;
     }

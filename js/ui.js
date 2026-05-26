@@ -554,7 +554,9 @@ const UI = (() => {
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `bop-log-turn${world.turn - 1}.json`;
+    const date = new Date().toISOString().slice(0, 10);
+    const result = world.gameOver?.result || 'inprogress';
+    a.download = `bop-${world.scenarioId}-${date}-t${world.turn - 1}-${result}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
