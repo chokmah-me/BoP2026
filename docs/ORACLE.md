@@ -140,7 +140,7 @@ const t = BoP.step([
 ]);
 ```
 
-Returns a `TurnResult` — see [Output Schema](#output-schema).
+Returns a **raw `TurnResult`** — see [Raw TurnResult](#raw-turnresult-from-bopstep) below. Note this differs from the per-turn format inside `exportAnalytics()` output.
 
 ---
 
@@ -179,7 +179,7 @@ const results = BoP.runBatch({
 });
 ```
 
-Returns `BatchResult[]`: `[{ runId, seed, params, result: SimResult }]`.
+Returns `BatchResult[]`: `[{ runId, seed, params, result: SimResult }]`. Note: `exportBatchAnalytics()` transforms this — it renames `result` to `analytics` and reshapes it to the analytics export format.
 
 ---
 
@@ -251,6 +251,8 @@ require('fs').writeFileSync('out.json', JSON.stringify(analytics, null, 2));
 
 ## Output Schema
 
+> **Two formats exist.** The raw API (`step()`, `run()`, `runBatch()`) returns one shape. `exportAnalytics()` / `exportBatchAnalytics()` reshapes it for storage. Field names differ — see below.
+
 ### Top-level (analytics object)
 
 ```js
@@ -308,17 +310,17 @@ require('fs').writeFileSync('out.json', JSON.stringify(analytics, null, 2));
 }
 ```
 
-### `TurnResult`
+### Raw `TurnResult` (from `BoP.step()`)
+
+What you get when calling `BoP.step()` directly. Field names differ from the analytics export.
 
 ```js
 {
-  turn: 1,
-  year: 2026,
-  actions: {
-    player: [{ actor: "US", actionId: "cyber_offense", target: "CN", flavor: "..." }],
-    npc:    [{ actor: "CN", actionId: "military_buildup", flavor: "..." }, ...]
-  },
-  cascades: [
+  turn:          1,
+  year:          2026,
+  playerActions: [{ actor: "US", actionId: "cyber_offense", target: "CN", flavor: "..." }],
+  npcActions:    [{ actor: "CN", actionId: "military_buildup", flavor: "..." }, ...],
+  cascadeLog: [
     {
       order:      1,                   // 1 = direct, 2 = probable, 3 = conditional, 4 = systemic
       type:       "stat_change",       // see cascade types below
@@ -344,11 +346,40 @@ require('fs').writeFileSync('out.json', JSON.stringify(analytics, null, 2));
       "taiwan_strait": { escalationLevel: { before: 2, after: 3, delta: 1 } }
     }
   },
+  stateSnapshot: { ... },  // full world state clone — large; use BoP.getState() for branching
   gameOver: null | { result: "lose", reason: "Taiwan Strait reached nuclear threshold" }
 }
 ```
 
 `stateDeltas` records only changed values. Unchanged stats, relationships, and crises do not appear.
+
+### Per-turn format inside analytics export (`exportAnalytics` output)
+
+`exportAnalytics()` remaps the raw `TurnResult` for storage. Key differences: `playerActions`/`npcActions` → `actions.player`/`actions.npc`; `cascadeLog` → `cascades`; `stateSnapshot` stripped.
+
+```js
+{
+  turn: 1,
+  year: 2026,
+  actions: {
+    player: [{ actor: "US", actionId: "cyber_offense", target: "CN", flavor: "..." }],
+    npc:    [{ actor: "CN", actionId: "military_buildup", flavor: "..." }, ...]
+  },
+  cascades: [
+    {
+      order:      1,
+      type:       "stat_change",
+      actor:      "CN",
+      confidence: "CONFIRMED",
+      text:       "PLA forces surge..."
+    }
+  ],
+  events:      [{ id: "financial_shock", name: "Global Financial Shock", description: "..." }],
+  stateDeltas: { stats: { ... }, relationships: { ... }, crises: { ... } },
+  // stateSnapshot is not present — stripped to keep file size reasonable
+  gameOver:    null | { result: "lose", reason: "Taiwan Strait reached nuclear threshold" }
+}
+```
 
 **Cascade types:** `stat_change`, `escalation`, `relationship`, `epistemic`, `cascade`, `systemic_warning`, `systemic_event`, `compound_pressure`, `entanglement`, `crisis_decay`, `warning`.
 
