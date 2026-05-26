@@ -12,7 +12,7 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across six domains (military, economic, cyber, information, diplomatic, domestic) with seven major actors: US, China, EU, Russia, India, the Gulf Bloc, and Iran. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, compound crises).
+BoP2026 models great-power competition across eight domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous) with seven major actors: US, China, EU, Russia, India, the Gulf Bloc, and Iran. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, compound crises).
 
 The engine is designed for two uses:
 
@@ -64,7 +64,7 @@ node scripts/analyze-results.js results.json
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run. Also: `iran_nuclear_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
 | `--out <path>` | `bop-results.json` | Output JSON file (`bop2026-analytics-v1` format) |
@@ -172,6 +172,7 @@ const batch = BoP.exportBatchAnalytics(results);
 |----------|-------|----------------------|---------------|-----------|
 | Taiwan Strait 2026 | 0% | 1% | 25.8 (σ 3.6) | 5.9 (σ 0.5) |
 | Iran Nuclear 2026 | 0% | 73% | 41.3 (σ 11.6) | 4.0 (σ 2.2) |
+| South China Sea 2026 | 0% | 9% | 25.2 (σ 8.8) | 5.2 (σ 1.4) |
 
 Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all 200 runs ended in loss, reflecting how difficult crisis management is under default conditions. Both scenarios are designed to be hard.
 
@@ -201,6 +202,9 @@ PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active 
 ### Iran Nuclear Threshold, 2026
 Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 2), Hormuz closure threat (level 1), Iran proxy network (level 2), Gulf Bloc fracture (level 1).
 
+### South China Sea, 2026
+China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the three scenarios — 9% baseline nuclear rate vs. 1% for Taiwan.
+
 ---
 
 ## Adding content
@@ -229,7 +233,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.1). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

@@ -83,5 +83,51 @@ window.SCENARIOS_DATA = {
       "GB":  { "US": 0.70, "CN": 0.55, "EU": 0.60, "IN": 0.65, "RU": 0.40, "IR": 0.60 },
       "IR":  { "US": 0.45, "CN": 0.55, "EU": 0.40, "IN": 0.50, "RU": 0.65, "GB": 0.60 }
     }
+  },
+  "south_china_sea_2026": {
+    "id": "south_china_sea_2026",
+    "name": "South China Sea, 2026",
+    "description": "China seizes a contested reef. Drone swarms have replaced coast guard skippers. Semiconductor supply lines hang in the balance. Five powers have a stake — none want to fire first.",
+    "startYear": 2026,
+    "player": "US",
+    "crises": [
+      {
+        "id": "scs_island_seizure", "name": "SCS Island Seizure", "domain": "military",
+        "involved": ["CN", "US", "IN"], "escalationLevel": 1,
+        "description": "PLA forces occupy Scarborough Shoal in force. Philippine coast guard vessels turned back. US 7th Fleet repositioning.",
+        "region": "scs_waters", "location": { "x": 748, "y": 210 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "scs_sea_lane", "name": "Sea Lane Blockade Threat", "domain": "economic",
+        "involved": ["CN", "US", "GB"], "escalationLevel": 1,
+        "description": "China signals intent to restrict passage through contested waters. 40% of global trade volume at risk. Insurance rates climbing.",
+        "region": "scs_waters", "location": { "x": 732, "y": 225 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "tech_supply_crunch", "name": "Semiconductor Chokepoint", "domain": "supply_chain",
+        "involved": ["CN", "US", "EU"], "escalationLevel": 1,
+        "description": "Taiwan TSMC output interrupted. ASML equipment shipments frozen. Global chip lead times extending to 14+ months.",
+        "region": "indo_pacific", "location": { "x": 762, "y": 195 },
+        "age": 1, "cascadeLog": []
+      },
+      {
+        "id": "drone_swarm_incident", "name": "Autonomous Engagement", "domain": "autonomous",
+        "involved": ["CN", "US", "IN"], "escalationLevel": 1,
+        "description": "CN drone swarms intercept US P-8 maritime patrol. Rules of engagement untested. No casualty — yet. Decision loops compressing.",
+        "region": "scs_waters", "location": { "x": 755, "y": 215 },
+        "age": 0, "cascadeLog": []
+      }
+    ],
+    "intelQuality": {
+      "US":  { "CN": 0.70, "EU": 0.85, "IN": 0.55, "RU": 0.55, "GB": 0.65, "IR": 0.40 },
+      "CN":  { "US": 0.70, "EU": 0.45, "IN": 0.55, "RU": 0.75, "GB": 0.65, "IR": 0.45 },
+      "EU":  { "US": 0.80, "CN": 0.40, "IN": 0.40, "RU": 0.60, "GB": 0.50, "IR": 0.35 },
+      "IN":  { "US": 0.50, "CN": 0.65, "EU": 0.40, "RU": 0.40, "GB": 0.60, "IR": 0.40 },
+      "RU":  { "US": 0.60, "CN": 0.75, "EU": 0.55, "IN": 0.35, "GB": 0.40, "IR": 0.60 },
+      "GB":  { "US": 0.60, "CN": 0.65, "EU": 0.50, "IN": 0.55, "RU": 0.40, "IR": 0.50 },
+      "IR":  { "US": 0.35, "CN": 0.50, "EU": 0.30, "IN": 0.40, "RU": 0.60, "GB": 0.55 }
+    }
   }
 };

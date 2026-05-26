@@ -2,7 +2,7 @@
 
 **Target Release Window:** Q3–Q4 2026  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
-**Status:** Planning Phase
+**Status:** In progress (v2.0.1 delivered supply_chain + autonomous domains + South China Sea scenario)
 
 ---
 
@@ -18,10 +18,10 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 
 | # | Scenario                              | Core Threat                                      | Relevance to BoP2026 v1.1                          | Priority in v1.1 |
 |---|---------------------------------------|--------------------------------------------------|----------------------------------------------------|------------------|
-| 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | New **Supply Chain Disruption** domain             | **High**         |
+| 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | New **Supply Chain Disruption** domain             | **v2.0.1 ✓**    |
 | 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | New **EMP Attacks** domain                         | **High**         |
 | 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | New **Biological Epidemic** domain                 | **High**         |
-| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | New **AI Warfare** + **UCAV/Drone Swarms** domains | **High**         |
+| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | New **AI Warfare** + **UCAV/Drone Swarms** domains | **v2.0.1 ✓**    |
 | 5 | The War for Space                     | Attacks on satellites and space assets          | Planned for v1.2 (Space domain)                    | Medium           |
 | 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Planned for v1.2 (Urban Operations)                | Medium           |
 | 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via existing **Economic** + new **Supply Chain** domains | Medium           |
@@ -34,9 +34,9 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 
 | Domain / Mechanic              | Description                                                                 | Krepinevich Link                  | Priority |
 |--------------------------------|-----------------------------------------------------------------------------|-----------------------------------|----------|
-| **Supply Chain Disruption**    | Attacks on semiconductors, rare earths, pharmaceuticals, and energy logistics. Creates cascading economic + domestic fragility. | "The Global Supply Chain War" scenario | **High** |
-| **AI Warfare & Autonomous Systems** | AI-driven targeting, swarm coordination, and adversarial AI attacks. Reduces human decision time and increases escalation speed. | "The Rise of the Machines" theme | **High** |
-| **UCAV / Drone Swarms**        | Low-cost unmanned combat aerial vehicles and loyal wingman concepts. New military actions with lower political cost but high escalation risk. | Drone proliferation warnings | **High** |
+| **Supply Chain Disruption**    | Attacks on semiconductors, rare earths, pharmaceuticals, and energy logistics. Creates cascading economic + domestic fragility. | "The Global Supply Chain War" scenario | **v2.0.1 ✓** |
+| **AI Warfare & Autonomous Systems** | AI-driven targeting, swarm coordination, and adversarial AI attacks. Reduces human decision time and increases escalation speed. | "The Rise of the Machines" theme | **v2.0.1 ✓** |
+| **UCAV / Drone Swarms**        | Low-cost unmanned combat aerial vehicles and loyal wingman concepts. New military actions with lower political cost but high escalation risk. | Drone proliferation warnings | **v2.0.1 ✓** |
 | **Biological Epidemic**        | Engineered or natural biological outbreaks with international response mechanics. Interacts with domestic stability and sanctions. | "Pandemic as Strategic Weapon" | **High** |
 | **EMP Attacks**                | Nuclear or non-nuclear electromagnetic pulse strikes causing infrastructure collapse, cyber blackouts, and command disruption. | "The EMP Nightmare" scenario | **High** |
 
@@ -44,7 +44,7 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 
 - **Domestic Faction System** — Replace unitary actor model with hardliner vs. moderate factions
 - **Enhanced Epistemic Model** — Perception drift + intelligence quality decay
-- **New Scenario: South China Sea 2026** — Contested sea lanes, island seizure, force projection costs
+- **New Scenario: South China Sea 2026** — Contested sea lanes, island seizure, force projection costs **(v2.0.1 ✓)**
 - **Technology Development Track** — R&D investment with delayed capability gains
 - **Arms Race Dynamics** — Military stat growth curves based on sustained spending
 

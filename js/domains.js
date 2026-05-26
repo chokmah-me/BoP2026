@@ -378,6 +378,152 @@ const Domains = (() => {
       ],
       effects3rd: [],
       tooltip: 'Slow but durable. Better for long-term stability than short-term crises.'
+    },
+
+    // ── SUPPLY CHAIN ──────────────────────────────────────────────────────────
+    {
+      id: 'critical_minerals_deal',
+      domain: 'supply_chain',
+      name: 'Critical Minerals Deal',
+      description: 'Secure bilateral access to rare earths, lithium, or semiconductors. Locks in a supply partner and signals economic alignment.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 0,
+      effects1st: { self: { economic: 6 }, target: { economic: 5 } },
+      effects2nd: [
+        { prob: 0.40, effect: { adversary_relationship: -8 }, label: 'Excluded powers view deal as economic bloc formation' },
+        { prob: 0.25, effect: { self: { domestic: 4 } }, label: 'Domestic industry lobbies applaud supply security' }
+      ],
+      effects3rd: [
+        { condition: 'third_party_involved', effect: { third_party: { relationships_us: -5 } }, label: 'Non-aligned states read deal as coercive alignment pressure' }
+      ],
+      domains: ['supply_chain'],
+      tooltip: 'Economic lock-in. Builds resilience but draws adversary reaction.'
+    },
+    {
+      id: 'supply_chain_chokepoint',
+      domain: 'supply_chain',
+      name: 'Chokepoint Seizure',
+      description: 'Threaten or seize control of a critical supply route — a strait, port, or processing facility — to pressure a rival.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 1,
+      effects1st: { self: { economic: 4 }, target: { economic: -15 } },
+      effects2nd: [
+        { prob: 0.35, effect: { self: { domestic: -6 } }, label: 'Global backlash raises domestic political cost' },
+        { prob: 0.25, effect: { target: { military: 4 } }, label: 'Target mobilizes to defend threatened route' }
+      ],
+      effects3rd: [
+        { condition: 'third_party_involved', effect: { third_party: { economic: -8 } }, label: 'Third parties suffer collateral supply disruption' }
+      ],
+      domains: ['supply_chain'],
+      tooltip: 'High leverage, high cost. Risks third-party blowback.'
+    },
+    {
+      id: 'tech_export_ban',
+      domain: 'supply_chain',
+      name: 'Technology Export Ban',
+      description: 'Prohibit sale of advanced chips, manufacturing equipment, or dual-use tech to the target. Slows their military and economic modernization.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 0,
+      effects1st: { self: { economic: -4 }, target: { economic: -10 } },
+      effects2nd: [
+        { prob: 0.40, effect: { target: { military: -5 } }, label: "Target's defense modernization slowed" },
+        { prob: 0.30, effect: { ally_relationships: -6 }, label: 'Allies resist being forced into decoupling' }
+      ],
+      effects3rd: [],
+      domains: ['supply_chain'],
+      tooltip: 'Self-costly. Forces decoupling but strains allies.'
+    },
+    {
+      id: 'reshoring_investment',
+      domain: 'supply_chain',
+      name: 'Industrial Reshoring',
+      description: 'Fund domestic production of critical inputs: semiconductors, rare earths, pharmaceuticals. Long-term resilience at short-term economic cost.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { economic: -5, military: 3, domestic: 4 } },
+      effects2nd: [
+        { prob: 0.35, effect: { ally_relationships: 5 }, label: 'Allies see a stable supply partner emerging' },
+        { prob: 0.20, effect: { self: { economic: 4 } }, label: 'Early industrial gains offset some costs' }
+      ],
+      effects3rd: [],
+      domains: ['supply_chain'],
+      tooltip: 'Slow burn. Pays off after turn 5.'
+    },
+
+    // ── AUTONOMOUS ────────────────────────────────────────────────────────────
+    {
+      id: 'drone_swarm_deploy',
+      domain: 'autonomous',
+      name: 'Drone Swarm Deployment',
+      description: 'Deploy autonomous UCAV swarms into a contested zone. Low political cost per unit, but high escalation risk if engagement rules are crossed.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 1,
+      effects1st: { self: { military: 7 }, target: { military: -5 } },
+      effects2nd: [
+        { prob: 0.30, effect: { self: { domestic: -4 } }, label: 'Domestic opposition to autonomous weapons use' },
+        { prob: 0.25, effect: { target: { cyber: -4 } }, label: 'Swarm disrupts adversary comms and sensor networks' }
+      ],
+      effects3rd: [
+        { condition: 'third_party_involved', effect: { third_party: { relationships_us: -7 } }, label: 'Non-aligned states alarmed by autonomous escalation precedent' }
+      ],
+      domains: ['autonomous'],
+      tooltip: 'High signal. Lower cost than boots. Escalation unpredictable.'
+    },
+    {
+      id: 'autonomous_defense_net',
+      domain: 'autonomous',
+      name: 'Autonomous Defense Net',
+      description: 'Deploy AI-driven sensor fusion and intercept layers around key installations. Reduces adversary first-strike confidence.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { military: 5, cyber: 3 } },
+      effects2nd: [
+        { prob: 0.25, effect: { self: { domestic: -3 } }, label: 'Civil liberties concerns over AI-controlled weapons' },
+        { prob: 0.20, effect: { adversary_relationship: -5 }, label: 'Adversaries read net as preparation for first strike' }
+      ],
+      effects3rd: [],
+      domains: ['autonomous'],
+      tooltip: 'Defensive posture. Reduces adversary risk appetite.'
+    },
+    {
+      id: 'counter_swarm_ops',
+      domain: 'autonomous',
+      name: 'Counter-Swarm Operations',
+      description: 'Electronic warfare and kinetic intercepts target adversary drone swarms. Degrades their autonomous warfare advantage.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 0,
+      effects1st: { self: { military: 3, cyber: 4 }, target: { military: -6 } },
+      effects2nd: [
+        { prob: 0.40, effect: { crisis_escalation: 1 }, label: 'Kinetic intercepts escalate rules of engagement' },
+        { prob: 0.25, effect: { self: { cyber: 4 } }, label: 'EW data improves own cyber posture' }
+      ],
+      effects3rd: [],
+      domains: ['autonomous'],
+      tooltip: 'Counters drone advantage. Risks conventional escalation.'
+    },
+    {
+      id: 'ai_surveillance_grid',
+      domain: 'autonomous',
+      name: 'AI Surveillance Grid',
+      description: 'Expand AI-curated intelligence collection over the target region. Improves perception accuracy and early warning.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { info: 8, cyber: 3 } },
+      effects2nd: [
+        { prob: 0.30, effect: { adversary_relationship: -6 }, label: 'Adversaries detect surveillance expansion' },
+        { prob: 0.20, effect: { ally_relationships: -4 }, label: 'Allies raise data sovereignty concerns' }
+      ],
+      effects3rd: [],
+      domains: ['autonomous'],
+      tooltip: 'Intel gain. Improves epistemic accuracy for 2–3 turns.'
     }
   ];
 
@@ -392,7 +538,7 @@ const Domains = (() => {
   }
 
   function getDomainList() {
-    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic'];
+    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous'];
   }
 
   function getDomainLabel(domain) {
@@ -402,7 +548,9 @@ const Domains = (() => {
       diplomatic: 'Diplomatic',
       cyber: 'Cyber',
       info: 'Information',
-      domestic: 'Domestic'
+      domestic: 'Domestic',
+      supply_chain: 'Supply Chain',
+      autonomous: 'Autonomous'
     }[domain] || domain;
   }
 
@@ -413,7 +561,9 @@ const Domains = (() => {
       diplomatic: '🕊️',
       cyber: '💻',
       info: '📡',
-      domestic: '🏛️'
+      domestic: '🏛️',
+      supply_chain: '⛓️',
+      autonomous: '🤖'
     }[domain] || '●';
   }
 

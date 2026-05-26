@@ -39,7 +39,9 @@ Please cite as:
 
 This v1.0 deposit represents the baseline personality vectors, cascade weights, and scenario content as of May 2026.
 
-**v2.0.0 (2026-05-25):** Breaking change to output format. `run-bop.js --out` now writes `bop2026-analytics-v1` JSON with per-turn `stateDeltas`, `initialState`, and compact power/crisis summaries. New Oracle API methods `exportAnalytics()` / `exportBatchAnalytics()`. Browser Save Log button. New docs: `docs/ORACLE.md`, `docs/QUICKSTART.md`. New test suite: `scripts/test-analytics.js` (8 tests). A new Zenodo version deposit for v2.0.0 is pending.
+**v2.0.0 (2026-05-25):** Breaking change to output format. `run-bop.js --out` now writes `bop2026-analytics-v1` JSON with per-turn `stateDeltas`, `initialState`, and compact power/crisis summaries. New Oracle API methods `exportAnalytics()` / `exportBatchAnalytics()`. Browser Save Log button. New docs: `docs/ORACLE.md`, `docs/QUICKSTART.md`. New test suite: `scripts/test-analytics.js` (8 tests).
+
+**v2.0.1 (2026-05-25):** Two new domains — `supply_chain` (4 actions: critical minerals deal, chokepoint seizure, tech export ban, industrial reshoring) and `autonomous` (4 actions: drone swarm deployment, autonomous defense net, counter-swarm ops, AI surveillance grid). New playable scenario: South China Sea 2026 with 4 crises across both new domains, a compound crisis (`south_seas_blockade`), and 4 SCS-specific events. No engine changes. Baseline nuclear rate: 9% (vs. 1% Taiwan, 73% Iran).
 
 ## Contact & Repository
 

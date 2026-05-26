@@ -328,6 +328,12 @@ const Cascades = (() => {
       name: 'European Security Unraveling',
       domain: 'compound',
       description: 'Cyber and diplomatic pressure on European institutions cross a threshold. Critical infrastructure down. NATO cohesion questioned.'
+    },
+    'scs_waters+scs_waters': {
+      id: 'south_seas_blockade',
+      name: 'South Seas Blockade',
+      domain: 'compound',
+      description: 'Island seizure, sea lane closure, and autonomous engagement converge. China declares an air defense identification zone over the South China Sea. Global trade routes buckle. India and the EU are forced off the fence.'
     }
   };
 

@@ -192,6 +192,38 @@ window.EVENT_TABLE = {
       "effects": { "targets": ["random_1"], "statDeltas": { "cyber": -12, "domestic": -9, "economic": -8 } },
       "advisorText": "This was a demonstration, not a war. The capability exists. Deterrence calculus has shifted.",
       "cascadeRisk": "communications_blackout"
+    },
+    {
+      "id": "scs_drone_escalation", "name": "SCS Drone Swarm Intercept",
+      "description": "Chinese autonomous swarms force a US maritime patrol aircraft to abort its mission. First autonomous intercept on record. No shots fired — yet.",
+      "probability": 0.25, "conditions": [{ "crisis": "drone_swarm_incident", "minEscalation": 2 }],
+      "effects": { "targets": ["US", "IN"], "statDeltas": { "military": -4 } },
+      "advisorText": "Decision loops are compressing. CN military confidence just jumped. Our response window is measured in hours.",
+      "cascadeRisk": "autonomous_escalation"
+    },
+    {
+      "id": "rare_earth_export_halt", "name": "Rare Earth Export Halt",
+      "description": "Beijing suspends rare earth and gallium exports. Global defense and EV supply chains stall within weeks.",
+      "probability": 0.20, "conditions": [{ "crisis": "tech_supply_crunch", "minEscalation": 2 }],
+      "effects": { "targets": ["EU", "IN", "US"], "statDeltas": { "economic": -9, "military": -4 } },
+      "advisorText": "China has exercised the chokepoint option. Reshoring timelines just became a national security priority.",
+      "cascadeRisk": "supply_chain_shock"
+    },
+    {
+      "id": "asean_neutrality_shift", "name": "ASEAN Declares Neutrality",
+      "description": "Facing Chinese economic coercion, ASEAN members issue a joint statement refusing to host US military exercises. The Gulf Bloc follows suit.",
+      "probability": 0.18, "conditions": [{ "crisis": "scs_island_seizure", "minEscalation": 2 }, { "minTurn": 3 }],
+      "effects": { "targets": ["GB"], "statDeltas": { "economic": 6 } },
+      "advisorText": "The hedging bloc just grew. Washington's hub-and-spoke alliance model is under strain.",
+      "cascadeRisk": null
+    },
+    {
+      "id": "undersea_cable_cut", "name": "Undersea Cable Severance",
+      "description": "Three transpacific data cables are severed in contested waters. Attribution unclear. Global internet rerouting causes 40-hour latency surge.",
+      "probability": 0.15, "conditions": [{ "crisis": "scs_sea_lane", "minEscalation": 2 }],
+      "effects": { "targets": ["EU", "IN"], "statDeltas": { "info": -8, "economic": -5 } },
+      "advisorText": "Epistemic fog is thickening. We are losing the information environment in real time.",
+      "cascadeRisk": "epistemic_breakdown"
     }
   ]
 };
