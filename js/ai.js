@@ -82,6 +82,27 @@ const AI = (() => {
     }
   };
 
+  function getMergeRisk(powerId, world) {
+    const involved = world.crises.filter(c => c.involved.includes(powerId) && c.escalationLevel >= 2);
+    if (involved.length < 2) return false;
+    const regions = involved.map(c => (c.location && c.location.region) || c.domain);
+    return regions.length !== new Set(regions).size;
+  }
+
+  function getStrategicPosture(powerId, persona, mergeRisk, world) {
+    const power = world.powers[powerId];
+    const involvedCrises = world.crises.filter(c => c.involved.includes(powerId));
+    const maxLevel = involvedCrises.reduce((m, c) => Math.max(m, c.escalationLevel), 0);
+
+    if (maxLevel >= 4) return 'de-escalate';
+    if (mergeRisk) return 'de-escalate';
+    if (maxLevel >= 3 && persona.riskTolerance < 0.6) return 'de-escalate';
+    if (power.trueState.domestic < 35) return 'consolidate';
+    if (maxLevel >= 3) return 'hold';
+    if (maxLevel === 0) return persona.riskTolerance > 0.6 ? 'escalate' : 'hold';
+    return 'hold';
+  }
+
   function decideTurn(powerId, world) {
     const power = world.powers[powerId];
     const persona = PERSONALITIES[powerId] || {
@@ -94,23 +115,27 @@ const AI = (() => {
     const actions = [];
     let apRemaining = power.actionPointsRemaining;
 
-    // domestic constraint: if domestic < 40, no high-escalation military
     const domesticConstrained = power.trueState.domestic < 40;
-
-    // find highest-threat power based on perceived relationships
     const threatSource = getMostThreateningPower(powerId, world);
-
-    // determine priority: if in a crisis, respond to it; else pursue strategic interest
     const activeCrisis = world.crises.find(c =>
       c.involved.includes(powerId) && c.escalationLevel >= 2
     );
+
+    const lastMem = power.memory[power.memory.length - 1];
+    const lastActions = lastMem ? lastMem.actions.map(a => a.actionId) : [];
+    const prevMem = power.memory[power.memory.length - 2];
+    const prevActions = prevMem ? prevMem.actions.map(a => a.actionId) : [];
+    const mergeRisk = getMergeRisk(powerId, world);
+    const posture = getStrategicPosture(powerId, persona, mergeRisk, world);
+    const involvedCrises = world.crises.filter(c => c.involved.includes(powerId));
+    const crisisLevel = involvedCrises.reduce((m, c) => Math.max(m, c.escalationLevel), 0);
 
     let actionPool = selectActionPool(powerId, persona, activeCrisis, threatSource, domesticConstrained, world);
 
     while (apRemaining > 0 && actionPool.length > 0) {
       const scored = actionPool
         .filter(a => a.cost <= apRemaining)
-        .map(a => ({ ...a, score: scoreAction(a, powerId, persona, activeCrisis, threatSource, world) }))
+        .map(a => ({ ...a, score: scoreAction(a, powerId, persona, activeCrisis, threatSource, posture, crisisLevel, lastActions, prevActions, world) }))
         .sort((a, b) => b.score - a.score);
 
       if (scored.length === 0) break;
@@ -126,7 +151,6 @@ const AI = (() => {
       });
 
       apRemaining -= chosen.cost;
-      // remove chosen from pool to avoid repetition
       actionPool = actionPool.filter(a => a.id !== chosen.id);
     }
 
@@ -179,7 +203,7 @@ const AI = (() => {
     });
   }
 
-  function scoreAction(action, powerId, persona, activeCrisis, threatSource, world) {
+  function scoreAction(action, powerId, persona, activeCrisis, threatSource, posture, crisisLevel, lastActions, prevActions, world) {
     let score = 0;
     const power = world.powers[powerId];
 
@@ -189,27 +213,49 @@ const AI = (() => {
     else if (domainPriority === 1) score += 20;
     else if (domainPriority === 2) score += 10;
 
-    // risk-tolerance modifies escalatory actions
-    if (action.escalationDelta > 0) {
-      score += persona.riskTolerance * 25;
-    }
-    if (action.escalationDelta < 0) {
-      score += (1 - persona.riskTolerance) * 20;
+    // risk-tolerance modifies escalatory actions (baseline)
+    if (action.escalationDelta > 0) score += persona.riskTolerance * 25;
+    if (action.escalationDelta < 0) score += (1 - persona.riskTolerance) * 20;
+
+    // crisis patience weight for de-escalation
+    if (activeCrisis && activeCrisis.domain === action.domain && action.escalationDelta < 0) {
+      score += persona.patience * 15;
     }
 
-    // if in a crisis, de-escalation is weighted by patience
-    if (activeCrisis && activeCrisis.domain === action.domain) {
-      if (action.escalationDelta < 0) score += persona.patience * 15;
-      if (action.escalationDelta > 0 && activeCrisis.escalationLevel >= 3) score -= 10;
+    // hard ceiling: crisis at level ≥ 4 → escalatory actions excluded
+    if (crisisLevel >= 4 && action.escalationDelta > 0) return -999;
+
+    // posture-driven overrides (dominant factor)
+    if (action.escalationDelta > 0) {
+      if (posture === 'de-escalate') score -= 80;
+      else if (posture === 'hold') score -= 20;
+      else if (posture === 'escalate') score += 20;
+      else if (posture === 'consolidate') score -= 30;
     }
+    if (action.escalationDelta < 0) {
+      if (posture === 'de-escalate') score += 50;
+      else if (posture === 'hold') score += 15;
+      else if (posture === 'escalate') score -= 10;
+      else if (posture === 'consolidate') score += 10;
+    }
+
+    // memory-based stance persistence
+    if (lastActions.includes('deploy_forces') && action.id === 'force_withdrawal') score -= 40;
+    if (lastActions.includes('force_withdrawal') && action.id === 'deploy_forces') score -= 35;
+    if (posture === 'de-escalate' && lastActions.some(id => {
+      const a = Domains.getById(id); return a && a.escalationDelta < 0;
+    })) score += 10;
+    // mild repeat-avoidance for non-posture actions
+    if (lastActions.includes(action.id) && prevActions.includes(action.id)) score -= 8;
 
     // prefer defensive actions if stat is low
     if (action.id === 'cyber_defense_hardening' && power.trueState.cyber < 50) score += 20;
     if (action.id === 'grid_stabilization' && power.trueState.domestic < 45) score += 25;
     if (action.id === 'coalition_shoring' && power.trueState.domestic < 50) score += 15;
 
-    // small random noise to prevent deterministic play
-    score += (Math.random() - 0.5) * 10;
+    // noise inversely proportional to crisis severity
+    const maxNoise = Math.max(2, 10 - crisisLevel * 2);
+    score += (Math.random() - 0.5) * maxNoise;
 
     return score;
   }
