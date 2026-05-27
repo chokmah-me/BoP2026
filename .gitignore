@@ -3,3 +3,8 @@ node_modules/
 bop-results.json
 docs/*-baseline.json
 logs/
+.env
+.env.*
+*.local
+# Add any test output files that might contain prompt logs
+debug-*.json

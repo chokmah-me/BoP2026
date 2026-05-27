@@ -1,94 +1,108 @@
-# Balance of Power 2026 — v1.1 Development Roadmap
+# Balance of Power 2026 — Development Roadmap
 
-**Target Release Window:** Q3–Q4 2026  
+**Current version:** v2.1.1 (2026-05-27)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
-**Status:** In progress (v2.1.1 IR/DPRK powers + Iran scenario fix; v2.1.0 DeepSeek LLM NPC backend; v2.0.5 AI audit; v2.0.4 posture system; v2.0.3 log save/auto-save; v2.0.2 Iran proxy events + headless fix; v2.0.1 supply_chain + autonomous + SCS)
+**Status:** Active development
 
 ---
 
 ## Strategic Inspiration
 
-This roadmap draws heavily from **Andrew Krepinevich’s *7 Deadly Scenarios: A Military Futurist Explores War in the 21st Century*** (2009). The book emphasizes the need for strategic foresight in an era of rapid technological change and multipolar competition. It highlights how traditional military power is increasingly challenged by non-traditional threats (cyber, biological, space, supply chain, and autonomous systems).
+This roadmap draws from **Andrew Krepinevich's *7 Deadly Scenarios: A Military Futurist Explores War in the 21st Century*** (2009). The book emphasizes strategic foresight in an era of rapid technological change and multipolar competition — highlighting how traditional military power is increasingly challenged by non-traditional threats (cyber, biological, space, supply chain, and autonomous systems).
 
-BoP2026 v1.1 will operationalize several of these insights by expanding the domain set and introducing compound crisis mechanics that reflect Krepinevich’s warnings about "compound threats" and "strategic surprise."
-
----
-
-## Krepinevich’s 7 Deadly Scenarios — Mapping to BoP2026 v1.1
-
-| # | Scenario                              | Core Threat                                      | Relevance to BoP2026 v1.1                          | Priority in v1.1 |
-|---|---------------------------------------|--------------------------------------------------|----------------------------------------------------|------------------|
-| 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | New **Supply Chain Disruption** domain             | **v2.0.1 ✓**    |
-| 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | New **EMP Attacks** domain                         | **High**         |
-| 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | New **Biological Epidemic** domain                 | **High**         |
-| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | New **AI Warfare** + **UCAV/Drone Swarms** domains | **v2.0.1 ✓**    |
-| 5 | The War for Space                     | Attacks on satellites and space assets          | Planned for v1.2 (Space domain)                    | Medium           |
-| 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Planned for v1.2 (Urban Operations)                | Medium           |
-| 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via existing **Economic** + new **Supply Chain** domains | Medium           |
+BoP2026 operationalizes several of these insights through expanded domains and compound crisis mechanics.
 
 ---
 
-## v1.1 High-Priority Additions
+## Krepinevich's 7 Deadly Scenarios — Mapping to BoP2026
 
-### New Domains & Mechanics (Inspired by Krepinevich + User Input)
+| # | Scenario                              | Core Threat                                      | BoP2026 Coverage                                   | Status |
+|---|---------------------------------------|--------------------------------------------------|----------------------------------------------------|--------|
+| 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | **Supply Chain** domain (4 actions)                | **v2.0.1 ✓** |
+| 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | **EMP Attacks** domain                             | Planned (v2.2) |
+| 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | **Biological Epidemic** domain                     | Planned (v2.2) |
+| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + **UCAV/Drone Swarms**      | **v2.0.1 ✓** |
+| 5 | The War for Space                     | Attacks on satellites and space assets          | Space domain (future scenario)                     | Medium |
+| 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Urban Operations (future scenario)                 | Medium |
+| 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via **Economic** + **Supply Chain** domains | Partial ✓ |
 
-| Domain / Mechanic              | Description                                                                 | Krepinevich Link                  | Priority |
-|--------------------------------|-----------------------------------------------------------------------------|-----------------------------------|----------|
-| **Supply Chain Disruption**    | Attacks on semiconductors, rare earths, pharmaceuticals, and energy logistics. Creates cascading economic + domestic fragility. | "The Global Supply Chain War" scenario | **v2.0.1 ✓** |
-| **AI Warfare & Autonomous Systems** | AI-driven targeting, swarm coordination, and adversarial AI attacks. Reduces human decision time and increases escalation speed. | "The Rise of the Machines" theme | **v2.0.1 ✓** |
-| **UCAV / Drone Swarms**        | Low-cost unmanned combat aerial vehicles and loyal wingman concepts. New military actions with lower political cost but high escalation risk. | Drone proliferation warnings | **v2.0.1 ✓** |
-| **Biological Epidemic**        | Engineered or natural biological outbreaks with international response mechanics. Interacts with domestic stability and sanctions. | "Pandemic as Strategic Weapon" | **High** |
-| **EMP Attacks**                | Nuclear or non-nuclear electromagnetic pulse strikes causing infrastructure collapse, cyber blackouts, and command disruption. | "The EMP Nightmare" scenario | **High** |
+---
 
-### New Powers
+## Shipped
 
-- **Iran (IR)** ✓ `v2.1.1` — Active in `iran_nuclear_2026` (nuclear program + proxy + Hormuz crises). Heuristic and LLM backends both supported. Stats: military 55, nuclear 2, cyber 60, riskTolerance 0.7.
-- **North Korea (DPRK)** ✓ `v2.1.1` — Added to `data/powers-data.js` and `js/ai.js`. Stats: military 68, nuclear 7, riskTolerance 0.85, patience 0.35. Not yet featured in a scenario — wire in when a Korean Peninsula / Northeast Asia scenario is built.
+### v2.0.x (2026-05-25 – 2026-05-26)
 
-### LLM NPC Backend (DeepSeek) ✓ `v2.1.0`
+- **Supply Chain domain** `v2.0.1` — 4 actions: `critical_minerals_deal`, `supply_chain_chokepoint`, `tech_export_ban`, `reshoring_investment`. Models rare earth and semiconductor leverage, export control coercion, and industrial decoupling.
+- **Autonomous domain** `v2.0.1` — 4 actions: `drone_swarm_deploy`, `autonomous_defense_net`, `counter_swarm_ops`, `ai_surveillance_grid`. Models UCAV swarm tactics and AI-curated counter-drone operations.
+- **South China Sea 2026 scenario** `v2.0.1` — 4 crises (SCS Island Seizure, Sea Lane Blockade, Semiconductor Chokepoint, Autonomous Engagement). Compound crisis `south_seas_blockade`. Highest direct US-China confrontation of the three scenarios (4% baseline nuclear rate).
+- **Iran proxy network events** `v2.0.2` — 6 stochastic events: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, Gulf Bloc alignment choices. `minValue` condition support added.
+- **Headless event engine** `v2.0.2` — `Events.init()` wired into `BoP.init()`. Stochastic events now fire in all batch and Oracle runs (were browser-only before).
+- **Log save / auto-save** `v2.0.3` — Save Log button in event log panel; auto-save on game over. Date-stamped filenames (`bop-{scenario}-{date}-t{turn}-{result}.json`). CLI output defaults to `logs/` directory.
+- **Strategic posture system** `v2.0.4` — `getStrategicPosture()` derives turn-level intent (escalate / hold / de-escalate / consolidate) from crisis levels, merge risk, and persona `riskTolerance`. De-escalate posture hard-excludes actions that would push any crisis to level 4+.
+- **AI audit** `v2.0.5` — Patience-gated AP hoarding (high-patience NPCs conserve in low-crisis turns). Generalized stat-health scoring. Delayed effects queue (`effects2nd` + `delay`). Pressure marker expiry (markers no longer accumulate for the full game).
 
-Two model modes:
+### v2.1.x (2026-05-26 – 2026-05-27)
+
+- **DeepSeek LLM NPC backend** `v2.1.0` — headless NPC decision-making via `deepseek-chat` (default) or `deepseek-reasoner` (`--thinking`, chain-of-thought). Requires `DEEPSEEK_API_KEY`. Prompt version `v1.2` tracked in `js/ai-deepseek.js` for cross-run reproducibility.
+- **Dry-run cost estimate** `v2.1.0` — `--dry-run` estimates token usage and API cost before any API calls.
+- **Prompt logging** `v2.1.0` — `--log-prompts` saves every prompt and raw LLM response to a `.jsonl` sidecar file.
+- **Iran (IR) as active NPC** `v2.1.1` — IR now acts each turn in `iran_nuclear_2026`. Fixed: IR was in powers-data but absent from all `crisis.involved` arrays, so `State.init()` never included it. Fixed scenario escalation stacking (narrowed `involved` lists, reduced starting levels from 2 to 1). Heuristic baseline: 14% nuclear, avg stability 20.7, avg turns 4.4.
+- **North Korea (DPRK) in engine** `v2.1.1` — Added to `data/powers-data.js` and `js/ai.js`. Stats: military 68, nuclear 7, riskTolerance 0.85, patience 0.35. Brinkmanship/survival-first doctrine. Not yet featured in a scenario.
+
+**LLM chat vs. thinking mode:**
 
 | Mode | Flag | Model | Cost/50-run (all NPCs) | Use when |
 |------|------|-------|------------------------|----------|
 | Chat (default) | _(none)_ | `deepseek-chat` | $0.10 | Baseline comparison, parameter sweeps, quick iteration |
 | Thinking | `--thinking` | `deepseek-reasoner` | $0.80 | Deep case studies, reasoning-chain analysis, pedagogical use |
 
-`--thinking` logs a chain-of-thought reasoning trace per NPC per turn (visible with `--log-prompts`). Good for studying *how* an LLM agent reasons about crisis escalation, not just what it decides. Not worth the 8x cost for sweeps — use chat mode for those.
+`--thinking` logs a chain-of-thought reasoning trace per NPC per turn (readable via `--log-prompts`). Useful for studying *how* an LLM agent reasons about crisis escalation. Not worth the 8x cost for sweeps.
 
-Prompt version tracked in `js/ai-deepseek.js` `PROMPT_VERSION` constant for cross-run reproducibility.
+---
 
-### Other Core v1.1 Features
+## Planned
 
-- **Domestic Faction System** — Replace unitary actor model with hardliner vs. moderate factions
-- **Enhanced Epistemic Model** — Perception drift + intelligence quality decay
-- **New Scenario: South China Sea 2026** — Contested sea lanes, island seizure, force projection costs **(v2.0.1 ✓)**
-- **Iran proxy network events** — Hezbollah/Houthi probabilistic branches, Gulf Bloc alignment choices, `minValue` condition support **(v2.0.2 ✓)**
-- **Headless event engine** — `Events.init()` wired into `BoP.init()`; stochastic events now fire in all batch/Oracle runs **(v2.0.2 ✓)**
-- **Technology Development Track** — R&D investment with delayed capability gains
-- **Arms Race Dynamics** — Military stat growth curves based on sustained spending
+### High Priority (v2.2 target)
+
+| Domain / Feature | Description | Krepinevich Link |
+|---|---|---|
+| **Biological Epidemic** | Engineered or natural outbreaks with international response mechanics. Interacts with domestic stability and sanctions. | "Pandemic as Strategic Weapon" |
+| **EMP Attacks** | Nuclear or non-nuclear EMP strikes causing infrastructure collapse, cyber blackouts, and command disruption. | "The EMP Nightmare" |
+| **Domestic Faction System** | Replace unitary actor model with hardliner vs. moderate factions. Internal politics shapes action selection. | Compound threat modeling |
+| **Korean Peninsula scenario** | Wire DPRK into a Northeast Asia scenario as an active NPC. | DPRK brinkmanship doctrine |
+
+### Medium Priority (future)
+
+| Feature | Description |
+|---|---|
+| **Enhanced Epistemic Model** | Perception drift + intelligence quality decay. Perceived vs. true state divergence accumulates over time. |
+| **Technology Development Track** | R&D investment with delayed capability gains. |
+| **Arms Race Dynamics** | Military stat growth curves based on sustained spending. |
+| **Space domain** | Attacks on satellites and space assets. New military actions + scenario. |
+| **Urban Operations** | Megacity warfare mechanics. Planned for a future scenario. |
 
 ---
 
 ## Documentation & Community Goals
 
-- Maintain `docs/ROADMAP.md` (this file)
+- Publish baseline dataset from v2.1.x runs for academic use (Taiwan, Iran, SCS — 100-run seed 0)
+- Publish 2–3 tutorial videos (Taiwan scenario walkthrough + sensitivity analysis)
 - Create `CONTRIBUTING.md` and contributor guidelines
-- Publish 2–3 tutorial videos (Taiwan scenario + sensitivity analysis walkthrough)
-- Release synthetic dataset from v1.1 baseline runs for academic use
 
 ---
 
-## Success Metrics for v1.1
+## Success Metrics
 
-- Achieve 20%+ increase in outcome variance through domestic factions and new domains
-- Successfully model at least 3 compound crises (e.g., Supply Chain + Biological + EMP)
-- Receive positive feedback from IR and war studies pilot users
-
----
-
-**Next Milestone:** Feature freeze and internal playtesting — August 2026
+- [x] Compound crisis mechanics: Supply Chain + Autonomous (SCS), Iran proxy + nuclear (Iran) — **met v2.0.x**
+- [x] Model at least 3 compound crises with divergent trajectories — **met v2.0.x**
+- [ ] Cover at least 4 of 7 Krepinevich scenarios with playable domain content (currently 3: Supply Chain, Autonomous, partial Financial)
+- [ ] Korean Peninsula scenario playable with DPRK as active NPC
+- [ ] Biological + EMP domains complete and integrated into at least one scenario each
 
 ---
 
-*"The future is already here — it’s just not evenly distributed."* — William Gibson (quoted in Krepinevich, 2009)
+**Next Milestone:** v2.2.0 — Biological Epidemic domain + EMP Attacks + Domestic Faction System
+
+---
+
+*"The future is already here — it's just not evenly distributed."* — William Gibson (quoted in Krepinevich, 2009)
