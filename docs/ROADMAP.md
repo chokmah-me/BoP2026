@@ -2,7 +2,7 @@
 
 **Target Release Window:** Q3–Q4 2026  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
-**Status:** In progress (v2.0.5 AI audit — patience, stat-health scoring, delayed effects, pressure marker expiry; v2.0.4 posture system + stance persistence; v2.0.3 log save/auto-save; v2.0.2 Iran proxy events + headless fix; v2.0.1 supply_chain + autonomous + SCS)
+**Status:** In progress (v2.1.1 IR/DPRK powers + Iran scenario fix; v2.1.0 DeepSeek LLM NPC backend; v2.0.5 AI audit; v2.0.4 posture system; v2.0.3 log save/auto-save; v2.0.2 Iran proxy events + headless fix; v2.0.1 supply_chain + autonomous + SCS)
 
 ---
 
@@ -40,12 +40,23 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 | **Biological Epidemic**        | Engineered or natural biological outbreaks with international response mechanics. Interacts with domestic stability and sanctions. | "Pandemic as Strategic Weapon" | **High** |
 | **EMP Attacks**                | Nuclear or non-nuclear electromagnetic pulse strikes causing infrastructure collapse, cyber blackouts, and command disruption. | "The EMP Nightmare" scenario | **High** |
 
-### New Powers (Required)
+### New Powers
 
-- **Iran (IR)** — Must be added as a playable power. Currently IR appears in crisis names (`iran_nuclear_2026` scenario) but is not in `POWERS_DATA`, causing LLM NPCs to hallucinate it as a valid target and crash. Needed for the Iran scenario to be fully playable and for the LLM backend to reason about it correctly.
-- **North Korea (DPRK)** — Must be added as a playable power. Key actor in any Northeast Asia / peninsula scenario; absence creates the same hallucination risk as IR.
+- **Iran (IR)** ✓ `v2.1.1` — Active in `iran_nuclear_2026` (nuclear program + proxy + Hormuz crises). Heuristic and LLM backends both supported. Stats: military 55, nuclear 2, cyber 60, riskTolerance 0.7.
+- **North Korea (DPRK)** ✓ `v2.1.1` — Added to `data/powers-data.js` and `js/ai.js`. Stats: military 68, nuclear 7, riskTolerance 0.85, patience 0.35. Not yet featured in a scenario — wire in when a Korean Peninsula / Northeast Asia scenario is built.
 
-Both should be added to `data/powers-data.js` with appropriate stats, relationships, and personalities in `js/ai.js` before any scenario that features them is promoted to a full LLM run.
+### LLM NPC Backend (DeepSeek) ✓ `v2.1.0`
+
+Two model modes:
+
+| Mode | Flag | Model | Cost/50-run (all NPCs) | Use when |
+|------|------|-------|------------------------|----------|
+| Chat (default) | _(none)_ | `deepseek-chat` | ~$0.10 | Baseline comparison, parameter sweeps, quick iteration |
+| Thinking | `--thinking` | `deepseek-reasoner` | ~$0.80 | Deep case studies, reasoning-chain analysis, pedagogical use |
+
+`--thinking` logs a chain-of-thought reasoning trace per NPC per turn (visible with `--log-prompts`). Good for studying *how* an LLM agent reasons about crisis escalation, not just what it decides. Not worth the 8x cost for sweeps — use chat mode for those.
+
+Prompt version tracked in `js/ai-deepseek.js` `PROMPT_VERSION` constant for cross-run reproducibility.
 
 ### Other Core v1.1 Features
 

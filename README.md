@@ -12,7 +12,7 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across eight domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous) with seven major actors: US, China, EU, Russia, India, the Gulf Bloc, and Iran. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, compound crises).
+BoP2026 models great-power competition across eight domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is in the engine but not yet featured in a scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, compound crises).
 
 The engine is designed for two uses:
 
@@ -103,14 +103,18 @@ DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
 
 LLM NPCs use prompt version `v1.2` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
 
-**Empirical results (Phase 2, 20 seeds, `taiwan_strait_2026` and `iran_nuclear_2026`):**
+**Chat vs. thinking mode:** the default `deepseek-chat` is fast and cheap (~$0.10/50-run all NPCs). Use it for parameter sweeps and baseline comparison. `--thinking` switches to `deepseek-reasoner` (~$0.80/50-run), which generates a chain-of-thought reasoning trace per NPC per turn. Use thinking mode when you want to study *how* an LLM agent reasons about crisis escalation — the traces are logged to the `.jsonl` sidecar via `--log-prompts`. Not worth the 8× cost for bulk runs.
+
+**Empirical results (20 seeds 0–19, `taiwan_strait_2026` and `iran_nuclear_2026`):**
 
 | Scenario | Backend | Avg stability | Avg turns | Nuclear % |
 |----------|---------|---------------|-----------|-----------|
 | Taiwan Strait | Heuristic | 21.6 | 4.5 | 0% |
 | Taiwan Strait | LLM CN+RU | **26.4** | 5.2 | 0% |
-| Iran Nuclear | Heuristic | 21.3 | 5.3 | 0% |
-| Iran Nuclear | LLM CN+RU | **28.6** | 5.1 | 0% |
+| Iran Nuclear (v2.1.1, IR active) | Heuristic | 20.9 | 4.5 | 20% |
+| Iran Nuclear (v2.1.1, IR active) | LLM CN+RU | **28.8** | 4.2 | 50% |
+
+In Taiwan, LLM NPCs raise stability without increasing nuclear risk. In Iran (v2.1.1, IR active), LLM CN+RU raise stability (+7.9) but also raise the nuclear rate (50% vs 20% heuristic). The divergence points to a mixed-backend effect: LLM powers cooperate more with each other while IR's heuristic brinkmanship drives escalation unchecked. Running IR as LLM too is the natural next step.
 
 ---
 
@@ -209,7 +213,7 @@ const batch = BoP.exportBatchAnalytics(results);
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
 | Taiwan Strait 2026 | 0% | 0% | 22.5 (σ 2.8) | 4.7 (σ 0.8) |
-| Iran Nuclear 2026 | 0% | 0% | 21.2 (σ 3.2) | 4.7 (σ 0.9) |
+| Iran Nuclear 2026 | 0% | 14% | 20.7 (σ 5.4) | 4.4 (σ 0.9) |
 | South China Sea 2026 | 0% | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
 
 Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all 300 runs ended in loss, reflecting how difficult crisis management is under default conditions. All scenarios are designed to be hard.
@@ -217,7 +221,7 @@ Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-o
 Key findings from the baseline:
 
 - **Taiwan** is now the tightest scenario (σ 2.8 stability, σ 0.8 turns). Nuclear escalation dropped to 0% — the v2.0.4 posture system de-escalates at crisis level 4+, which consistently prevents Taiwan from reaching nuclear threshold.
-- **Iran** nuclear rate dropped from 79% (v2.0.2) to 0%. The strategic posture system (v2.0.4) triggers de-escalation before the four interlocking crises reach nuclear threshold. Average run length extended from 3.0 to 4.7 turns as a result. Stability distribution tightened considerably (σ 3.2 vs. σ 13.4 prior).
+- **Iran** nuclear rate is 14% with Iran (IR) now an active NPC (v2.1.1). Prior v2.0.6 baseline (0% nuclear, 4.7 turns) had IR absent from the world — Iran never acted. With IR active, escalation is higher but controlled: the scenario starting levels were reduced from 2 to 1 and the crisis involved lists narrowed to direct actors to prevent multi-power escalation stacking. σ 5.4 stability reflects wider outcome spread as IR's brinkmanship doctrine creates divergent trajectories.
 - **SCS** retains the highest nuclear rate at 4%, reflecting the direct US-China military confrontation dynamic. Stability spread (σ 6.4) is still the widest of the three, driven by the autonomous engagement and semiconductor chokepoint crises creating divergent trajectories.
 - EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
 
@@ -227,6 +231,7 @@ Reproduce:
 node scripts/run-bop.js --scenario taiwan_strait_2026 --runs 100 --seed 0 --out docs/taiwan-baseline.json
 node scripts/analyze-results.js docs/taiwan-baseline.json
 
+# Iran baseline reflects v2.1.1 (IR active). Prior v2.0.6 baseline is no longer valid.
 node scripts/run-bop.js --scenario iran_nuclear_2026 --runs 100 --seed 0 --out docs/iran-baseline.json
 node scripts/analyze-results.js docs/iran-baseline.json
 
@@ -242,7 +247,7 @@ node scripts/analyze-results.js docs/scs-baseline.json
 PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active crises at start: Taiwan military escalation (level 2), US-China trade war (level 3), Baltic cyber probe (level 1). Seven powers active.
 
 ### Iran Nuclear Threshold, 2026
-Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 2), Hormuz closure threat (level 1), Iran proxy network (level 2), Gulf Bloc fracture (level 1). Six scenario-specific stochastic events model the proxy branches: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, and Gulf Bloc alignment choices (US alignment vs. China hedging).
+Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 1), Hormuz closure threat (level 1), Iran proxy network (level 1), Gulf Bloc fracture (level 1). Iran (IR) is an active NPC — takes actions each turn alongside US, CN, EU, IN, RU, GB. Six scenario-specific stochastic events model the proxy branches: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, and Gulf Bloc alignment choices (US alignment vs. China hedging).
 
 ### South China Sea, 2026
 China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the three scenarios — 9% baseline nuclear rate vs. 1% for Taiwan.

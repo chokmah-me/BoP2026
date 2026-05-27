@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-05-27 (v2.1.1)
+
+### Added
+- **North Korea (DPRK)** as an active power (`data/powers-data.js`, `js/ai.js`): military 68,
+  nuclear 7, riskTolerance 0.85, patience 0.35, priorityDomains military/nuclear/cyber.
+  Personality: brinkmanship doctrine, survival-first. Not yet featured in a scenario.
+
+### Fixed
+- **IR absent from world.powers in iran_nuclear_2026** (`data/scenarios-data.js`): Iran appeared
+  in crisis descriptions but was not in any `crisis.involved` array, so `State.init()` never
+  included it in the world. Result: 0 IR actions across all LLM runs. Fixed by adding IR to
+  `involved` for `iran_nuclear_program`, `hormuz_blockade_threat`, and `iran_proxy_escalation`.
+- **Iran scenario escalation stacking** (`data/scenarios-data.js`): starting escalation reduced
+  from 2→1 on the two military crises. `iran_nuclear_program` involved list narrowed to
+  [US, IR]; `iran_proxy_escalation` to [US, IR, EU, GB]. With all 7 powers previously in
+  `involved`, each power's military action applied +1 escalation per turn — easy +5 stacking
+  in one turn triggered the nuclear hair-trigger immediately. New heuristic baseline: 4% nuclear,
+  4.5 avg turns (was 0% nuclear/0 IR actions; scenario was effectively unplayable as designed).
+- **world.powers guard in ai.js** (`js/ai.js`): `getMostHostile()` and cooperative target
+  selection iterated `power.relationships` including absent powers (e.g. DPRK, which is in
+  POWERS_DATA but not in most scenarios). Absent power selected as target → cascade called
+  `State.getPower('DPRK').name` → crash. Both loops now guard with `otherId in world.powers`.
+
+### Calibration note
+Iran Nuclear heuristic baseline (50-run seed 200): 4% nuclear, avg stability 20.0, avg turns 4.5.
+Prior baseline (v2.0.6, no active IR): 0% nuclear, avg stability 21.2, avg turns 4.7.
+
 ## 2026-05-26 (v2.1.0)
 
 ### Added

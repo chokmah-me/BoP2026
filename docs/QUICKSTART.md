@@ -153,4 +153,58 @@ node scripts/test-analytics.js
 
 ---
 
+## 8. LLM NPC backend (DeepSeek)
+
+NPCs can use a DeepSeek LLM instead of the rule-based heuristic. Get a free API key at [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys).
+
+```powershell
+# Set key for the session (PowerShell)
+$env:DEEPSEEK_API_KEY = "sk-..."
+
+# bash/zsh
+export DEEPSEEK_API_KEY="sk-..."
+```
+
+```bash
+# Smoke test — 1 turn, verifies API connectivity (~$0.0002)
+node scripts/test-deepseek.js
+
+# Estimate cost before committing (no API calls)
+node scripts/run-bop.js --ai-backend deepseek --runs 50 --dry-run
+
+# CN + RU as LLM NPCs, 20 seeds, with prompt log
+node scripts/run-bop.js --ai-backend deepseek --ai-powers CN,RU \
+  --runs 20 --seed 0 --log-prompts --out logs/llm-cnru.json
+
+# All NPCs as LLM, 50 runs (~$0.10)
+node scripts/run-bop.js --ai-backend deepseek --runs 50 --seed 200
+
+# Iran scenario with all LLM NPCs (includes Iran/IR as active NPC)
+node scripts/run-bop.js --scenario iran_nuclear_2026 --ai-backend deepseek --runs 50 --seed 200
+```
+
+**Chat vs. thinking mode:**
+
+| Mode | Flag | Model | Cost/50-run | Use when |
+|------|------|-------|-------------|----------|
+| Chat (default) | _(none)_ | `deepseek-chat` | ~$0.10 | Parameter sweeps, baseline comparison, large runs |
+| Thinking | `--thinking` | `deepseek-reasoner` | ~$0.80 | Case studies, reasoning-chain analysis, pedagogical use |
+
+`--thinking` adds a chain-of-thought reasoning trace per NPC per turn. It's readable via `--log-prompts` — useful when you want to see *how* the LLM reasons about the crisis, not just what it decides. Eight times more expensive than chat mode, so don't use it for sweeps.
+
+**What the LLM does:** each NPC gets a system prompt with its personality, current crisis levels, stat summary, and available actions. Returns a JSON array of up to 3 actions within its AP budget. Invalid targets are dropped silently. Rate-limit errors retry with exponential backoff before falling back to the heuristic.
+
+**Approximate cost reference:**
+
+| Setup | Runs | Cost |
+|---|---|---|
+| 1 power (e.g. CN), 20 runs | 20 | ~$0.01 |
+| 2 powers (CN+RU), 50 runs | 50 | ~$0.05 |
+| All NPCs (7), 50 runs | 50 | ~$0.10 |
+| All NPCs, `--thinking`, 50 runs | 50 | ~$0.80 |
+
+Always run `--dry-run` first on a new setup to confirm the cost estimate before committing.
+
+---
+
 For full API reference, see [README.md](../README.md#oracle-api). For model assumptions and limitations, see [docs/model-notes.md](model-notes.md).
