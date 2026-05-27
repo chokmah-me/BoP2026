@@ -1,11 +1,35 @@
 # Changelog
 
+## 2026-05-27 (v2.2.1)
+
+### Fixed
+- **Entanglement cascade stacking** (`js/cascades.js`): Bystander powers were taking the -3
+  domestic penalty for *each* simultaneous entanglement event in the same cascade resolution.
+  In Korean Peninsula (3 concurrent multi-targeted powers per turn) this stacked to -9 domestic/turn
+  per bystander before any action effects landed, guaranteeing collapse in 2–3 turns. Fixed with a
+  `penalizedByEntanglement` Set in `apply3rdOrder()`: each bystander now takes the penalty at most
+  once per resolution. All scenarios benefit; most impactful in multi-crisis configurations.
+- **Korean Peninsula escalation rebalance** (`data/scenarios-data.js`): Starting escalation reduced:
+  ICBM Test Series 2→1, Sanctions Regime Collapse 2→1, Forward Nuclear Posture 3→2. Sum 8→5,
+  now in range with other scenarios (Iran 4, Taiwan 7). Post-fix heuristic baseline (25 runs,
+  seed 42): avg turns 9.1 (was 2.8), avg stability 28.7 (was 23.2). Scenario now supports
+  meaningful play arcs.
+
+## 2026-05-27 (v2.2.0)
+
+### Added
+- **Korean Peninsula 2026 scenario** (`data/scenarios-data.js`): DPRK as active NPC. Four crises:
+  ICBM Test Series (military, L2), Sanctions Regime Collapse (economic, L2), Lazarus Financial
+  Operations (cyber, L1), Forward Nuclear Posture (military, L3). DPRK intel matrix added —
+  US-on-DPRK quality 0.30 (most opaque state in game). Heuristic baseline (100 runs, seed 0–99):
+  0% nuclear, avg stability 19.7 (σ 3.0), avg turns 5.3 (σ 1.1).
+
 ## 2026-05-27 (v2.1.1)
 
 ### Added
 - **North Korea (DPRK)** as an active power (`data/powers-data.js`, `js/ai.js`): military 68,
   nuclear 7, riskTolerance 0.85, patience 0.35, priorityDomains military/nuclear/cyber.
-  Personality: brinkmanship doctrine, survival-first. Not yet featured in a scenario.
+  Personality: brinkmanship doctrine, survival-first. Featured in Korean Peninsula 2026 (v2.2.0).
 
 ### Fixed
 - **IR absent from world.powers in iran_nuclear_2026** (`data/scenarios-data.js`): Iran appeared

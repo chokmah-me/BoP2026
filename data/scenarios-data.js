@@ -129,5 +129,52 @@ window.SCENARIOS_DATA = {
       "GB":  { "US": 0.60, "CN": 0.65, "EU": 0.50, "IN": 0.55, "RU": 0.40, "IR": 0.50 },
       "IR":  { "US": 0.35, "CN": 0.50, "EU": 0.30, "IN": 0.40, "RU": 0.60, "GB": 0.55 }
     }
+  },
+  "korean_peninsula_2026": {
+    "id": "korean_peninsula_2026",
+    "name": "Korean Peninsula, 2026",
+    "description": "DPRK moves tactical warheads to forward positions after the latest ICBM series. China talks, Russia arms, the US 7th Fleet repositions. The peninsula is one miscalculation from exchange.",
+    "startYear": 2026,
+    "player": "US",
+    "crises": [
+      {
+        "id": "dprk_icbm_series", "name": "ICBM Test Series", "domain": "military",
+        "involved": ["DPRK", "US"], "escalationLevel": 1,
+        "description": "DPRK fires three Hwasong-18 ICBMs over Japan in 72 hours. US STRATCOM elevates alert. DEFCON 4.",
+        "region": "korean_peninsula", "location": { "x": 783, "y": 133 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "sanctions_collapse", "name": "Sanctions Regime Collapse", "domain": "economic",
+        "involved": ["US", "DPRK", "CN", "RU"], "escalationLevel": 1,
+        "description": "Russian oil-for-arms swap collapses UN sanctions. Chinese banks resume correspondent relationships. Treasury's maximum-pressure toolkit is broken.",
+        "region": "korean_peninsula", "location": { "x": 772, "y": 125 },
+        "age": 2, "cascadeLog": []
+      },
+      {
+        "id": "lazarus_financial_ops", "name": "Lazarus Financial Operations", "domain": "cyber",
+        "involved": ["DPRK", "US", "GB"], "escalationLevel": 1,
+        "description": "Lazarus Group drains $1.2B from South Korean and UK crypto exchanges. Funds routed to ICBM procurement. Attribution confirmed, response options limited.",
+        "region": "korean_peninsula", "location": { "x": 790, "y": 140 },
+        "age": 1, "cascadeLog": []
+      },
+      {
+        "id": "peninsula_nuclear_posture", "name": "Forward Nuclear Posture", "domain": "military",
+        "involved": ["DPRK", "US", "CN"], "escalationLevel": 2,
+        "description": "Satellite imagery confirms tactical warheads at Kaesong and Wonsan. Kim signals first-use if regime survival threatened. US-ROK combined exercises suspended under pressure.",
+        "region": "korean_peninsula", "location": { "x": 778, "y": 148 },
+        "age": 0, "cascadeLog": []
+      }
+    ],
+    "intelQuality": {
+      "US":   { "CN": 0.60, "EU": 0.80, "IN": 0.50, "RU": 0.55, "GB": 0.75, "IR": 0.40, "DPRK": 0.30 },
+      "CN":   { "US": 0.65, "EU": 0.45, "IN": 0.50, "RU": 0.70, "GB": 0.55, "IR": 0.50, "DPRK": 0.55 },
+      "EU":   { "US": 0.75, "CN": 0.40, "IN": 0.40, "RU": 0.55, "GB": 0.55, "IR": 0.40, "DPRK": 0.25 },
+      "IN":   { "US": 0.50, "CN": 0.55, "EU": 0.40, "RU": 0.35, "GB": 0.55, "IR": 0.45, "DPRK": 0.25 },
+      "RU":   { "US": 0.60, "CN": 0.65, "EU": 0.50, "IN": 0.35, "GB": 0.45, "IR": 0.65, "DPRK": 0.50 },
+      "GB":   { "US": 0.70, "CN": 0.55, "EU": 0.60, "IN": 0.55, "RU": 0.40, "IR": 0.55, "DPRK": 0.30 },
+      "IR":   { "US": 0.40, "CN": 0.50, "EU": 0.35, "IN": 0.45, "RU": 0.65, "GB": 0.55, "DPRK": 0.30 },
+      "DPRK": { "US": 0.35, "CN": 0.55, "EU": 0.25, "IN": 0.25, "RU": 0.45, "GB": 0.30, "IR": 0.30 }
+    }
   }
 };

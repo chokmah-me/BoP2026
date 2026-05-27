@@ -1,16 +1,16 @@
-# Zenodo Deposit — Balance of Power 2026 v2.0.6
+# Zenodo Deposit — Balance of Power 2026 v2.2.1
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
-**Deposit Date:** 24 May 2026 (updated 26 May 2026)  
+**Deposit Date:** 24 May 2026 (updated 27 May 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914
 
 ## Description
 
-Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Seven great powers (US, China, EU, Russia, India, Gulf Bloc, Iran) compete across eight domains: military, economic, cyber, information, diplomatic, domestic, supply chain, and autonomous systems. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
+Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Eight great powers (US, China, EU, Russia, India, Gulf Bloc, Iran, North Korea) compete across eight domains: military, economic, cyber, information, diplomatic, domestic, supply chain, and autonomous systems. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
 
-Three playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, and South China Sea 2026. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema: per-turn state deltas, relationship shifts, and crisis escalation levels, ready for analysis in Python or R.
+Four playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, and Korean Peninsula 2026. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema: per-turn state deltas, relationship shifts, and crisis escalation levels, ready for analysis in Python or R.
 
 Calibrated for face validity against open-source IR literature. Not intended for forecasting or policy prescription.
 
@@ -27,19 +27,39 @@ Calibrated for face validity against open-source IR literature. Not intended for
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.0.6)
+## Files Included in This Deposit (v2.2.1)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
 - Complete documentation (`README.md`, `docs/`)
-- 100-run baseline results for all three scenarios
+- 100-run baseline results for all four scenarios
 - Model assumptions and known limitations
 
-## Release Notes — v2.0.6
+## Release Notes — v2.2.1
 
 **What is this?**
 
-BoP2026 is a crisis simulation you can play in a browser or run headless from the command line to generate synthetic geopolitical data. This release (v2.0.6) is the first stable version after a significant AI overhaul.
+BoP2026 is a crisis simulation you can play in a browser or run headless from the command line to generate synthetic geopolitical data. v2.2.1 patches the Korean Peninsula scenario, which was unplayable on release due to two compounding bugs. v2.2.0 added the Korean Peninsula scenario and completed the eight-power engine. See Version History below for the full changelog from v2.0.6 through v2.2.1.
+
+**Entanglement cascade fix + KP rebalance (v2.2.1)**
+
+Bystander powers were taking -3 domestic for each simultaneous entanglement event in the same cascade resolution. In Korean Peninsula (3 concurrent targeting nodes per turn) this stacked to -9/turn per power, collapsing games in 2–3 turns. Fixed with a `penalizedByEntanglement` Set: each bystander now takes the penalty once per resolution. KP escalation levels also rebalanced (sum 8→5). Post-fix baseline: avg turns 9.1 (was 2.8), avg stability 28.7 (was 23.2).
+
+**Korean Peninsula 2026 (v2.2.0)**
+
+The fourth playable scenario. DPRK is the primary NPC antagonist — highest risk tolerance (0.85) and lowest patience (0.35) of any power. Four crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). Post-fix heuristic baseline: avg stability 28.7, avg turns 9.1.
+
+**Iran active + DPRK in engine (v2.1.1)**
+
+Iran (IR) was previously listed as a power but absent from all crisis `involved` arrays, so it never acted. Fixed. Iran nuclear baseline: 14% nuclear rate, avg stability 20.7, avg turns 4.4. DPRK added to engine with brinkmanship/survival-first doctrine. Not featured in a scenario until v2.2.0.
+
+**DeepSeek LLM NPC backend (v2.1.0)**
+
+NPCs can use a DeepSeek LLM instead of the rule-based heuristic. Headless only, requires `DEEPSEEK_API_KEY`. Supports `deepseek-chat` (default, ~$0.002/run) and `deepseek-reasoner` with chain-of-thought (`--thinking`, ~$0.016/run).
+
+**Original posture system (v2.0.6)**
+
+The AI overhaul:
 
 **The big change: the AI stopped being reckless**
 
@@ -58,19 +78,20 @@ Result: Iran nuclear rate dropped from 79% to 0%. SCS dropped from 9% to 4%. Tai
 - *Save and auto-save.* The game now downloads a timestamped JSON log automatically when it ends. You can also click Save Log at any point. The CLI defaults output to a `logs/` folder with a date-stamped filename.
 - *South China Sea scenario.* Third playable scenario added: contested reef seizure, drone swarm engagement, semiconductor chokepoint. Two new action domains — supply chain and autonomous systems — ship with it.
 
-**Baseline (100 runs, seed 0–99, v2.0.6)**
+**Heuristic baseline (v2.2.1, default parameters)**
 
 | Scenario | Nuclear % | Avg stability | Avg turns |
 |---|---|---|---|
 | Taiwan Strait 2026 | 0% | 22.5 (σ 2.8) | 4.7 (σ 0.8) |
-| Iran Nuclear 2026 | 0% | 21.2 (σ 3.2) | 4.7 (σ 0.9) |
+| Iran Nuclear 2026 | 14% | 20.7 (σ 5.4) | 4.4 (σ 0.9) |
 | South China Sea 2026 | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
+| Korean Peninsula 2026† | 0% | 28.7 | 9.1 |
 
-All scenarios end in loss under default conditions — they are designed to be hard. Win conditions require active crisis management the AI-controlled player does not attempt.
+All scenarios end in loss under default conditions — they are designed to be hard. Win conditions require active crisis management the AI-controlled player does not attempt. †KP: 25-run post-fix baseline (seed 42).
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.6). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.2.1). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
 
@@ -87,6 +108,14 @@ All scenarios end in loss under default conditions — they are designed to be h
 **v2.0.5 (2026-05-26):** AI audit — patience governs AP spending (patient powers conserve AP in low-crisis turns), generalized stat-health scoring (any stat below 45 prioritized, not just cyber/domestic), delayed effects queue now works (`reshoring_investment` +8 payoff fires in the correct future turn), pressure marker expiry (markers clear each turn and re-trigger only if conditions still hold).
 
 **v2.0.6 (2026-05-26):** Docs only. `ORACLE.md` schema corrected — `TurnResult` split into raw vs. analytics-export shapes, stale field references removed. `GROK_PROJECT.md` updated to reflect accurate doc state. Baseline re-run; all version refs updated to v2.0.6.
+
+**v2.1.0 (2026-05-26):** DeepSeek LLM NPC backend (`js/ai-deepseek.js`). Headless-only; supports `deepseek-chat` and `deepseek-reasoner` (chain-of-thought via `--thinking`). Dry-run cost estimate (`--dry-run`). Prompt logging (`--log-prompts`).
+
+**v2.1.1 (2026-05-27):** Iran (IR) wired into `iran_nuclear_2026` as active NPC — was in powers-data but absent from all crisis `involved` arrays. Iran nuclear baseline: 14% nuclear, avg 4.4 turns. DPRK added to engine (`powers-data.js`, `ai.js`) with brinkmanship/survival-first doctrine. AI guard added for absent-power target selection.
+
+**v2.2.0 (2026-05-27):** Korean Peninsula 2026 scenario. DPRK active NPC. Four crises: ICBM Test Series, Sanctions Collapse, Lazarus Cyber Ops, Forward Nuclear Posture. DPRK intel matrix (US-on-DPRK: 0.30).
+
+**v2.2.1 (2026-05-27):** Entanglement cascade cap — bystanders penalized once per cascade resolution (was once per entanglement event, stacking to -9/turn in KP). KP escalation rebalanced: sum 8→5 (2,2,1,3 → 1,1,1,2). Post-fix baseline: avg turns 9.1, avg stability 28.7.
 
 ## Contact & Repository
 

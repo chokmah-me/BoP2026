@@ -19,7 +19,7 @@ No npm, no build step. Node 16+ for headless runs. A modern browser for the game
 
 ```bash
 node scripts/run-bop.js --scenario taiwan_strait_2026 --runs 1 --seed 42 --out run.json
-# or: south_china_sea_2026, iran_nuclear_2026
+# or: south_china_sea_2026, iran_nuclear_2026, korean_peninsula_2026
 ```
 
 `run.json` is an array with one element. The analytics object inside it looks like:

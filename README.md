@@ -12,11 +12,11 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across eight domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is in the engine but not yet featured in a scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, compound crises).
+BoP2026 models great-power competition across eight domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, compound crises).
 
 The engine is designed for two uses:
 
-1. **Classroom / wargame**: play as the United States through the Taiwan Strait or Iran Nuclear scenarios in a browser, no install required.
+1. **Classroom / wargame**: play as the United States through the Taiwan Strait, Iran Nuclear, or Korean Peninsula scenarios in a browser, no install required.
 2. **Research companion**: run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
 
 This is a **stylized model**, not an empirically fitted one. Parameters are calibrated for face validity against open-source IR literature, not regression-estimated from historical data. See [docs/model-notes.md](docs/model-notes.md) for assumptions and limitations.
@@ -64,7 +64,7 @@ node scripts/analyze-results.js results.json
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
 | `--out <path>` | `logs/bop-{scenario}-{date}-s{seed}-x{runs}.json` | Output file (`bop2026-analytics-v1`). `logs/` dir created automatically. |
@@ -208,15 +208,16 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-100-run baseline (seed 0–99, default parameters, v2.1.1):
+Heuristic baseline (default parameters, v2.2.1):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
 | Taiwan Strait 2026 | 0% | 0% | 22.5 (σ 2.8) | 4.7 (σ 0.8) |
 | Iran Nuclear 2026 | 0% | 14% | 20.7 (σ 5.4) | 4.4 (σ 0.9) |
 | South China Sea 2026 | 0% | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
+| Korean Peninsula 2026† | 0% | 0% | 28.7 | 9.1 |
 
-Seed 0–99, default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all 300 runs ended in loss, reflecting how difficult crisis management is under default conditions. All scenarios are designed to be hard.
+Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance.
 
 Key findings from the baseline:
 
@@ -237,6 +238,9 @@ node scripts/analyze-results.js docs/iran-baseline.json
 
 node scripts/run-bop.js --scenario south_china_sea_2026 --runs 100 --seed 0 --out docs/scs-baseline.json
 node scripts/analyze-results.js docs/scs-baseline.json
+
+node scripts/run-bop.js --scenario korean_peninsula_2026 --runs 100 --seed 0 --out docs/korean-baseline.json
+node scripts/analyze-results.js docs/korean-baseline.json
 ```
 
 ---
@@ -250,7 +254,10 @@ PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active 
 Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 1), Hormuz closure threat (level 1), Iran proxy network (level 1), Gulf Bloc fracture (level 1). Iran (IR) is an active NPC — takes actions each turn alongside US, CN, EU, IN, RU, GB. Six scenario-specific stochastic events model the proxy branches: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, and Gulf Bloc alignment choices (US alignment vs. China hedging).
 
 ### South China Sea, 2026
-China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the three scenarios — 4% baseline nuclear rate vs. 0% for Taiwan.
+China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the four scenarios — 4% baseline nuclear rate vs. 0% for Taiwan.
+
+### Korean Peninsula, 2026
+DPRK moves tactical warheads to forward positions after the latest ICBM series. Four active crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK is the primary NPC antagonist — highest riskTolerance (0.85) and lowest patience (0.35) in the game. High starting escalation (sum 5) leaves little diplomatic margin.
 
 ---
 
@@ -280,7 +287,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.1.1). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.2.1). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

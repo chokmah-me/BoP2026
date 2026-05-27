@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.1.1 (2026-05-27)  
+**Current version:** v2.2.1 (2026-05-27)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -47,7 +47,8 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 - **Dry-run cost estimate** `v2.1.0` — `--dry-run` estimates token usage and API cost before any API calls.
 - **Prompt logging** `v2.1.0` — `--log-prompts` saves every prompt and raw LLM response to a `.jsonl` sidecar file.
 - **Iran (IR) as active NPC** `v2.1.1` — IR now acts each turn in `iran_nuclear_2026`. Fixed: IR was in powers-data but absent from all `crisis.involved` arrays, so `State.init()` never included it. Fixed scenario escalation stacking (narrowed `involved` lists, reduced starting levels from 2 to 1). Heuristic baseline: 14% nuclear, avg stability 20.7, avg turns 4.4.
-- **North Korea (DPRK) in engine** `v2.1.1` — Added to `data/powers-data.js` and `js/ai.js`. Stats: military 68, nuclear 7, riskTolerance 0.85, patience 0.35. Brinkmanship/survival-first doctrine. Not yet featured in a scenario.
+- **North Korea (DPRK) in engine** `v2.1.1` — Added to `data/powers-data.js` and `js/ai.js`. Stats: military 68, nuclear 7, riskTolerance 0.85, patience 0.35. Brinkmanship/survival-first doctrine.
+- **Korean Peninsula 2026 scenario** `v2.2.0` — DPRK active NPC. 4 crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK intel matrix added (US-on-DPRK: 0.30 — most opaque state). `v2.2.1` rebalanced escalation levels (sum 8→5) and fixed entanglement cascade stacking; post-fix baseline: avg stability 28.7, avg turns 9.1.
 
 **LLM chat vs. thinking mode:**
 
@@ -69,7 +70,7 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | **Biological Epidemic** | Engineered or natural outbreaks with international response mechanics. Interacts with domestic stability and sanctions. | "Pandemic as Strategic Weapon" |
 | **EMP Attacks** | Nuclear or non-nuclear EMP strikes causing infrastructure collapse, cyber blackouts, and command disruption. | "The EMP Nightmare" |
 | **Domestic Faction System** | Replace unitary actor model with hardliner vs. moderate factions. Internal politics shapes action selection. | Compound threat modeling |
-| **Korean Peninsula scenario** | Wire DPRK into a Northeast Asia scenario as an active NPC. | DPRK brinkmanship doctrine |
+| ~~**Korean Peninsula scenario**~~ | ~~Wire DPRK into a Northeast Asia scenario as an active NPC.~~ | **Shipped v2.2.0** |
 
 ### Medium Priority (future)
 
@@ -96,12 +97,12 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 - [x] Compound crisis mechanics: Supply Chain + Autonomous (SCS), Iran proxy + nuclear (Iran) — **met v2.0.x**
 - [x] Model at least 3 compound crises with divergent trajectories — **met v2.0.x**
 - [ ] Cover at least 4 of 7 Krepinevich scenarios with playable domain content (currently 3: Supply Chain, Autonomous, partial Financial)
-- [ ] Korean Peninsula scenario playable with DPRK as active NPC
+- [x] Korean Peninsula scenario playable with DPRK as active NPC — **shipped v2.2.0**
 - [ ] Biological + EMP domains complete and integrated into at least one scenario each
 
 ---
 
-**Next Milestone:** v2.2.0 — Biological Epidemic domain + EMP Attacks + Domestic Faction System
+**Next Milestone:** v2.3.0 — Biological Epidemic domain + EMP Attacks + Domestic Faction System
 
 ---
 

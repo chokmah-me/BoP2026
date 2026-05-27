@@ -314,20 +314,25 @@ const Cascades = (() => {
         type: 'systemic_event' });
     }
 
-    // Third-party entanglement: multiple powers targeting the same actor
+    // Third-party entanglement: multiple powers targeting the same actor.
+    // Each bystander takes -3 domestic at most once per cascade resolution,
+    // regardless of how many simultaneous entanglement events fire.
     const targetCounts = {};
     for (const action of actions) {
       if (action.target) {
         targetCounts[action.target] = (targetCounts[action.target] || 0) + 1;
       }
     }
+    const penalizedByEntanglement = new Set();
     for (const [targetId, count] of Object.entries(targetCounts)) {
       if (count >= 2) {
         const target = State.getPower(targetId);
-        const bystanders = getBystanderPowers(null, targetId, world);
+        const bystanders = getBystanderPowers(null, targetId, world)
+          .filter(id => !penalizedByEntanglement.has(id));
         for (const b of bystanders) {
           State.adjustRelationship(b, targetId, 8);
           State.applyStatDelta(b, 'domestic', -3);
+          penalizedByEntanglement.add(b);
         }
         if (bystanders.length > 0) {
           log.push({ order: 3, confidence: 'LIKELY (65%)', actor: 'SYSTEM',

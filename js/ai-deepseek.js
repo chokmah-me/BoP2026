@@ -52,7 +52,7 @@ class DeepSeekBackend {
         { role: 'system', content: systemMsg },
         { role: 'user', content: userMsg }
       ],
-      max_tokens: 300,
+      max_tokens: this.model === 'deepseek-reasoner' ? 4000 : 300,
       temperature: 0.6
     });
 
@@ -84,7 +84,12 @@ class DeepSeekBackend {
         }
 
         const data = await resp.json();
-        const responseText = data.choices[0]?.message?.content || '';
+        const msg = data.choices[0]?.message || {};
+        const reasoningContent = msg.reasoning_content || '';
+        const rawContent = msg.content || '';
+        // deepseek-reasoner may embed chain-of-thought in <think>...</think> inside content;
+        // strip it so the JSON array search doesn't match text inside the thinking block.
+        const responseText = rawContent.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
 
         const usage = data.usage || {};
         this._inputTokens += usage.prompt_tokens || 0;
@@ -94,7 +99,9 @@ class DeepSeekBackend {
           const entry = JSON.stringify({
             promptVersion: PROMPT_VERSION,
             powerId, turn: world.turn, model: this.model,
-            systemMsg, userMsg, response: responseText, usage
+            systemMsg, userMsg,
+            reasoning: reasoningContent || undefined,
+            response: responseText, usage
           }) + '\n';
           fs.appendFileSync(this.logFile, entry);
         }
