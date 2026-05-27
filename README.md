@@ -103,7 +103,7 @@ DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
 
 LLM NPCs use prompt version `v1.2` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
 
-**Chat vs. thinking mode:** the default `deepseek-chat` is fast and cheap (~$0.10/50-run all NPCs). Use it for parameter sweeps and baseline comparison. `--thinking` switches to `deepseek-reasoner` (~$0.80/50-run), which generates a chain-of-thought reasoning trace per NPC per turn. Use thinking mode when you want to study *how* an LLM agent reasons about crisis escalation — the traces are logged to the `.jsonl` sidecar via `--log-prompts`. Not worth the 8× cost for bulk runs.
+**Chat vs. thinking mode:** the default `deepseek-chat` is fast and cheap (about $0.10/50-run, all NPCs). Use it for parameter sweeps and baseline comparison. `--thinking` switches to `deepseek-reasoner` (about $0.80/50-run), which generates a chain-of-thought reasoning trace per NPC per turn. Use thinking mode when you want to study *how* an LLM agent reasons about crisis escalation — the traces are logged to the `.jsonl` sidecar via `--log-prompts`. Not worth the 8x cost for bulk runs.
 
 **Empirical results (20 seeds 0–19, `taiwan_strait_2026` and `iran_nuclear_2026`):**
 

@@ -187,8 +187,8 @@ node scripts/run-bop.js --scenario iran_nuclear_2026 --ai-backend deepseek --run
 
 | Mode | Flag | Model | Cost/50-run | Use when |
 |------|------|-------|-------------|----------|
-| Chat (default) | _(none)_ | `deepseek-chat` | ~$0.10 | Parameter sweeps, baseline comparison, large runs |
-| Thinking | `--thinking` | `deepseek-reasoner` | ~$0.80 | Case studies, reasoning-chain analysis, pedagogical use |
+| Chat (default) | _(none)_ | `deepseek-chat` | $0.10 | Parameter sweeps, baseline comparison, large runs |
+| Thinking | `--thinking` | `deepseek-reasoner` | $0.80 | Case studies, reasoning-chain analysis, pedagogical use |
 
 `--thinking` adds a chain-of-thought reasoning trace per NPC per turn. It's readable via `--log-prompts` — useful when you want to see *how* the LLM reasons about the crisis, not just what it decides. Eight times more expensive than chat mode, so don't use it for sweeps.
 
@@ -198,10 +198,10 @@ node scripts/run-bop.js --scenario iran_nuclear_2026 --ai-backend deepseek --run
 
 | Setup | Runs | Cost |
 |---|---|---|
-| 1 power (e.g. CN), 20 runs | 20 | ~$0.01 |
-| 2 powers (CN+RU), 50 runs | 50 | ~$0.05 |
-| All NPCs (7), 50 runs | 50 | ~$0.10 |
-| All NPCs, `--thinking`, 50 runs | 50 | ~$0.80 |
+| 1 power (e.g. CN), 20 runs | 20 | $0.01 |
+| 2 powers (CN+RU), 50 runs | 50 | $0.05 |
+| All NPCs (7), 50 runs | 50 | $0.10 |
+| All NPCs, `--thinking`, 50 runs | 50 | $0.80 |
 
 Always run `--dry-run` first on a new setup to confirm the cost estimate before committing.
 

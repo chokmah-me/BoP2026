@@ -51,8 +51,8 @@ Two model modes:
 
 | Mode | Flag | Model | Cost/50-run (all NPCs) | Use when |
 |------|------|-------|------------------------|----------|
-| Chat (default) | _(none)_ | `deepseek-chat` | ~$0.10 | Baseline comparison, parameter sweeps, quick iteration |
-| Thinking | `--thinking` | `deepseek-reasoner` | ~$0.80 | Deep case studies, reasoning-chain analysis, pedagogical use |
+| Chat (default) | _(none)_ | `deepseek-chat` | $0.10 | Baseline comparison, parameter sweeps, quick iteration |
+| Thinking | `--thinking` | `deepseek-reasoner` | $0.80 | Deep case studies, reasoning-chain analysis, pedagogical use |
 
 `--thinking` logs a chain-of-thought reasoning trace per NPC per turn (visible with `--log-prompts`). Good for studying *how* an LLM agent reasons about crisis escalation, not just what it decides. Not worth the 8x cost for sweeps — use chat mode for those.
 
