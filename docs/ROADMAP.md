@@ -40,6 +40,13 @@ BoP2026 v1.1 will operationalize several of these insights by expanding the doma
 | **Biological Epidemic**        | Engineered or natural biological outbreaks with international response mechanics. Interacts with domestic stability and sanctions. | "Pandemic as Strategic Weapon" | **High** |
 | **EMP Attacks**                | Nuclear or non-nuclear electromagnetic pulse strikes causing infrastructure collapse, cyber blackouts, and command disruption. | "The EMP Nightmare" scenario | **High** |
 
+### New Powers (Required)
+
+- **Iran (IR)** — Must be added as a playable power. Currently IR appears in crisis names (`iran_nuclear_2026` scenario) but is not in `POWERS_DATA`, causing LLM NPCs to hallucinate it as a valid target and crash. Needed for the Iran scenario to be fully playable and for the LLM backend to reason about it correctly.
+- **North Korea (DPRK)** — Must be added as a playable power. Key actor in any Northeast Asia / peninsula scenario; absence creates the same hallucination risk as IR.
+
+Both should be added to `data/powers-data.js` with appropriate stats, relationships, and personalities in `js/ai.js` before any scenario that features them is promoted to a full LLM run.
+
 ### Other Core v1.1 Features
 
 - **Domestic Faction System** — Replace unitary actor model with hardliner vs. moderate factions

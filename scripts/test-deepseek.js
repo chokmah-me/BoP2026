@@ -41,7 +41,7 @@ load('js/ai.js');
 load('js/oracle.js');
 
 const BoP = ctx.BoP;
-const DeepSeekBackend = require('./ai-deepseek.js');
+const DeepSeekBackend = require('../js/ai-deepseek.js');
 
 // ── Run one turn ─────────────────────────────────────────────────────────────
 (async () => {

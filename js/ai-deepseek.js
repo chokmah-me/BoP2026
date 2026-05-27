@@ -13,7 +13,7 @@
 const fs = require('fs');
 
 // Bump when prompt structure changes so logged runs stay comparable across experiments.
-const PROMPT_VERSION = 'v1.0';
+const PROMPT_VERSION = 'v1.2';
 
 // Pricing per 1M tokens (deepseek-chat / deepseek-v4-flash, non-thinking)
 const PRICE_INPUT = 0.14;
@@ -61,8 +61,8 @@ class DeepSeekBackend {
             { role: 'system', content: systemMsg },
             { role: 'user', content: userMsg }
           ],
-          max_tokens: 200,
-          temperature: 0.4
+          max_tokens: 300,
+          temperature: 0.6
         })
       });
 
@@ -87,8 +87,9 @@ class DeepSeekBackend {
         fs.appendFileSync(this.logFile, entry);
       }
 
-      const parsed = this._parseResponse(responseText, powerId);
-      if (parsed) return [parsed];
+      const validTargets = new Set(Object.keys(world.powers).filter(id => id !== powerId));
+      const parsed = this._parseResponse(responseText, powerId, pw, validTargets);
+      if (parsed.length > 0) return parsed;
 
       process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: bad parse, using fallback\n`);
     } catch (err) {
@@ -99,9 +100,14 @@ class DeepSeekBackend {
   }
 
   _buildPrompt(powerId, pw, world) {
-    const crisesList = world.crises
-      .filter(c => c.escalationLevel > 0)
-      .map(c => `${c.id}(lvl ${c.escalationLevel}, parties:${(c.involved || []).join(',')})`)
+    const myCrises = world.crises
+      .filter(c => c.escalationLevel > 0 && (c.involved || []).includes(powerId))
+      .map(c => `${c.id}(lvl ${c.escalationLevel}/5)`)
+      .join('; ') || 'none';
+
+    const otherCrises = world.crises
+      .filter(c => c.escalationLevel > 0 && !(c.involved || []).includes(powerId))
+      .map(c => `${c.id}(lvl ${c.escalationLevel}/5, parties:${(c.involved || []).join(',')})`)
       .join('; ') || 'none';
 
     const rels = Object.entries(pw.relationships)
@@ -117,41 +123,68 @@ class DeepSeekBackend {
     const otherPowers = Object.keys(world.powers).filter(id => id !== powerId).join(', ');
 
     const systemMsg =
-`You are ${powerId} in Balance of Power 2026, a turn-based geopolitical crisis simulation.
+`You are ${powerId} in Balance of Power 2026, a turn-based geopolitical simulation.
 Personality: risk_tolerance=${(pw.riskTolerance||0.5).toFixed(2)}, patience=${(pw.patience||0.5).toFixed(2)}.
 Priority domains: ${(pw.priorityDomains||[]).join(', ') || 'military, economic'}.
-Goal: advance national interests. Avoid crisis level 5 (nuclear exchange = game over).
-If requiresTarget=required, pick one power from: ${otherPowers}.
-Respond ONLY with JSON: {"actionId":"<id>","target":"<powerId or null>"}`;
+Goal: advance national interests. Crisis level 5 = nuclear exchange = game over for all.
+You have ${ap} AP to spend. Spend as much AP as useful — pick 1 to 3 actions whose costs sum to at most ${ap}.
+If requiresTarget=required, target MUST be one of these exact IDs: ${otherPowers}. No other values are valid.
+Respond ONLY with a JSON array: [{"actionId":"<id>","target":"<powerId or null>"}, ...]
+Pick diverse actions across domains — do not repeat the same actionId more than once.`;
 
     const userMsg =
 `Turn ${world.turn} (${world.year}). AP=${ap}.
 Stats: ${JSON.stringify(pw.trueState)}.
 Relations: ${rels}.
-Crises: ${crisesList}.
-Actions:
+YOUR crises (act on these): ${myCrises}.
+Other crises: ${otherCrises}.
+Available actions:
 ${actionLines}`;
 
     return { systemMsg, userMsg };
   }
 
-  _parseResponse(text, powerId) {
-    const match = text.match(/\{[^{}]+\}/);
-    if (!match) return null;
-    try {
-      const obj = JSON.parse(match[0]);
-      if (!obj.actionId || typeof obj.actionId !== 'string') return null;
+  _parseResponse(text, powerId, pw, validTargets) {
+    const ap = pw ? (pw.actionPointsRemaining ?? pw.actionPoints ?? 3) : 3;
+    // Accept either an array or a single object
+    const arrMatch = text.match(/\[[\s\S]*?\]/);
+    const objMatch = text.match(/\{[^{}]+\}/);
+    let items = [];
+    if (arrMatch) {
+      try { items = JSON.parse(arrMatch[0]); } catch { /* fall through */ }
+    }
+    if (!Array.isArray(items) || items.length === 0) {
+      if (objMatch) {
+        try { const o = JSON.parse(objMatch[0]); if (o.actionId) items = [o]; } catch { /* ignore */ }
+      }
+    }
+    if (!Array.isArray(items) || items.length === 0) return [];
+
+    const results = [];
+    let apUsed = 0;
+    const usedIds = new Set();
+    for (const obj of items) {
+      if (!obj.actionId || typeof obj.actionId !== 'string') continue;
+      if (usedIds.has(obj.actionId)) continue; // no duplicates
       const action = this.actions.find(a => a.id === obj.actionId);
-      if (!action) return null;
-      return {
+      if (!action) continue;
+      const cost = action.cost || 1;
+      if (apUsed + cost > ap) break;
+      // Validate target is a real power; drop invalid targets rather than crashing
+      let target = obj.target && obj.target !== 'null' ? obj.target : null;
+      if (target && validTargets && !validTargets.has(target)) target = null;
+      // If action requires a target and we have none, skip it
+      if (action.requiresTarget && !target) continue;
+      results.push({
         actor: powerId,
         actionId: obj.actionId,
-        target: obj.target && obj.target !== 'null' ? obj.target : null,
+        target,
         flavor: `[LLM] ${powerId} selects ${action.name}.`
-      };
-    } catch {
-      return null;
+      });
+      apUsed += cost;
+      usedIds.add(obj.actionId);
     }
+    return results;
   }
 
   /**
