@@ -73,6 +73,44 @@ node scripts/analyze-results.js results.json
 | `--cascade-scale <f>` | `1.0` | Multiplier on systemic event deltas (0 = off) |
 | `--<power>-risk <f>` | persona default | Override riskTolerance (0–1). E.g. `--cn-risk 0.9` |
 | `--<power>-patience <f>` | persona default | Override patience (0–1). E.g. `--ru-patience 0.2` |
+| `--ai-backend <id>` | `heuristic` | NPC AI backend: `heuristic` or `deepseek` |
+| `--ai-powers <ids>` | `all` | Powers using LLM backend: `all` or comma-list e.g. `CN,RU` |
+| `--log-prompts` | off | Save LLM prompt+response to a `.jsonl` sidecar file |
+| `--thinking` | off | Use `deepseek-reasoner` (chain-of-thought) instead of `deepseek-chat` |
+| `--dry-run` | off | Estimate token cost without making API calls (DeepSeek only) |
+
+### LLM NPC backend (DeepSeek)
+
+NPCs can use a DeepSeek LLM instead of the rule-based heuristic. Headless only — no browser support. Requires a `DEEPSEEK_API_KEY` environment variable.
+
+```bash
+# Smoke test — 1 turn, ~$0.0002
+DEEPSEEK_API_KEY=sk-... node scripts/test-deepseek.js
+
+# CN + RU as LLM NPCs, 20 seeds, with prompt log
+DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
+  --ai-backend deepseek --ai-powers CN,RU \
+  --runs 20 --seed 0 --log-prompts --out logs/llm-cnru.json
+
+# All 5 NPCs, 50 runs (~$0.10)
+DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
+  --ai-backend deepseek --runs 50 --seed 200
+
+# Dry-run cost estimate — no API calls made
+DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
+  --ai-backend deepseek --runs 50 --dry-run
+```
+
+LLM NPCs use prompt version `v1.2` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
+
+**Empirical results (Phase 2, 20 seeds, `taiwan_strait_2026` and `iran_nuclear_2026`):**
+
+| Scenario | Backend | Avg stability | Avg turns | Nuclear % |
+|----------|---------|---------------|-----------|-----------|
+| Taiwan Strait | Heuristic | 21.6 | 4.5 | 0% |
+| Taiwan Strait | LLM CN+RU | **26.4** | 5.2 | 0% |
+| Iran Nuclear | Heuristic | 21.3 | 5.3 | 0% |
+| Iran Nuclear | LLM CN+RU | **28.6** | 5.1 | 0% |
 
 ---
 

@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-05-26 (v2.1.0)
+
+### Added
+- **DeepSeek LLM NPC backend** (`js/ai-deepseek.js`): headless-only LLM backend for NPC
+  decision-making. Replaces the rule-based heuristic for any subset of powers via
+  `--ai-backend deepseek --ai-powers CN,RU` (or `all`). Requires `DEEPSEEK_API_KEY` env var.
+  Supports `deepseek-chat` (default) and `deepseek-reasoner` (chain-of-thought via
+  `--thinking`). Prompt version tracked in `PROMPT_VERSION` constant for reproducibility.
+- **Dry-run cost estimate** (`scripts/run-bop.js --dry-run`): estimates token usage and
+  API cost before making any API calls.
+- **Prompt logging** (`--log-prompts`): saves every system+user prompt and raw LLM response
+  to a `.jsonl` sidecar file alongside the batch output, keyed by `promptVersion`.
+- **Phase 0 smoke test** (`scripts/test-deepseek.js`): single-turn integration test that
+  validates API connectivity, action parsing, and cost reporting. Costs ~$0.0002.
+
+### Fixed
+- **Single-action bottleneck** (`js/ai-deepseek.js` prompt v1.1): LLM was returning one
+  action per turn, leaving 2/3 AP unspent. Prompt now requests a JSON array; parser
+  validates the AP budget and deduplicates action IDs across the array.
+- **Hallucinated power targets** (`js/ai-deepseek.js` prompt v1.2): LLM targeted `"IR"`
+  in `iran_nuclear_2026` — Iran appears in crisis names but is not a playable power.
+  `_parseResponse` now validates all targets against `world.powers`; invalid targets are
+  dropped; `requiresTarget` actions with no valid target are skipped rather than forwarded
+  to cascade.
+- **Rate-limit fetch failures** (`js/ai-deepseek.js`): burst API calls across 5 NPCs hit
+  DeepSeek's rate limit (34.7% fallback rate in Phase 3). Replaced silent fallback with
+  exponential backoff retry (1s → 2s → 4s → 8s, 4 attempts) on HTTP 429/503 and transient
+  network errors.
+- **Smoke test require path** (`scripts/test-deepseek.js`): corrected
+  `./ai-deepseek` → `../js/ai-deepseek`.
+
+### Research note (v2.1.0 LLM baseline)
+Phase 2 comparison, 20 seeds, CN+RU as LLM NPCs vs. full heuristic:
+- Taiwan Strait: avg stability 21.6 → 26.4 (+4.8), avg turns 4.5 → 5.2 (+0.7)
+- Iran Nuclear: avg stability 21.3 → 28.6 (+7.3), avg turns 5.3 → 5.1 (−0.2)
+
+LLM NPCs consistently raise global stability without increasing nuclear risk.
+RU shows the highest action diversity (17–21 action types); CN defaults toward diplomatic
+actions (`trade_deal`, `bilateral_negotiation`, `cyber_defense_hardening`).
+
 ## 2026-05-26 (v2.0.6)
 
 ### Fixed
