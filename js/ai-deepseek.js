@@ -46,54 +46,75 @@ class DeepSeekBackend {
     if (!pw) return fallbackFn ? fallbackFn(powerId, world) : [];
 
     const { systemMsg, userMsg } = this._buildPrompt(powerId, pw, world);
-    let responseText = null;
+    const body = JSON.stringify({
+      model: this.model,
+      messages: [
+        { role: 'system', content: systemMsg },
+        { role: 'user', content: userMsg }
+      ],
+      max_tokens: 300,
+      temperature: 0.6
+    });
 
-    try {
-      const resp = await fetch('https://api.deepseek.com/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: [
-            { role: 'system', content: systemMsg },
-            { role: 'user', content: userMsg }
-          ],
-          max_tokens: 300,
-          temperature: 0.6
-        })
-      });
+    const MAX_RETRIES = 4;
+    const BASE_DELAY_MS = 1000;
 
-      if (!resp.ok) {
-        const errText = await resp.text();
-        throw new Error(`HTTP ${resp.status}: ${errText.slice(0, 200)}`);
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const resp = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`
+          },
+          body
+        });
+
+        // Rate limited — back off and retry
+        if (resp.status === 429 || resp.status === 503) {
+          const delay = BASE_DELAY_MS * Math.pow(2, attempt);
+          process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: HTTP ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})\n`);
+          await new Promise(r => setTimeout(r, delay));
+          continue;
+        }
+
+        if (!resp.ok) {
+          const errText = await resp.text();
+          throw new Error(`HTTP ${resp.status}: ${errText.slice(0, 200)}`);
+        }
+
+        const data = await resp.json();
+        const responseText = data.choices[0]?.message?.content || '';
+
+        const usage = data.usage || {};
+        this._inputTokens += usage.prompt_tokens || 0;
+        this._outputTokens += usage.completion_tokens || 0;
+
+        if (this.logPrompts && this.logFile) {
+          const entry = JSON.stringify({
+            promptVersion: PROMPT_VERSION,
+            powerId, turn: world.turn, model: this.model,
+            systemMsg, userMsg, response: responseText, usage
+          }) + '\n';
+          fs.appendFileSync(this.logFile, entry);
+        }
+
+        const validTargets = new Set(Object.keys(world.powers).filter(id => id !== powerId));
+        const parsed = this._parseResponse(responseText, powerId, pw, validTargets);
+        if (parsed.length > 0) return parsed;
+
+        process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: bad parse, using fallback\n`);
+        break;
+      } catch (err) {
+        // Transient network failure — retry with backoff
+        if (attempt < MAX_RETRIES) {
+          const delay = BASE_DELAY_MS * Math.pow(2, attempt);
+          process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: ${err.message}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})\n`);
+          await new Promise(r => setTimeout(r, delay));
+        } else {
+          process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: ${err.message} — giving up, using fallback\n`);
+        }
       }
-
-      const data = await resp.json();
-      responseText = data.choices[0]?.message?.content || '';
-
-      const usage = data.usage || {};
-      this._inputTokens += usage.prompt_tokens || 0;
-      this._outputTokens += usage.completion_tokens || 0;
-
-      if (this.logPrompts && this.logFile) {
-        const entry = JSON.stringify({
-          promptVersion: PROMPT_VERSION,
-          powerId, turn: world.turn, model: this.model,
-          systemMsg, userMsg, response: responseText, usage
-        }) + '\n';
-        fs.appendFileSync(this.logFile, entry);
-      }
-
-      const validTargets = new Set(Object.keys(world.powers).filter(id => id !== powerId));
-      const parsed = this._parseResponse(responseText, powerId, pw, validTargets);
-      if (parsed.length > 0) return parsed;
-
-      process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: bad parse, using fallback\n`);
-    } catch (err) {
-      process.stderr.write(`[DeepSeek] ${powerId} t${world.turn} error: ${err.message} — using fallback\n`);
     }
 
     return fallbackFn ? fallbackFn(powerId, world) : [];
