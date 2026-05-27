@@ -92,7 +92,7 @@ DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
   --ai-backend deepseek --ai-powers CN,RU \
   --runs 20 --seed 0 --log-prompts --out logs/llm-cnru.json
 
-# All 5 NPCs, 50 runs (~$0.10)
+# All NPCs, 50 runs (~$0.10)
 DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
   --ai-backend deepseek --runs 50 --seed 200
 
@@ -208,7 +208,7 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-100-run baseline (seed 0–99, default parameters, v2.0.6):
+100-run baseline (seed 0–99, default parameters, v2.1.1):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
@@ -244,13 +244,13 @@ node scripts/analyze-results.js docs/scs-baseline.json
 ## Scenarios
 
 ### Taiwan Strait, 2026
-PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active crises at start: Taiwan military escalation (level 2), US-China trade war (level 3), Baltic cyber probe (level 1). Seven powers active.
+PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active crises at start: Taiwan military escalation (level 2), US-China trade war (level 3), Baltic cyber probe (level 1). Five NPCs active (CN, EU, IN, RU, GB).
 
 ### Iran Nuclear Threshold, 2026
 Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 1), Hormuz closure threat (level 1), Iran proxy network (level 1), Gulf Bloc fracture (level 1). Iran (IR) is an active NPC — takes actions each turn alongside US, CN, EU, IN, RU, GB. Six scenario-specific stochastic events model the proxy branches: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, and Gulf Bloc alignment choices (US alignment vs. China hedging).
 
 ### South China Sea, 2026
-China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the three scenarios — 9% baseline nuclear rate vs. 1% for Taiwan.
+China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the three scenarios — 4% baseline nuclear rate vs. 0% for Taiwan.
 
 ---
 
@@ -280,7 +280,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.0.6). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.1.1). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---
