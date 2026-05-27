@@ -47,21 +47,21 @@ window.SCENARIOS_DATA = {
     "crises": [
       {
         "id": "iran_nuclear_program", "name": "Iran Nuclear Threshold", "domain": "military",
-        "involved": ["US", "EU", "IN", "CN", "RU"], "escalationLevel": 2,
+        "involved": ["US", "IR"], "escalationLevel": 1,
         "description": "IAEA inspectors expelled. Enrichment at 84%. Israeli strike window opening. US 5th Fleet on alert in the Gulf.",
         "region": "persian_gulf", "location": { "x": 580, "y": 155 },
         "age": 0, "cascadeLog": []
       },
       {
         "id": "hormuz_blockade_threat", "name": "Hormuz Closure Threat", "domain": "economic",
-        "involved": ["GB", "US", "IN"], "escalationLevel": 1,
+        "involved": ["GB", "US", "IN", "IR"], "escalationLevel": 1,
         "description": "IRGC commanders threaten Strait of Hormuz closure. Oil markets spike 18%. Indian Navy on quiet standby.",
         "region": "persian_gulf", "location": { "x": 592, "y": 172 },
         "age": 0, "cascadeLog": []
       },
       {
         "id": "iran_proxy_escalation", "name": "Iran Proxy Network Activated", "domain": "military",
-        "involved": ["EU", "GB", "US", "RU", "CN"], "escalationLevel": 2,
+        "involved": ["US", "IR", "EU", "GB"], "escalationLevel": 1,
         "description": "Hezbollah on highest alert. Houthi strikes resuming. Iranian-backed militias mobilizing across Iraq and Syria.",
         "region": "levant", "location": { "x": 548, "y": 170 },
         "age": 1, "cascadeLog": []

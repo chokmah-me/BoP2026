@@ -79,6 +79,18 @@ const AI = (() => {
         'Iran leverages its resistance axis to apply pressure.',
         'The nuclear program advances, step by carefully calculated step.'
       ]
+    },
+    DPRK: {
+      riskTolerance: 0.85,
+      patience: 0.35,
+      priorityDomains: ['military', 'nuclear', 'cyber'],
+      flavorText: [
+        'Pyongyang tests a ballistic missile, daring the world to respond.',
+        'The DPRK leverages nuclear ambiguity to extract concessions.',
+        'A provocation is calibrated — enough to signal resolve, not enough to invite retaliation.',
+        'Kim Jong-un reads hesitation as invitation.',
+        'The regime prioritizes survival above all else.'
+      ]
     }
   };
 
@@ -172,7 +184,7 @@ const AI = (() => {
     let mostHostile = null;
     let lowestRel = 0;
     for (const [otherId, rel] of Object.entries(power.relationships)) {
-      if (rel < lowestRel) {
+      if (otherId in world.powers && rel < lowestRel) {
         lowestRel = rel;
         mostHostile = otherId;
       }
@@ -282,7 +294,7 @@ const AI = (() => {
       let bestId = null;
       let bestRel = -Infinity;
       for (const [otherId, rel] of Object.entries(actor.relationships)) {
-        if (otherId !== actorId && rel > bestRel) {
+        if (otherId in world.powers && otherId !== actorId && rel > bestRel) {
           bestRel = rel;
           bestId = otherId;
         }
