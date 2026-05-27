@@ -15,12 +15,11 @@ const fs = require('fs');
 // Bump when prompt structure changes so logged runs stay comparable across experiments.
 const PROMPT_VERSION = 'v1.2';
 
-// Pricing per 1M tokens (deepseek-chat / deepseek-v4-flash, non-thinking)
-const PRICE_INPUT = 0.14;
-const PRICE_OUTPUT = 0.28;
-// deepseek-reasoner (thinking mode)
-const PRICE_INPUT_THINK = 0.55;
-const PRICE_OUTPUT_THINK = 2.19;
+// Pricing per 1M tokens (deepseek-v4-flash, used for both deepseek-chat and deepseek-reasoner).
+// DeepSeek bills reasoner at chat prices — confirmed against dashboard usage data 2026-05-27.
+const PRICE_INPUT_MISS = 0.14;   // cache miss
+const PRICE_INPUT_HIT  = 0.0028; // cache hit (50x cheaper)
+const PRICE_OUTPUT     = 0.28;
 
 class DeepSeekBackend {
   constructor(options = {}) {
@@ -30,6 +29,7 @@ class DeepSeekBackend {
     this.logFile = options.logFile || null;
     this.actions = options.actions || [];
     this._inputTokens = 0;
+    this._inputCacheHit = 0;
     this._outputTokens = 0;
   }
 
@@ -92,7 +92,9 @@ class DeepSeekBackend {
         const responseText = rawContent.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
 
         const usage = data.usage || {};
-        this._inputTokens += usage.prompt_tokens || 0;
+        const cacheHit = usage.prompt_cache_hit_tokens || 0;
+        this._inputTokens += (usage.prompt_tokens || 0) - cacheHit;
+        this._inputCacheHit += cacheHit;
         this._outputTokens += usage.completion_tokens || 0;
 
         if (this.logPrompts && this.logFile) {
@@ -219,14 +221,14 @@ ${actionLines}`;
    * Return token usage and estimated cost so far.
    */
   getCostSummary() {
-    const isThinking = this.model === 'deepseek-reasoner';
-    const priceIn = isThinking ? PRICE_INPUT_THINK : PRICE_INPUT;
-    const priceOut = isThinking ? PRICE_OUTPUT_THINK : PRICE_OUTPUT;
-    const cost = (this._inputTokens / 1e6) * priceIn + (this._outputTokens / 1e6) * priceOut;
+    const cost = (this._inputTokens / 1e6) * PRICE_INPUT_MISS
+               + (this._inputCacheHit / 1e6) * PRICE_INPUT_HIT
+               + (this._outputTokens / 1e6) * PRICE_OUTPUT;
     return {
       promptVersion: PROMPT_VERSION,
       model: this.model,
       inputTokens: this._inputTokens,
+      inputCacheHitTokens: this._inputCacheHit,
       outputTokens: this._outputTokens,
       estimatedCostUSD: parseFloat(cost.toFixed(5))
     };

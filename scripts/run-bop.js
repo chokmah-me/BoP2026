@@ -259,7 +259,8 @@ async function runAll() {
     const cost = backend.getCostSummary();
     console.log('─'.repeat(40));
     console.log(`  DeepSeek model : ${cost.model}`);
-    console.log(`  Input tokens   : ${cost.inputTokens.toLocaleString()}`);
+    console.log(`  Input tokens   : ${cost.inputTokens.toLocaleString()} (cache miss)`);
+    console.log(`  Cache hit tok  : ${cost.inputCacheHitTokens.toLocaleString()}`);
     console.log(`  Output tokens  : ${cost.outputTokens.toLocaleString()}`);
     console.log(`  Estimated cost : $${cost.estimatedCostUSD}`);
     console.log('─'.repeat(40));

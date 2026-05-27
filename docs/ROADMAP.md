@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.2.2 (2026-05-27)  
+**Current version:** v2.2.3 (2026-05-27)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -55,9 +55,9 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | Mode | Flag | Model | Cost/50-run (all NPCs) | Use when |
 |------|------|-------|------------------------|----------|
 | Chat (default) | _(none)_ | `deepseek-chat` | ~$0.10 | Baseline comparison, parameter sweeps, quick iteration |
-| Thinking | `--thinking` | `deepseek-reasoner` | ~$3–7 | Deep case studies, reasoning-chain analysis, pedagogical use |
+| Thinking | `--thinking` | `deepseek-reasoner` | ~$0.70–1.40 | Deep case studies, reasoning-chain analysis, pedagogical use |
 
-Cost scales with game length. Taiwan/Iran (~4–5 turns): ~$3/50-run. Korean Peninsula (~6–9 turns): ~$6–7/50-run. `--thinking` logs a chain-of-thought reasoning trace per NPC per turn (readable via `--log-prompts`). Useful for studying *how* an LLM agent reasons about crisis escalation. Too expensive for bulk sweeps.
+Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0.70/50-run for Taiwan/Iran (4–5 turns), ~$1.40/50-run for Korean Peninsula (6–9 turns). Cache hits (typically 20%+ of input) reduce cost further. `--thinking` logs a chain-of-thought reasoning trace per NPC per turn (readable via `--log-prompts`). Useful for studying *how* an LLM agent reasons about crisis escalation. ~14x chat cost — not worth it for bulk sweeps.
 
 ---
 
