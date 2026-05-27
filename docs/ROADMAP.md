@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.2.1 (2026-05-27)  
+**Current version:** v2.2.2 (2026-05-27)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -48,16 +48,16 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 - **Prompt logging** `v2.1.0` — `--log-prompts` saves every prompt and raw LLM response to a `.jsonl` sidecar file.
 - **Iran (IR) as active NPC** `v2.1.1` — IR now acts each turn in `iran_nuclear_2026`. Fixed: IR was in powers-data but absent from all `crisis.involved` arrays, so `State.init()` never included it. Fixed scenario escalation stacking (narrowed `involved` lists, reduced starting levels from 2 to 1). Heuristic baseline: 14% nuclear, avg stability 20.7, avg turns 4.4.
 - **North Korea (DPRK) in engine** `v2.1.1` — Added to `data/powers-data.js` and `js/ai.js`. Stats: military 68, nuclear 7, riskTolerance 0.85, patience 0.35. Brinkmanship/survival-first doctrine.
-- **Korean Peninsula 2026 scenario** `v2.2.0` — DPRK active NPC. 4 crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK intel matrix added (US-on-DPRK: 0.30 — most opaque state). `v2.2.1` rebalanced escalation levels (sum 8→5) and fixed entanglement cascade stacking; post-fix baseline: avg stability 28.7, avg turns 9.1.
+- **Korean Peninsula 2026 scenario** `v2.2.0` — DPRK active NPC. 4 crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK intel matrix added (US-on-DPRK: 0.30 — most opaque state). `v2.2.1` rebalanced escalation levels (sum 8→5) and fixed entanglement cascade stacking. Heuristic post-fix baseline: avg stability 28.7, avg turns 9.1. DeepSeek thinking post-fix baseline (v2.2.2, 25 runs): avg stability 28.9, avg turns 6.4, cost $3.36.
 
 **LLM chat vs. thinking mode:**
 
 | Mode | Flag | Model | Cost/50-run (all NPCs) | Use when |
 |------|------|-------|------------------------|----------|
-| Chat (default) | _(none)_ | `deepseek-chat` | $0.10 | Baseline comparison, parameter sweeps, quick iteration |
-| Thinking | `--thinking` | `deepseek-reasoner` | $0.80 | Deep case studies, reasoning-chain analysis, pedagogical use |
+| Chat (default) | _(none)_ | `deepseek-chat` | ~$0.10 | Baseline comparison, parameter sweeps, quick iteration |
+| Thinking | `--thinking` | `deepseek-reasoner` | ~$3–7 | Deep case studies, reasoning-chain analysis, pedagogical use |
 
-`--thinking` logs a chain-of-thought reasoning trace per NPC per turn (readable via `--log-prompts`). Useful for studying *how* an LLM agent reasons about crisis escalation. Not worth the 8x cost for sweeps.
+Cost scales with game length. Taiwan/Iran (~4–5 turns): ~$3/50-run. Korean Peninsula (~6–9 turns): ~$6–7/50-run. `--thinking` logs a chain-of-thought reasoning trace per NPC per turn (readable via `--log-prompts`). Useful for studying *how* an LLM agent reasons about crisis escalation. Too expensive for bulk sweeps.
 
 ---
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-05-27 (v2.2.2)
+
+### Research notes
+- **KP post-fix DeepSeek thinking baseline** (25 runs, seed 42, `deepseek-reasoner`, all NPCs):
+  avg turns 6.4 (was 2.8 pre-fix), avg stability 28.9 (was 23.2), cost $3.36 (was $1.43).
+  Confirms v2.2.1 fixes hold under LLM-driven play. Thinking-mode cost scales with game
+  length — budget ~$0.13/run for KP, ~$0.06/run for shorter scenarios.
+- **Thinking-mode cost correction** (README, ROADMAP): prior $0.80/50-run estimate was derived
+  from broken 2–3 turn KP games. Corrected to scenario-dependent ranges ($3–7/50-run for KP,
+  ~$3/50-run for Taiwan/Iran).
+
 ## 2026-05-27 (v2.2.1)
 
 ### Fixed

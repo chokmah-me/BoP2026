@@ -1,4 +1,4 @@
-# Zenodo Deposit — Balance of Power 2026 v2.2.1
+# Zenodo Deposit — Balance of Power 2026 v2.2.2
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
 **Deposit Date:** 24 May 2026 (updated 27 May 2026)  
@@ -27,7 +27,7 @@ Calibrated for face validity against open-source IR literature. Not intended for
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.2.1)
+## Files Included in This Deposit (v2.2.2)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
@@ -35,11 +35,15 @@ All parameters are calibrated for **face validity** against open-source IR liter
 - 100-run baseline results for all four scenarios
 - Model assumptions and known limitations
 
-## Release Notes — v2.2.1
+## Release Notes — v2.2.2
 
 **What is this?**
 
-BoP2026 is a crisis simulation you can play in a browser or run headless from the command line to generate synthetic geopolitical data. v2.2.1 patches the Korean Peninsula scenario, which was unplayable on release due to two compounding bugs. v2.2.0 added the Korean Peninsula scenario and completed the eight-power engine. See Version History below for the full changelog from v2.0.6 through v2.2.1.
+BoP2026 is a crisis simulation you can play in a browser or run headless from the command line to generate synthetic geopolitical data. v2.2.2 is a docs-only release with updated KP baselines and corrected thinking-mode cost estimates. v2.2.1 patched the Korean Peninsula scenario. v2.2.0 added it. See Version History below for the full changelog from v2.0.6 through v2.2.2.
+
+**KP post-fix DeepSeek thinking baseline (v2.2.2)**
+
+25 runs, seed 42, `deepseek-reasoner`, all NPCs: avg turns 6.4, avg stability 28.9, cost $3.36. Confirms the v2.2.1 fixes hold under LLM-driven play. Also corrects thinking-mode cost estimates — prior figures were based on broken 2–3 turn games.
 
 **Entanglement cascade fix + KP rebalance (v2.2.1)**
 
@@ -78,7 +82,7 @@ Result: Iran nuclear rate dropped from 79% to 0%. SCS dropped from 9% to 4%. Tai
 - *Save and auto-save.* The game now downloads a timestamped JSON log automatically when it ends. You can also click Save Log at any point. The CLI defaults output to a `logs/` folder with a date-stamped filename.
 - *South China Sea scenario.* Third playable scenario added: contested reef seizure, drone swarm engagement, semiconductor chokepoint. Two new action domains — supply chain and autonomous systems — ship with it.
 
-**Heuristic baseline (v2.2.1, default parameters)**
+**Heuristic baseline (v2.2.2, default parameters)**
 
 | Scenario | Nuclear % | Avg stability | Avg turns |
 |---|---|---|---|
@@ -91,7 +95,7 @@ All scenarios end in loss under default conditions — they are designed to be h
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.2.1). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.2.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
 
@@ -116,6 +120,8 @@ All scenarios end in loss under default conditions — they are designed to be h
 **v2.2.0 (2026-05-27):** Korean Peninsula 2026 scenario. DPRK active NPC. Four crises: ICBM Test Series, Sanctions Collapse, Lazarus Cyber Ops, Forward Nuclear Posture. DPRK intel matrix (US-on-DPRK: 0.30).
 
 **v2.2.1 (2026-05-27):** Entanglement cascade cap — bystanders penalized once per cascade resolution (was once per entanglement event, stacking to -9/turn in KP). KP escalation rebalanced: sum 8→5 (2,2,1,3 → 1,1,1,2). Post-fix baseline: avg turns 9.1, avg stability 28.7.
+
+**v2.2.2 (2026-05-27):** Docs only. KP post-fix DeepSeek thinking baseline (25 runs, seed 42): avg turns 6.4, avg stability 28.9, cost $3.36. Corrected thinking-mode cost estimates (prior $0.80/50-run was derived from broken 2-turn games; actual cost scales with game length).
 
 ## Contact & Repository
 
