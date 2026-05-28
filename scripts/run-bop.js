@@ -27,42 +27,13 @@
  */
 'use strict';
 
-const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
+const { loadEngine } = require('./load-engine');
 
-const ROOT = path.join(__dirname, '..');
-
-// Set up a shared context that mimics the browser global scope.
-// All BoP modules use IIFE pattern and reference each other by name.
-// vm.createContext(global) makes global act as the script's global object.
-global.window = global;
-const ctx = vm.createContext(global);
-
-function load(rel) {
-  const file = path.join(ROOT, rel);
-  const code = fs.readFileSync(file, 'utf8');
-  // vm.runInContext with `const` top-level — rewrite to `var` so names
-  // are available on the context object across subsequent script calls.
-  const patched = code.replace(/^(const|let) ([A-Z][A-Za-z_]*)\s*=/m, 'var $2 =');
-  vm.runInContext(patched, ctx, { filename: file });
-}
-
-// Load in the same order as index.html
-load('data/powers-data.js');
-load('data/scenarios-data.js');
-load('data/doctrines-data.js');
-load('data/events-data.js');
-load('js/state.js');
-load('js/domains.js');
-load('js/cascades.js');
-load('js/epistemic.js');
-load('js/events.js');
-load('js/ai.js');
-load('js/oracle.js');
-
+// Load the browser-style engine modules into a shared VM context.
+const ctx = loadEngine();
 const BoP = ctx.BoP;
-if (!BoP) { console.error('Failed to load BoP oracle.'); process.exit(1); }
 
 // ── Parse CLI args ───────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -219,17 +190,8 @@ async function runAll() {
       const bar = '='.repeat(Math.round((i) / opts.runs * 30)).padEnd(30, '-');
       process.stdout.write(`\r  [${bar}] ${i}/${opts.runs}`);
 
-      // Seed the RNG (same mulberry32 logic as oracle internals)
-      let s = seed;
-      const origRandom = Math.random;
-      Math.random = (() => {
-        return function () {
-          s |= 0; s = (s + 0x6D2B79F5) | 0;
-          let t = Math.imul(s ^ (s >>> 15), 1 | s);
-          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-        };
-      })();
+      // Seed the RNG via the engine's shared mulberry32.
+      BoP.seed(seed);
 
       try {
         BoP.init(opts.scenario, initOptions);
@@ -257,7 +219,7 @@ async function runAll() {
       } catch (err) {
         results.push({ runId: i, seed, params: {}, error: err.message });
       } finally {
-        Math.random = origRandom;
+        BoP.unseed();
       }
     }
 
@@ -305,6 +267,9 @@ async function runAll() {
   const avgStab = valid.length
     ? (valid.reduce((s, r) => s + r.result.outcome.stabilityIndex, 0) / valid.length).toFixed(1)
     : 0;
+  const avgRisk = valid.length
+    ? (valid.reduce((s, r) => s + (r.result.outcome.systemicRisk?.index ?? 0), 0) / valid.length).toFixed(1)
+    : 0;
   const avgTurns = valid.length
     ? (valid.reduce((s, r) => s + r.result.outcome.turnsPlayed, 0) / valid.length).toFixed(1)
     : 0;
@@ -313,6 +278,7 @@ async function runAll() {
   console.log(`  Runs completed : ${valid.length} / ${opts.runs}`);
   console.log(`  Win rate       : ${valid.length ? Math.round(wins / valid.length * 100) : 0}%`);
   console.log(`  Avg stability  : ${avgStab}`);
+  console.log(`  Avg syst. risk : ${avgRisk}`);
   console.log(`  Avg turns      : ${avgTurns}`);
   console.log(`  Nuclear events : ${nuclear} (${valid.length ? Math.round(nuclear / valid.length * 100) : 0}%)`);
   console.log('─'.repeat(40));

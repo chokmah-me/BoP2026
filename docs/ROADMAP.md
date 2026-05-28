@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.4.2 (2026-05-28)  
+**Current version:** v2.5.0 (2026-05-28)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -29,6 +29,23 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.5.x (2026-05-28)
+
+- **Sovereignty Void requires a doctrine** `v2.5.0` — `requiresDoctrine` gate. Without a
+  doctrine `t_rat` defaulted to 999s and the void fired every turn (degenerate). `BoP.init()`
+  throws when the scenario needs a doctrine and none is supplied; standard mode hides the
+  scenario until one is chosen.
+- **AOM revert restores human control** `v2.5.0` — `revert_midcourse_defense` now clears
+  `autonomyDelegated` and lifts the Rice mask (`Epistemic.clearRiceMask()`), matching the
+  (corrected) tooltip.
+- **Systemic Risk Index** `v2.5.0` — `State.getSystemicRiskIndex()` folds crisis escalation
+  and nuclear posture into a second outcome metric (`outcome.systemicRisk`), so research isn't
+  keyed on mean-domestic GSI alone. GSI and its thresholds unchanged.
+- **Engine/infra cleanup** `v2.5.0` — shared `scripts/load-engine.js` (regex `/m`→`/gm`),
+  unified oracle turn executors (`_beginTurn`/`_finishTurn`), single mulberry32 via
+  `BoP.seed`/`BoP.unseed`, documented AOM world-field schema in `state.js`, and a
+  zero-dependency `package.json` + GitHub Actions CI wiring `npm test`.
 
 ### v2.4.x (2026-05-28)
 

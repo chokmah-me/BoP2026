@@ -16,32 +16,11 @@
  */
 'use strict';
 
-const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
+const { loadEngine } = require('./load-engine');
 
-const ROOT = path.join(__dirname, '..');
-global.window = global;
-const ctx = vm.createContext(global);
-
-function load(rel) {
-  const code = fs.readFileSync(path.join(ROOT, rel), 'utf8');
-  const patched = code.replace(/^(const|let) ([A-Z][A-Za-z_]*)\s*=/m, 'var $2 =');
-  vm.runInContext(patched, ctx, { filename: rel });
-}
-
-load('data/powers-data.js');
-load('data/scenarios-data.js');
-load('data/doctrines-data.js');
-load('data/events-data.js');
-load('js/state.js');
-load('js/domains.js');
-load('js/cascades.js');
-load('js/epistemic.js');
-load('js/events.js');
-load('js/ai.js');
-load('js/oracle.js');
-
+const ctx = loadEngine();
 const BoP = ctx.BoP;
 
 // ── CLI ──────────────────────────────────────────────────────────────────────

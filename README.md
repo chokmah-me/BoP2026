@@ -41,7 +41,7 @@ Select a scenario and doctrine on the opening screen. Click **End Turn** to adva
 
 ### Node.js (headless research runs)
 
-Requires Node.js 16+.
+Requires Node.js 18+. No runtime dependencies — `package.json` only wires the test/research scripts.
 
 ```bash
 # Default: 10 runs of Taiwan Strait, random seeds
@@ -58,6 +58,9 @@ node scripts/run-bop.js --scenario iran_nuclear_2026 --runs 50
 
 # Analyze batch output
 node scripts/analyze-results.js results.json
+
+# Run the regression tests (CI runs the same)
+npm test
 ```
 
 **CLI flags:**
@@ -145,6 +148,12 @@ console.log(result.outcome.turnsPlayed);
 const step = BoP.step();   // one turn, AI decides all actions
 console.log(step.cascadeLog);
 
+// Reproducible runs (mulberry32). runBatch seeds internally.
+BoP.seed(42);
+BoP.init('taiwan_strait_2026');
+const seeded = BoP.run();
+BoP.unseed();
+
 // Branching / counterfactuals
 const snap = BoP.getState();
 BoP.run();                   // outcome A
@@ -178,7 +187,12 @@ const batch = BoP.exportBatchAnalytics(results);
   outcome: {
     result: 'win' | 'lose' | 'incomplete',
     reason: string,
-    stabilityIndex: number,   // 0–100
+    stabilityIndex: number,   // 0–100, mean domestic stat
+    systemicRisk: {           // second composite metric
+      index: number,          // 0–100, GSI minus crisis/nuclear penalties
+      crisisPressure: number, // sum of escalation across crises
+      maxNuclear: number      // peak nuclear posture (0–5)
+    },
     turnsPlayed: number
   },
   turns: TurnResult[],        // per-turn cascade logs, actions, events, deltas
@@ -262,6 +276,9 @@ China seizes a contested reef and drone swarms have replaced coast guard skipper
 
 ### Korean Peninsula, 2026
 DPRK moves tactical warheads to forward positions after the latest ICBM series. Four active crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK is the primary NPC antagonist — highest riskTolerance (0.85) and lowest patience (0.35) in the game. High starting escalation (sum 5) leaves little diplomatic margin.
+
+### Sovereignty Void, 2026
+Golden Dome is online and boost-phase physics set the clock. The AOM latency mechanic compares your doctrine's ratification time (`t_rat`) against each crisis's intercept window (`t_event`): if `t_rat > t_event`, the sovereignty void fires and your input doesn't register. **Requires a `--doctrine`** (UI hides it until one is chosen; `BoP.init` throws without one) — the headline mechanic is built around `t_rat`, which defaults to 999s with no doctrine. Crises: DPRK boost-phase launch (autonomous, `t_event` 90s — no doctrine closes it), PLA hypersonic strike (autonomous, 120s — MING can close it), C2 comms blackout (cyber, adds 30s to `t_rat`), and a dormant DoDD 3000.09 review triggered by pre-delegation. Resolution paths: intercept if fast enough, pre-delegate authority (Rice-Theorem stat mask, DoDD review), or revert to midcourse (clears delegation, restores human control).
 
 ---
 

@@ -1,5 +1,54 @@
 # Changelog
 
+## 2026-05-28 (v2.5.0)
+
+AOM / sovereignty-void hardening and engine/infra debt cleanup. No change to
+heuristic outcomes — a seeded Taiwan batch (`--seed 42 --runs 10`) is byte-identical
+before and after, confirming the RNG dedup and loader change are behavior-neutral.
+
+### Changed
+- **`sovereignty_void_2026` now requires a doctrine** (`data/scenarios-data.js`,
+  `js/oracle.js`, `js/main.js`): the scenario carries `requiresDoctrine: true`.
+  Without a doctrine, `t_rat` fell back to `999`, so the sovereignty void fired every
+  turn and boost-phase crises ran straight to a nuclear loss — degenerate by default.
+  `BoP.init()` now throws (listing the valid doctrine ids) if the scenario needs one
+  and none is given, and the standard-mode scenario list hides it until a doctrine is
+  chosen.
+- **`revert_midcourse_defense` now restores human control** (`js/cascades.js`,
+  `js/epistemic.js`, `js/domains.js`): in addition to skipping the latency gate for the
+  turn, it clears `autonomyDelegated[actor]` and lifts the Rice mask via the new
+  `Epistemic.clearRiceMask()`. The tooltip previously claimed "No Rice mask" while doing
+  nothing of the sort — now corrected.
+- **Shared Node engine loader** (`scripts/load-engine.js`, new): `run-bop.js`,
+  `test-cascades.js`, `test-analytics.js`, `test-deepseek.js`, and `sensitivity-sweep.js`
+  all `require('./load-engine')` instead of each copying the VM bootstrap. The
+  module-rewrite regex changed from `/m` (first match only) to `/gm` (all top-level
+  declarations), with a comment on why indented IIFE-internal `const`s stay untouched.
+- **Unified oracle turn executors** (`js/oracle.js`): `_executeTurn` and
+  `_executeTurnAsync` now share `_beginTurn()`/`_finishTurn()` helpers; only the
+  sync-vs-await action-collection loop differs. The mulberry32 PRNG, previously copied
+  into `run-bop.js`, `test-analytics.js`, and `research-ui.js`, now lives once in the
+  oracle and is reached via the new `BoP.seed(n)` / `BoP.unseed()` public methods.
+
+### Added
+- **`State.getSystemicRiskIndex()`** (`js/state.js`): a second composite outcome metric
+  alongside GSI. Returns `{ index, crisisPressure, maxNuclear }` — GSI minus penalties for
+  summed crisis escalation and peak nuclear posture, so research isn't keyed on mean-domestic
+  alone (which can read "stable" one escalation from a nuclear exchange). Exposed in the
+  oracle `outcome.systemicRisk` and printed by `run-bop.js` as `Avg syst. risk`. GSI and its
+  win/lose thresholds are unchanged.
+- **AOM world-field schema** (`js/state.js`): `autonomyDelegated`, `autonomyMasks`, and
+  `bpiReverted` are now initialized in the `world` literal with one documenting comment
+  block (previously created lazily and undocumented).
+- **`package.json` + CI** (`package.json`, `.github/workflows/ci.yml`, new): zero-dependency
+  manifest wiring the dependency-free Node tests as `npm test` (the browser test stays under
+  `npm run test:browser` since it needs Playwright). GitHub Actions runs `npm test` on push/PR.
+
+### Known issue
+- One pre-existing `test-cascades.js` assertion ("crisis does NOT decay when its actor took an
+  action") fails and predates this release; CI will be red until the decay logic or that test
+  is addressed.
+
 ## 2026-05-28 (v2.4.2)
 
 UI readability and accessibility pass. No engine or research-API behavior

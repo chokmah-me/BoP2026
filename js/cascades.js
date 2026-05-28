@@ -177,9 +177,13 @@ const Cascades = (() => {
       }
     }
 
-    // AOM: Path 3 — flag the latency gate to skip this turn
+    // AOM: Path 3 — flag the latency gate to skip this turn, and restore human
+    // control by undoing any prior pre-delegation (clears the autonomy flag and
+    // lifts the Rice mask for this actor).
     if (def.cancelsBPI) {
       world.bpiReverted = true;
+      if (world.autonomyDelegated) delete world.autonomyDelegated[action.actor];
+      Epistemic.clearRiceMask(action.actor, world);
     }
   }
 

@@ -72,6 +72,8 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Version History
 
+**v2.5.0 (2026-05-28):** AOM / sovereignty-void hardening and infra cleanup. `sovereignty_void_2026` now requires a doctrine (`requiresDoctrine`; `BoP.init` throws without one). `revert_midcourse_defense` clears pre-delegation and lifts the Rice mask (`Epistemic.clearRiceMask()`). New `State.getSystemicRiskIndex()` second outcome metric (`outcome.systemicRisk`, folds crisis escalation + nuclear posture). Shared Node loader (`scripts/load-engine.js`), unified oracle turn executors, single mulberry32 via `BoP.seed`/`BoP.unseed`, documented AOM world-field schema, zero-dependency `package.json` + GitHub Actions CI.
+
 **v2.4.0 (2026-05-28):** Sovereignty Void scenario. AOM latency-governance framework (`_latencyGate()` in `js/cascades.js`). Three new autonomous actions: `boost_phase_intercept`, `pre_delegate_authority`, `revert_midcourse_defense`. t_rat on all 4 doctrines. JUCHE doctrine (DPRK playable, t_rat=45s). DPRK as targetable NPC in sovereignty_void. AOM-aware heuristic AI and DeepSeek prompt. Rice-Theorem epistemic mask. Escalation log noise fix (0→0 suppressed).
 
 **v2.3.0 (2026-05-28):** Biological Epidemic domain (4 actions). EMP Attacks domain (4 actions). Bio/EMP cascade rules (3rd-order markers + 4th-order systemic thresholds). 4 new stochastic events. `iran_bio_program` crisis (Iran Nuclear 2026). `dprk_emp_threat` crisis (Korean Peninsula 2026). Escalation fix: untargeted actions no longer cascade into domain-mismatched crises.

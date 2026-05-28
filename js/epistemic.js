@@ -56,10 +56,16 @@ const Epistemic = (() => {
     world.autonomyMasks[powerId] = [...new Set([...existing, ...statDomains])];
   }
 
+  // Lift a power's Rice mask, restoring normal perception of its stats.
+  // Used by revert_midcourse_defense to undo a prior pre-delegation.
+  function clearRiceMask(powerId, world) {
+    if (world.autonomyMasks) delete world.autonomyMasks[powerId];
+  }
+
   function getUncertaintyBand(viewerId, targetId, world) {
     const quality = world.intelQuality[viewerId]?.[targetId] ?? 0.5;
     return Math.round((1 - quality) * 20);
   }
 
-  return { update, applyDisinformation, revealIntel, getPerceivedValue, getUncertaintyBand, applyRiceMask };
+  return { update, applyDisinformation, revealIntel, getPerceivedValue, getUncertaintyBand, applyRiceMask, clearRiceMask };
 })();

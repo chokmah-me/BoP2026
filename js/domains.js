@@ -721,7 +721,7 @@ const Domains = (() => {
       ],
       effects3rd: [],
       domains: ['autonomous'],
-      tooltip: 'No sovereignty void fires this turn. No Rice mask. Adversary notes the hesitation.'
+      tooltip: 'No sovereignty void fires this turn. Clears any pre-delegation and lifts the Rice mask — human control restored. Adversary notes the hesitation.'
     }
   ];
 

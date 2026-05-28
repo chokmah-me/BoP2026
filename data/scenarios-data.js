@@ -197,6 +197,7 @@ window.SCENARIOS_DATA = {
     "description": "Golden Dome is online. Boost-phase physics set the clock. Your doctrine sets your speed. The gap between them is the point.",
     "startYear": 2026,
     "player": "US",
+    "requiresDoctrine": true,
     "crises": [
       {
         "id": "boost_phase_north_korea", "name": "DPRK Boost-Phase Launch",

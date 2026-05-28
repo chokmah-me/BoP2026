@@ -28,7 +28,11 @@ function showScenarioSelect(doctrineId = null) {
 
   const grid = document.getElementById('scenario-grid');
 
-  let scenarioCards = Object.values(window.SCENARIOS_DATA).map(s => `
+  // Scenarios flagged requiresDoctrine (e.g. Sovereignty Void) are degenerate
+  // without a doctrine, so they only appear once one has been chosen.
+  let scenarioCards = Object.values(window.SCENARIOS_DATA)
+    .filter(s => !s.requiresDoctrine || doctrineId)
+    .map(s => `
     <div class="scenario-card" data-id="${s.id}">
       <div class="scenario-card-name">${s.name}</div>
       <div class="scenario-card-desc">${s.description}</div>
