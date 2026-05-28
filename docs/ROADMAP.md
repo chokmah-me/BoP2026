@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.4.0 (2026-05-28)  
+**Current version:** v2.4.1 (2026-05-28)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -47,6 +47,9 @@ BoP2026 operationalizes several of these insights through expanded domains and c
   player's ratification constraint.
 - **DPRK as full NPC** `v2.4.0` — Active in `sovereignty_void_2026`. Existing DPRK AI personality
   (riskTolerance 0.85, patience 0.35, priorityDomains: military/nuclear/cyber/emp).
+- **AOM engine fixes** `v2.4.1` — Idempotent pre-delegation, `playerOnly` action filter,
+  autonomous-domain game-over check, dormant-crisis AOM context injection, truncated-run
+  `draw`/`lose` outcomes, `oracle.setPlayerOverride()`, `--doctrine` CLI flag.
 
 ### v2.3.x (2026-05-28)
 

@@ -157,14 +157,15 @@ const Cascades = (() => {
     }
 
     // AOM: Rice-Theorem mask — applied when pre-delegating autonomous authority
-    if (def.riceMaskStats && def.riceMaskStats.length > 0) {
+    const alreadyDelegated = !!world.autonomyDelegated?.[action.actor];
+    if (def.riceMaskStats && def.riceMaskStats.length > 0 && !alreadyDelegated) {
       Epistemic.applyRiceMask(action.actor, def.riceMaskStats, world);
       world.autonomyDelegated = world.autonomyDelegated || {};
       world.autonomyDelegated[action.actor] = true;
     }
 
     // AOM: trigger a dormant crisis (e.g. policy_review_tribunal on DoDD violation)
-    if (def.triggersCrisis) {
+    if (def.triggersCrisis && !alreadyDelegated) {
       const tc = (world.crises || []).find(c => c.id === def.triggersCrisis);
       if (tc && tc.escalationLevel === 0) {
         State.adjustCrisisEscalation(tc.id, 1);

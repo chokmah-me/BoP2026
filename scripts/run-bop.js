@@ -77,7 +77,8 @@ const opts = {
   aiPowers: 'all',
   logPrompts: false,
   thinking: false,
-  dryRun: false
+  dryRun: false,
+  doctrine: null
 };
 
 for (let i = 0; i < args.length; i++) {
@@ -85,6 +86,7 @@ for (let i = 0; i < args.length; i++) {
   const val = () => { i++; return args[i]; };
 
   if (arg === '--scenario') opts.scenario = val();
+  else if (arg === '--doctrine') opts.doctrine = val();
   else if (arg === '--runs') opts.runs = parseInt(val());
   else if (arg === '--seed') opts.seed = parseInt(val());
   else if (arg === '--out') opts.out = val();
@@ -120,6 +122,7 @@ fs.mkdirSync(path.join(process.cwd(), path.dirname(opts.out)), { recursive: true
 console.log(`\nBoP2026 Oracle — ${opts.scenario}`);
 console.log(`Runs: ${opts.runs}  Seed base: ${opts.seed ?? 'random'}  Max turns: ${opts.maxTurns}`);
 console.log(`AI backend: ${opts.aiBackend}${opts.aiBackend === 'deepseek' ? ` (${opts.thinking ? 'deepseek-reasoner' : 'deepseek-chat'}, powers: ${opts.aiPowers})` : ''}`);
+if (opts.doctrine) console.log(`Doctrine: ${opts.doctrine}`);
 if (Object.keys(opts.paramOverrides).length) {
   console.log('Param overrides:', JSON.stringify(opts.paramOverrides));
 }
@@ -180,7 +183,8 @@ for (let i = 0; i < opts.runs; i++) {
 const initOptions = {
   paramOverrides: Object.keys(opts.paramOverrides).length ? opts.paramOverrides : undefined,
   player: opts.player || undefined,
-  cascadeScale: opts.cascadeScale != null ? opts.cascadeScale : undefined
+  cascadeScale: opts.cascadeScale != null ? opts.cascadeScale : undefined,
+  doctrine: opts.doctrine || undefined
 };
 const runOptions = { maxTurns: opts.maxTurns };
 
@@ -240,6 +244,12 @@ async function runAll() {
               backend.decideTurn(id, world, heuristicFallback)
             );
           }
+        }
+        // Also override the player when --ai-powers all or player explicitly listed
+        if (!llmPowers || llmPowers.includes(world0.player)) {
+          BoP.setPlayerOverride((id, world) =>
+            backend.decideTurn(id, world, heuristicFallback)
+          );
         }
 
         const result = await BoP.runAsync(runOptions);

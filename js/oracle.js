@@ -25,6 +25,7 @@ const BoP = (() => {
   }
 
   let _overrides = {};
+  let _playerOverride = null;
   let _origRandom = null;
 
   function _patchRNG(seed) {
@@ -99,7 +100,9 @@ const BoP = (() => {
 
     const playerActions = playerActionsOverride != null
       ? playerActionsOverride
-      : AI.decideTurn(world.player, world);
+      : _playerOverride
+        ? await _playerOverride(world.player, world)
+        : AI.decideTurn(world.player, world);
     for (const a of playerActions) State.queueAction(a);
 
     const allActions = [...world.pendingActions];
@@ -255,13 +258,20 @@ const BoP = (() => {
     }
 
     const fw = State.get();
+    const gsi = State.getGlobalStabilityIndex();
+    const resolvedOutcome = fw.gameOver || {
+      result: gsi >= 40 ? 'draw' : 'lose',
+      reason: gsi >= 40
+        ? `Ran ${turns.length} turns. Stability held at ${gsi} — no decisive outcome.`
+        : `Ran ${turns.length} turns. Stability collapsed to ${gsi}.`
+    };
     return {
       scenarioId,
       initialState,
       outcome: {
-        result: fw.gameOver?.result || 'incomplete',
-        reason: fw.gameOver?.reason || '',
-        stabilityIndex: State.getGlobalStabilityIndex(),
+        result: resolvedOutcome.result,
+        reason: resolvedOutcome.reason,
+        stabilityIndex: gsi,
         turnsPlayed: turns.length
       },
       turns,
@@ -308,13 +318,20 @@ const BoP = (() => {
     }
 
     const fw = State.get();
+    const gsi = State.getGlobalStabilityIndex();
+    const resolvedOutcome = fw.gameOver || {
+      result: gsi >= 40 ? 'draw' : 'lose',
+      reason: gsi >= 40
+        ? `Ran ${turns.length} turns. Stability held at ${gsi} — no decisive outcome.`
+        : `Ran ${turns.length} turns. Stability collapsed to ${gsi}.`
+    };
     return {
       scenarioId,
       initialState,
       outcome: {
-        result: fw.gameOver?.result || 'incomplete',
-        reason: fw.gameOver?.reason || '',
-        stabilityIndex: State.getGlobalStabilityIndex(),
+        result: resolvedOutcome.result,
+        reason: resolvedOutcome.reason,
+        stabilityIndex: gsi,
         turnsPlayed: turns.length
       },
       turns,
@@ -392,9 +409,15 @@ const BoP = (() => {
     _overrides[powerId] = fn;
   }
 
-  /** Remove all NPC overrides. */
+  /** Override the AI decision function for the player power (async path only). */
+  function setPlayerOverride(fn) {
+    _playerOverride = fn;
+  }
+
+  /** Remove all NPC and player overrides. */
   function clearOverrides() {
     _overrides = {};
+    _playerOverride = null;
   }
 
   // ── Analytics export ─────────────────────────────────────────────────────
@@ -477,7 +500,7 @@ const BoP = (() => {
     }));
   }
 
-  const api = { init, step, stepAsync, run, runAsync, runBatch, getState, setState, setNPCOverride, clearOverrides, exportAnalytics, exportBatchAnalytics };
+  const api = { init, step, stepAsync, run, runAsync, runBatch, getState, setState, setNPCOverride, setPlayerOverride, clearOverrides, exportAnalytics, exportBatchAnalytics };
 
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = api;

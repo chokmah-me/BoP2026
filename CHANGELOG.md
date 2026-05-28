@@ -1,5 +1,54 @@
 # Changelog
 
+## 2026-05-28 (v2.4.1)
+
+### Fixed
+- **`checkGameOver` catches autonomous-domain crises** (`js/state.js`): lv5 on
+  `boost_phase_north_korea` or `hypersonic_taiwan` now ends the game with
+  "Sovereignty void cascaded to terminal threshold." Previously only `military`
+  and `compound` domain crises triggered this check.
+- **Boost-phase crisis starting escalation: 2 → 0** (`data/scenarios-data.js`):
+  latency gate skips `escalationLevel ≤ 0` crises, so the void no longer fires
+  on turn 1. Crises must be escalated above 0 by NPC actions before the
+  t_rat/t_event gap becomes decisive. Avg turns: 1.0 → 8.2 (heuristic baseline).
+- **Truncated-run outcomes** (`js/oracle.js`): `run()` / `runAsync()` hitting
+  `maxTurns` now return `result: 'draw'` (GSI ≥ 40) or `result: 'lose'` (GSI < 40)
+  with a stability summary, not `result: 'incomplete'` with an empty reason string.
+- **AOM context injection always-on** (`js/ai-deepseek.js`): `_buildPrompt()`
+  now injects the `LATENCY GOVERNANCE (AOM):` block whenever the scenario has
+  boost-phase crises (`t_event != null`), not only when `escalationLevel > 0`.
+  Dormant crises (lv=0) are shown as activatable threats with per-doctrine
+  close/void verdict. Adversary framing explains how to activate them.
+- **Pre-delegation idempotent** (`js/cascades.js`): `apply1stOrder()` uses an
+  `alreadyDelegated` flag so a second `pre_delegate_authority` pick neither
+  re-applies the Rice mask nor re-triggers DoDD review.
+- **`playerOnly` actions filtered from NPCs** (`js/domains.js`, `js/ai.js`,
+  `js/ai-deepseek.js`): `pre_delegate_authority` and `revert_midcourse_defense`
+  marked `playerOnly: true`. Heuristic AI strips them from the NPC action pool;
+  DeepSeek backend strips them from the NPC affordance list. DPRK was picking
+  `pre_delegate_authority` with no mechanical effect but costing domestic -8.
+- **Delegated-status prompt** (`js/ai-deepseek.js`): after `pre_delegate_authority`
+  fires, subsequent player prompts show "ALREADY ACTIVE — do not select again"
+  instead of the three-paths menu.
+
+### Added
+- **`oracle.setPlayerOverride(fn)`** (`js/oracle.js`): allows LLM backends to
+  control the player power in headless mode, not just NPCs. Cleared by
+  `clearOverrides()`. Async path only (sync `run()` / `runBatch()` ignore it).
+- **`--doctrine <id>`** (`scripts/run-bop.js`): passes doctrine to `BoP.init`.
+  Valid ids: `MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE`. Shown in run header.
+- **Player power in LLM override** (`scripts/run-bop.js`): `--ai-powers all`
+  (or explicit player id in the list) now routes the player through the LLM
+  backend via `setPlayerOverride`.
+
+### Research notes (v2.4.1 baseline — deepseek-reasoner)
+- **MAGA doctrine, seed 42, max-turns 5, US+CN+DPRK thinking**: US chose
+  `revert_midcourse_defense` turns 2-3 (preserving human control while DPRK
+  escalated C2 blackout to lv5), then `pre_delegate_authority` on turn 4 once
+  the DPRK boost-phase crisis reached lv2, then `boost_phase_intercept` on turn 5
+  through the autonomous path. No double-delegation; no NPC playerOnly picks.
+  Stability 28; lose via cascade. Cost: $0.011 (31k output tokens, deepseek-reasoner).
+
 ## 2026-05-28 (v2.4.0)
 
 ### Added

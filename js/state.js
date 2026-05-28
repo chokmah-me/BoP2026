@@ -209,10 +209,13 @@ const State = (() => {
   }
 
   function checkGameOver() {
-    // Nuclear exchange: any military or compound crisis at level 5
-    const nuclear = world.crises.find(c => (c.domain === 'military' || c.domain === 'compound') && c.escalationLevel >= 5);
+    // Nuclear exchange: any military, compound, or autonomous (boost-phase) crisis at level 5
+    const nuclear = world.crises.find(c => (c.domain === 'military' || c.domain === 'compound' || c.domain === 'autonomous') && c.escalationLevel >= 5);
     if (nuclear) {
-      world.gameOver = { result: 'lose', reason: 'Nuclear exchange. Civilization does not recover.' };
+      const reason = nuclear.domain === 'autonomous'
+        ? `Sovereignty void cascaded to terminal threshold. ${nuclear.name} exceeded all governance bounds.`
+        : 'Nuclear exchange. Civilization does not recover.';
+      world.gameOver = { result: 'lose', reason };
       return true;
     }
     // Player collapse

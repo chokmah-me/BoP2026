@@ -694,6 +694,7 @@ const Domains = (() => {
       cost: 3,
       requiresTarget: false,
       escalationDelta: 0,
+      playerOnly: true,
       riceMaskStats: ['military', 'autonomous'],
       triggersCrisis: 'policy_review_tribunal',
       effects1st: { self: { domestic: -8 } },
@@ -712,6 +713,7 @@ const Domains = (() => {
       cost: 1,
       requiresTarget: false,
       escalationDelta: 0,
+      playerOnly: true,
       cancelsBPI: true,
       effects1st: { self: { military: -2 } },
       effects2nd: [

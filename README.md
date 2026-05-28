@@ -137,7 +137,7 @@ BoP.init('taiwan_strait_2026', {
 
 // Run to completion (returns SimResult)
 const result = BoP.run({ maxTurns: 20 });
-console.log(result.outcome.result);        // 'win' | 'lose' | 'incomplete'
+console.log(result.outcome.result);        // 'win' | 'lose' | 'draw'
 console.log(result.outcome.stabilityIndex);
 console.log(result.outcome.turnsPlayed);
 
@@ -150,6 +150,7 @@ const snap = BoP.getState();
 BoP.run();                   // outcome A
 BoP.setState(snap);          // reset to branch point
 BoP.setNPCOverride('CN', (id, world) => [...]);
+BoP.setPlayerOverride((id, world) => [...]);  // override player power too (async path)
 BoP.run();                   // outcome B under different CN behavior
 
 // Batch sweep

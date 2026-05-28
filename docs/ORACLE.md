@@ -221,6 +221,25 @@ The override function receives `(powerId, world)` and must return an array of ac
 
 ---
 
+### `BoP.setPlayerOverride(fn)` (async path only)
+
+Override the AI decision function for the player power. Works like `setNPCOverride` but applies to whichever power is `world.player`. Only active in `runAsync()` / `stepAsync()` — the sync `run()` and `runBatch()` paths ignore it.
+
+```js
+// Route the player through an LLM backend
+BoP.setPlayerOverride(async (powerId, world) => {
+  const actions = await myLLM.decide(powerId, world);
+  return actions;
+});
+
+await BoP.runAsync({ maxTurns: 10 });
+BoP.clearOverrides();  // clears both NPC and player overrides
+```
+
+Useful for testing whether an LLM correctly navigates player-specific mechanics (e.g. AOM pre-delegation in `sovereignty_void_2026`) that are filtered from NPC action pools.
+
+---
+
 ### `BoP.exportAnalytics(simResult, meta?)`
 
 Convert a `SimResult` to `bop2026-analytics-v1` format. Strips raw `stateSnapshot` blobs from each turn to keep file size reasonable.
@@ -265,7 +284,7 @@ require('fs').writeFileSync('out.json', JSON.stringify(analytics, null, 2));
   seed:        42 | null,
   paramOverrides: {},                      // from meta arg
   outcome: {
-    result:         "win" | "lose" | "incomplete",
+    result:         "win" | "lose" | "draw",
     reason:         "string",              // human-readable game-over cause
     stabilityIndex: 24,                   // avg domestic stat across powers (0–100)
     turnsPlayed:    6
