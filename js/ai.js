@@ -275,6 +275,40 @@ const AI = (() => {
       }
     }
 
+    // AOM: latency-aware scoring for boost-phase actions
+    if (action.boostPhase) {
+      const t_rat = world.doctrine?.profile?.t_rat;
+      const bpiCrises = world.crises.filter(c =>
+        c.t_event && c.escalationLevel > 0 && c.involved.includes(powerId)
+      );
+      if (bpiCrises.length === 0) {
+        score -= 50;
+      } else {
+        const canClose = t_rat != null && bpiCrises.some(c => t_rat <= c.t_event);
+        if (canClose) {
+          // Intercept prevents +2 void escalation — override escalatory posture penalty
+          const postureRestore = posture === 'de-escalate' ? 80 : posture === 'hold' ? 20 : 0;
+          score += postureRestore + 120; // large enough to beat any de-escalatory alternative
+        } else {
+          score -= 30; // void will fire regardless — wasted AP
+        }
+      }
+    }
+    if (action.id === 'pre_delegate_authority') {
+      const bpiCrises = world.crises.filter(c => c.t_event && c.escalationLevel >= 3);
+      if (bpiCrises.length === 0) {
+        score -= 60;
+      } else {
+        const t = world.doctrine?.profile?.t_rat ?? 999;
+        if (!bpiCrises.some(c => t <= c.t_event)) score += persona.riskTolerance * 35;
+        if (power.trueState.domestic < 40) score -= 40;
+      }
+    }
+    if (action.cancelsBPI) {
+      const bpiActive = world.crises.some(c => c.t_event && c.escalationLevel > 0);
+      score += (bpiActive && persona.riskTolerance < 0.4) ? 20 : -20;
+    }
+
     // noise inversely proportional to crisis severity
     const maxNoise = Math.max(2, 10 - crisisLevel * 2);
     score += (Math.random() - 0.5) * maxNoise;

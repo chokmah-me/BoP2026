@@ -152,7 +152,7 @@ class DeepSeekBackend {
 
     const otherPowers = Object.keys(world.powers).filter(id => id !== powerId).join(', ');
 
-    const systemMsg =
+    let systemMsg =
 `You are ${powerId} in Balance of Power 2026, a turn-based geopolitical simulation.
 Personality: risk_tolerance=${(pw.riskTolerance||0.5).toFixed(2)}, patience=${(pw.patience||0.5).toFixed(2)}.
 Priority domains: ${(pw.priorityDomains||[]).join(', ') || 'military, economic'}.
@@ -170,6 +170,37 @@ YOUR crises (act on these): ${myCrises}.
 Other crises: ${otherCrises}.
 Available actions:
 ${actionLines}`;
+
+    // AOM latency block — injected when boost-phase crises are active
+    const bpiCrises = (world.crises || []).filter(c => c.t_event && c.escalationLevel > 0);
+    if (bpiCrises.length > 0) {
+      const isPlayer = powerId === world.player;
+      const t_rat = world.doctrine?.profile?.t_rat ?? null;
+      let aom = '\n\nLATENCY GOVERNANCE (AOM):';
+
+      if (isPlayer && t_rat != null) {
+        aom += `\nYour doctrine ratification time: t_rat=${t_rat}s.`;
+        for (const c of bpiCrises) {
+          const canClose = t_rat <= c.t_event;
+          aom += `\n${c.id}: t_event=${c.t_event}s — ${canClose
+            ? 'YOU CAN authorize intercept in time.'
+            : `SOVEREIGNTY VOID WILL FIRE (t_rat ${t_rat}s > t_event ${c.t_event}s). boost_phase_intercept will be nullified.`}`;
+        }
+        aom += '\nThree paths: (1) boost_phase_intercept — only effective if t_rat <= t_event; (2) pre_delegate_authority — bypasses t_rat entirely, costs domestic -8, triggers DoDD 3000.09 review; (3) revert_midcourse_defense — abandon BPI, preserve sovereignty, adversary reads as weakness.';
+      } else {
+        const playerTRat = world.doctrine?.profile?.t_rat ?? 999;
+        aom += `\n${world.player} ratification time: ${playerTRat}s.`;
+        for (const c of bpiCrises) {
+          const playerCanClose = playerTRat <= c.t_event;
+          aom += `\n${c.id}: t_event=${c.t_event}s — ${world.player} ${playerCanClose
+            ? 'CAN close this window.'
+            : 'CANNOT authorize in time — sovereignty void will escalate this crisis automatically.'}`;
+        }
+        aom += `\nExploit options: escalate boost-phase crises (sovereignty void fires without player consent); escalate c2_blackout (adds 30s to ${world.player} t_rat, widening the gap).`;
+      }
+
+      systemMsg += aom;
+    }
 
     return { systemMsg, userMsg };
   }
