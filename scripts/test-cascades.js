@@ -260,10 +260,11 @@ test('crisis decays when untouched this turn', () => {
 
 test('crisis does NOT decay when its actor took an action this turn', () => {
   const world = makeWorld();
-  world.crises[0].escalationLevel = 2; // CN+US crisis, US acting
-  Math.random = () => 0.1;
-  // coalition_shoring by US — findRelevantCrisis finds crisis 0 (US involved), protects it
-  ctx.Cascades.resolve([act('coalition_shoring', 'US')], world);
+  world.crises[0].escalationLevel = 2; // crisis 0: military, involved [CN, US]
+  Math.random = () => 0.1; // < 0.15 decay threshold, so an unprotected crisis would decay
+  // military_exercises (military, untargeted, escalationDelta 0) by US — findRelevantCrisis
+  // primaryMatch links it to crisis 0 (domain military + US involved), protecting it from decay.
+  ctx.Cascades.resolve([act('military_exercises', 'US')], world);
   assert.strictEqual(world.crises[0].escalationLevel, 2,
     `crisis 0 should be protected from decay, got ${world.crises[0].escalationLevel}`);
 });

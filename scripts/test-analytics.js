@@ -176,6 +176,7 @@ test('9. minValue condition blocks below threshold and passes above', () => {
   const world = BoP.getState();
   // hezbollah_degraded: minTurn 3, crisis iran_proxy_escalation minEsc 2, US.military minValue 55
   world.turn = 5; // satisfy minTurn
+  world.crises.find(c => c.id === 'iran_proxy_escalation').escalationLevel = 2; // satisfy minEscalation
   world.powers['US'].trueState.military = 40; // below threshold
   let firedBelow = false;
   for (let i = 0; i < 100; i++) {
