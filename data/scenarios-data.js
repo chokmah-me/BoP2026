@@ -200,7 +200,7 @@ window.SCENARIOS_DATA = {
     "crises": [
       {
         "id": "boost_phase_north_korea", "name": "DPRK Boost-Phase Launch",
-        "domain": "autonomous", "involved": ["US", "CN"],
+        "domain": "autonomous", "involved": ["US", "CN", "DPRK"],
         "escalationLevel": 2, "t_event": 90,
         "description": "KP solid-fuel ICBM detected at T+0. Boost phase ends at T+90. No doctrine closes this window.",
         "region": "northeast_asia", "location": { "x": 720, "y": 175 },

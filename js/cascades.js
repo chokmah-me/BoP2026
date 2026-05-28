@@ -135,13 +135,15 @@ const Cascades = (() => {
       if (crisis) {
         const prev = crisis.escalationLevel;
         State.adjustCrisisEscalation(crisis.id, def.escalationDelta);
-        log.push({
-          order: 1,
-          confidence: 'CONFIRMED',
-          actor: action.actor,
-          text: `[${crisis.name}] Escalation: ${prev} → ${crisis.escalationLevel}`,
-          type: 'escalation'
-        });
+        if (crisis.escalationLevel !== prev) {
+          log.push({
+            order: 1,
+            confidence: 'CONFIRMED',
+            actor: action.actor,
+            text: `[${crisis.name}] Escalation: ${prev} → ${crisis.escalationLevel}`,
+            type: 'escalation'
+          });
+        }
       }
     }
 
