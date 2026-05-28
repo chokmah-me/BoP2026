@@ -1,5 +1,56 @@
 # Changelog
 
+## 2026-05-28 (v2.3.0)
+
+### Added
+- **Biological Epidemic domain** (`js/domains.js`): 4 new actions covering the full response arc —
+  `bio_surveillance_network` (early warning, defensive), `pandemic_response_pact` (bilateral
+  health cooperation, de-escalatory), `medical_reserve_deployment` (emergency stockpile release),
+  `bio_program_attribution` (accusatory, escalatory, high backfire risk). Domain icon 🧬.
+- **EMP Attacks domain** (`js/domains.js`): 4 new actions —
+  `emp_hardening` (Faraday/HEMP shielding, defensive), `emp_capability_signal` (deterrence test,
+  escalation +1), `emp_strike` (high-altitude EMP, most escalatory non-nuclear action in game:
+  target cyber −18, military −10, economic −8, escalation +2), `grid_restoration_aid`
+  (partner infrastructure rebuild, de-escalatory). Domain icon ⚡.
+- **New cascade rules** (`js/cascades.js`):
+  - Bio 3rd-order: 2+ biological actions in one turn pushes `bio_acceleration_pressure` marker.
+  - Bio 4th-order: `bio_acceleration_pressure` + 2 powers with domestic < 40 → global
+    `pandemic_outbreak` (all: domestic −10, economic −8).
+  - EMP 3rd-order: any `emp_strike` → bystander powers take cyber −6 (electromagnetic spillover),
+    pushes `emp_cascade_pressure` marker.
+  - EMP 4th-order: `emp_cascade_pressure` + 2 powers with cyber < 30 → global `c4isr_collapse`
+    (all: military −12, info −8, space −6).
+- **4 new stochastic events** (`data/events-data.js`):
+  - `bio_treaty_breakdown` — fires when `iran_bio_program` crisis is active (all: info −6, domestic −4).
+  - `weaponized_pathogen_alert` — fires at crisis level 2+ (2 random powers: domestic −14, economic −9).
+  - `dprk_haed_test` — fires when `dprk_emp_threat` hits level 2 (US/CN/IN: cyber −10, military −6, space −5).
+  - `solar_geomagnetic_storm` — rare natural/ambiguous event (prob 0.04, all powers: cyber −12, space −14, economic −6).
+- **`iran_bio_program` crisis** in Iran Nuclear 2026 (`data/scenarios-data.js`): biological domain,
+  IR/US/EU, escalation level 1. Dual-use IRGC fermentation facilities outside Tabriz.
+- **`dprk_emp_threat` crisis** in Korean Peninsula 2026 (`data/scenarios-data.js`): EMP domain,
+  DPRK/US/CN, escalation level 1. KN-23s repositioned consistent with HAED launch profile.
+- **AI priority domains** (`js/ai.js`): IR gets `biological`; DPRK gets `emp` in `priorityDomains`.
+  Other powers pick up new domain actions via active crisis domain matching.
+
+### Fixed
+- **`findRelevantCrisis` escalation over-triggering** (`js/cascades.js`): the broad any-crisis
+  fallback allowed untargeted escalatory actions (most notably `public_statement`, escalationDelta +1)
+  to cascade into any crisis an actor happened to be involved in, regardless of domain match.
+  In the Iran scenario with 6 LLM NPCs all using `public_statement`, this stacked 5–6 escalation
+  steps per turn across Iran's already-stressed crises, causing 100% nuclear outcomes at 2.4 avg
+  turns. Fix: untargeted actions now only escalate domain-matched crises (no fallback). Targeted
+  actions fall back only when both actor and target share the same crisis. Iran LLM chat result
+  post-fix: 40% nuclear, 34.5 avg stability, 4.1 avg turns (was 100% / 48.6 / 2.4).
+
+### Research notes (v2.3.0 baselines)
+- **Heuristic** (20 runs, seed 42): Iran 0% nuclear / 28.0 stability / 8.0 turns;
+  KP 0% nuclear / 33.0 stability / 8.0 turns.
+- **Iran LLM chat post-fix** (10 runs, seed 42, all NPCs): 40% nuclear / 34.5 stability / 4.1 turns.
+  LLM NPCs adopt biological actions naturally when `iran_bio_program` crisis is active
+  (11 bio-action calls observed across 10 runs).
+- **KP LLM chat** (10 runs, seed 42, all NPCs): 0% nuclear / 31.0 stability / 5.1 turns.
+  EMP domain heavily used: 41 `emp_hardening`, 26 `emp_capability_signal`, 2 `emp_strike`.
+
 ## 2026-05-27 (v2.2.3)
 
 ### Fixed

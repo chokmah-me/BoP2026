@@ -454,6 +454,149 @@ const Domains = (() => {
       tooltip: 'Short-term economic cost. Some early gains possible; allies may warm to a stable supply partner.'
     },
 
+    // ── BIOLOGICAL ────────────────────────────────────────────────────────────
+    {
+      id: 'bio_surveillance_network',
+      domain: 'biological',
+      name: 'Pathogen Surveillance Network',
+      description: 'Deploy genomic monitoring at ports, hospitals, and wildlife interfaces. Early warning for natural outbreaks and engineered threats.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { domestic: 5, info: 4 } },
+      effects2nd: [
+        { prob: 0.35, effect: { self: { domestic: 5 } }, label: 'Early detection limits domestic spread', delay: 2 },
+        { prob: 0.25, effect: { ally_relationships: 5 }, label: 'WHO data-sharing strengthens allied health confidence' }
+      ],
+      effects3rd: [],
+      domains: ['biological'],
+      tooltip: 'Pure defense. Delayed domestic payoff when outbreaks hit. No escalation risk.'
+    },
+    {
+      id: 'pandemic_response_pact',
+      domain: 'biological',
+      name: 'Pandemic Response Pact',
+      description: 'Bilateral health cooperation: shared surveillance data, pre-positioned stockpiles, and rapid response protocols.',
+      cost: 1,
+      requiresTarget: true,
+      escalationDelta: -1,
+      effects1st: { self: { domestic: 4 }, target: { domestic: 4 } },
+      effects2nd: [
+        { prob: 0.50, effect: { relationship_target: 10 }, label: 'Health cooperation builds broader diplomatic trust' },
+        { prob: 0.20, effect: { self: { economic: 3 } }, label: 'Joint medical R&D creates commercial spillovers' }
+      ],
+      effects3rd: [],
+      domains: ['biological'],
+      tooltip: 'Positive-sum. Builds relationship capital while hardening both sides.'
+    },
+    {
+      id: 'medical_reserve_deployment',
+      domain: 'biological',
+      name: 'Medical Reserve Deployment',
+      description: 'Release national vaccine and antiviral stockpiles. Blunts an active outbreak at short-term economic cost.',
+      cost: 2,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { domestic: 10, economic: -6 } },
+      effects2nd: [
+        { prob: 0.40, effect: { self: { domestic: 6 } }, label: 'Rapid deployment limits mortality; public confidence rises' },
+        { prob: 0.30, effect: { ally_relationships: 7 }, label: 'Surplus reserve sharing earns allied goodwill' }
+      ],
+      effects3rd: [],
+      domains: ['biological'],
+      tooltip: 'Costly stabilizer. Best used when domestic is spiking from a bio event.'
+    },
+    {
+      id: 'bio_program_attribution',
+      domain: 'biological',
+      name: 'Bio Program Attribution',
+      description: 'Publicly attribute a state biological weapons program or a suspicious outbreak. Imposes international cost on the target.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 1,
+      effects1st: { target: { info: -12, domestic: -5 } },
+      effects2nd: [
+        { prob: 0.40, effect: { relationship_target: -15 }, label: 'Diplomatic relations collapse; target rejects attribution' },
+        { prob: 0.30, effect: { self: { info: -8 } }, label: 'Attribution disputed; source methods exposed or credibility damaged' },
+        { prob: 0.25, effect: { ally_relationships: 8 }, label: 'Allies rally around shared biological security norm' }
+      ],
+      effects3rd: [],
+      domains: ['biological'],
+      tooltip: 'High-risk accusation. If evidence is thin, backfire is severe.'
+    },
+
+    // ── EMP ───────────────────────────────────────────────────────────────────
+    {
+      id: 'emp_hardening',
+      domain: 'emp',
+      name: 'EMP Hardening',
+      description: 'Faraday shielding and HEMP-hardened command networks across military and critical infrastructure. Reduces EMP vulnerability.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { cyber: 8, military: 3 } },
+      effects2nd: [
+        { prob: 0.35, effect: { self: { military: 4 } }, label: 'Hardened C2 systems improve wartime resilience', delay: 2 },
+        { prob: 0.20, effect: { self: { economic: -3 } }, label: 'Mandatory civilian infrastructure upgrades raise compliance costs' }
+      ],
+      effects3rd: [],
+      domains: ['emp'],
+      tooltip: 'Pure defense. Delayed military payoff. No escalation risk.'
+    },
+    {
+      id: 'emp_capability_signal',
+      domain: 'emp',
+      name: 'EMP Capability Signal',
+      description: 'Test or reveal an EMP weapon system. Demonstrates the capacity to blind adversary C4ISR without conventional engagement.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 1,
+      effects1st: { self: { info: 5, military: 3 } },
+      effects2nd: [
+        { prob: 0.45, effect: { adversary_relationship: -8 }, label: 'Adversaries read test as preparation for first strike' },
+        { prob: 0.30, effect: { crisis_escalation: 1 }, label: 'Crisis actors recalibrate escalation thresholds' },
+        { prob: 0.25, effect: { ally_relationships: -5 }, label: 'Allies uneasy about electromagnetic escalation precedent' }
+      ],
+      effects3rd: [],
+      domains: ['emp'],
+      tooltip: 'Deterrence signal at escalation cost. Reveals your hand.'
+    },
+    {
+      id: 'emp_strike',
+      domain: 'emp',
+      name: 'EMP Strike',
+      description: 'Deploy a high-altitude EMP or directed high-power microwave weapon against the target. Blinds their C4ISR and collapses grid infrastructure.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 2,
+      effects1st: { target: { cyber: -18, military: -10, economic: -8 } },
+      effects2nd: [
+        { prob: 0.45, effect: { crisis_escalation: 1 }, label: 'Target interprets strike as prelude to conventional assault' },
+        { prob: 0.35, effect: { self: { domestic: -6 } }, label: 'International condemnation of indiscriminate infrastructure attack' },
+        { prob: 0.20, effect: { self: { military: 5 } }, label: 'Blind adversary enables immediate operational exploitation' }
+      ],
+      effects3rd: [],
+      domains: ['emp'],
+      tooltip: 'Catastrophic to target. Triggers escalation spiral and collateral bleed to bystanders.'
+    },
+    {
+      id: 'grid_restoration_aid',
+      domain: 'emp',
+      name: 'Grid Restoration Aid',
+      description: 'Emergency infrastructure restoration to a partner devastated by EMP or grid attack. Rebuilds cyber capacity and domestic stability.',
+      cost: 1,
+      requiresTarget: true,
+      escalationDelta: -1,
+      effects1st: { target: { cyber: 10, domestic: 6 } },
+      effects2nd: [
+        { prob: 0.55, effect: { relationship_target: 10 }, label: 'Crisis solidarity deepens bilateral alignment' },
+        { prob: 0.25, effect: { self: { economic: -4 } }, label: 'Restoration hardware and technical teams are costly' }
+      ],
+      effects3rd: [],
+      domains: ['emp'],
+      tooltip: 'De-escalatory. Rebuilds a partner hit by grid attack. Strong relationship payoff.'
+    },
+
     // ── AUTONOMOUS ────────────────────────────────────────────────────────────
     {
       id: 'drone_swarm_deploy',
@@ -538,7 +681,7 @@ const Domains = (() => {
   }
 
   function getDomainList() {
-    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous'];
+    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous', 'biological', 'emp'];
   }
 
   function getDomainLabel(domain) {
@@ -550,7 +693,9 @@ const Domains = (() => {
       info: 'Information',
       domestic: 'Domestic',
       supply_chain: 'Supply Chain',
-      autonomous: 'Autonomous'
+      autonomous: 'Autonomous',
+      biological: 'Biological',
+      emp: 'EMP'
     }[domain] || domain;
   }
 
@@ -563,7 +708,9 @@ const Domains = (() => {
       info: '📡',
       domestic: '🏛️',
       supply_chain: '⛓️',
-      autonomous: '🤖'
+      autonomous: '🤖',
+      biological: '🧬',
+      emp: '⚡'
     }[domain] || '●';
   }
 

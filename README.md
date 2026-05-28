@@ -12,7 +12,7 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across eight domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, compound crises).
+BoP2026 models great-power competition across ten domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, pandemic outbreak, C4ISR collapse, compound crises).
 
 The engine is designed for two uses:
 
@@ -105,16 +105,18 @@ LLM NPCs use prompt version `v1.2` (tracked in `js/ai-deepseek.js`). Each NPC re
 
 **Chat vs. thinking mode:** the default `deepseek-chat` is fast and cheap (about $0.10/50-run, all NPCs). Use it for parameter sweeps and baseline comparison. `--thinking` switches to `deepseek-reasoner`, which generates a chain-of-thought reasoning trace per NPC per turn. Both models bill at `deepseek-v4-flash` rates ($0.14/$0.28 per 1M input/output, with 50x cache-hit discount). Actual cost: ~$1.40/50-run for Korean Peninsula (6–9 turn games), ~$0.70/50-run for Taiwan/Iran (4–5 turns). Use thinking mode when you want to study *how* an LLM agent reasons about crisis escalation — the traces are logged to the `.jsonl` sidecar via `--log-prompts`. Not worth ~14x over chat for bulk sweeps.
 
-**Empirical results (20 seeds 0–19, `taiwan_strait_2026` and `iran_nuclear_2026`):**
+**Empirical results:**
 
-| Scenario | Backend | Avg stability | Avg turns | Nuclear % |
-|----------|---------|---------------|-----------|-----------|
-| Taiwan Strait | Heuristic | 21.6 | 4.5 | 0% |
-| Taiwan Strait | LLM CN+RU | **26.4** | 5.2 | 0% |
-| Iran Nuclear (v2.1.1, IR active) | Heuristic | 20.9 | 4.5 | 20% |
-| Iran Nuclear (v2.1.1, IR active) | LLM CN+RU | **28.8** | 4.2 | 50% |
+| Scenario | Backend | Avg stability | Avg turns | Nuclear % | Version |
+|----------|---------|---------------|-----------|-----------|---------|
+| Taiwan Strait | Heuristic | 21.6 | 4.5 | 0% | v2.1.1 |
+| Taiwan Strait | LLM CN+RU | **26.4** | 5.2 | 0% | v2.1.1 |
+| Iran Nuclear | Heuristic | 28.0 | 8.0 | 0% | v2.3.0 |
+| Iran Nuclear | LLM all NPCs | **34.5** | 4.1 | 40% | v2.3.0 |
+| Korean Peninsula | Heuristic | 33.0 | 8.0 | 0% | v2.3.0 |
+| Korean Peninsula | LLM all NPCs | **31.0** | 5.1 | 0% | v2.3.0 |
 
-In Taiwan, LLM NPCs raise stability without increasing nuclear risk. In Iran (v2.1.1, IR active), LLM CN+RU raise stability (+7.9) but also raise the nuclear rate (50% vs 20% heuristic). The divergence points to a mixed-backend effect: LLM powers cooperate more with each other while IR's heuristic brinkmanship drives escalation unchecked. Running IR as LLM too is the natural next step.
+LLM NPCs adopt new domain actions naturally: 11 biological-domain calls observed in 10 Iran runs (IR using `bio_surveillance_network`, `bio_program_attribution`); 69 EMP-domain calls in 10 KP runs (DPRK using `emp_hardening` and `emp_capability_signal` most; `emp_strike` used sparingly as a last resort).
 
 ---
 

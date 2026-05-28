@@ -286,6 +286,42 @@ window.EVENT_TABLE = {
       "cascadeRisk": "iranian_retaliation"
     },
     {
+      "id": "dprk_haed_test", "name": "DPRK High-Altitude Nuclear Detonation",
+      "description": "North Korea detonates a device at 100km altitude. The EMP footprint covers the Korean peninsula and parts of Japan. No ground casualties. Every grid-connected system in range fails instantly.",
+      "probability": 0.20,
+      "conditions": [{ "crisis": "dprk_emp_threat", "minEscalation": 2 }],
+      "effects": { "targets": ["US", "CN", "IN"], "statDeltas": { "cyber": -10, "military": -6, "space": -5 } },
+      "advisorText": "STRATCOM confirms high-altitude detonation. C4ISR degraded across the theater. Decision loops are now measured in seconds, not minutes.",
+      "cascadeRisk": "c4isr_collapse"
+    },
+    {
+      "id": "solar_geomagnetic_storm", "name": "Carrington-Class Geomagnetic Storm",
+      "description": "A solar superstorm induces ground currents that fry transformer banks across three continents. Ambiguity: natural event, or cover for a coordinated EMP attack?",
+      "probability": 0.04,
+      "conditions": [],
+      "effects": { "targets": ["all"], "statDeltas": { "cyber": -12, "space": -14, "economic": -6 } },
+      "advisorText": "Origin unverifiable. Attribution impossible. Every major power will assume the others exploited the window. Epistemic environment about to collapse.",
+      "cascadeRisk": "communications_blackout"
+    },
+    {
+      "id": "bio_treaty_breakdown", "name": "Biological Weapons Treaty Collapse",
+      "description": "A verification regime breakdown at the Biological Weapons Convention. Key signatories withdraw inspectors. The norm against state bioweapons programs visibly weakens.",
+      "probability": 0.12,
+      "conditions": [{ "crisis": "iran_bio_program", "minEscalation": 1 }],
+      "effects": { "targets": ["all"], "statDeltas": { "info": -6, "domestic": -4 } },
+      "advisorText": "With inspection access gone, attribution collapses. Any future outbreak will be unverifiable. Epistemic environment degrading.",
+      "cascadeRisk": "epistemic_cascade"
+    },
+    {
+      "id": "weaponized_pathogen_alert", "name": "WHO Engineered Pathogen Alert",
+      "description": "WHO emergency session after a disease cluster shows genetic markers inconsistent with natural evolution. Three capitals on biological standby.",
+      "probability": 0.08,
+      "conditions": [{ "crisis": "iran_bio_program", "minEscalation": 2 }],
+      "effects": { "targets": ["random_2"], "statDeltas": { "domestic": -14, "economic": -9 } },
+      "advisorText": "Lab origin probability assessed at 70%. Domestic panic spreading faster than our public messaging. Medical reserve deployment window is 1–2 turns.",
+      "cascadeRisk": "domestic_fragility_cascade"
+    },
+    {
       "id": "gulf_bloc_hedges_china", "name": "Gulf Bloc Deepens China Hedging",
       "description": "Gulf sovereign wealth funds expand BRI capital flows. Saudi Aramco signs yuan-denominated contracts. Washington credibility cost rising.",
       "probability": 0.18,

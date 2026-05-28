@@ -301,6 +301,39 @@ const Cascades = (() => {
         type: 'systemic_warning' });
     }
 
+    // EMP strike collateral: electromagnetic burst bleeds into adjacent powers' cyber
+    const empStrikes = actions.filter(a => a.actionId === 'emp_strike');
+    if (empStrikes.length > 0) {
+      const marker = 'emp_cascade_pressure';
+      if (!world.activeSystemicEvents.includes(marker)) {
+        world.activeSystemicEvents.push(marker);
+      }
+      const cyberDelta = Math.round(-6 * scale);
+      for (const strike of empStrikes) {
+        const bystanders = getBystanderPowers(strike.actor, strike.target, world);
+        for (const b of bystanders) {
+          State.applyStatDelta(b, 'cyber', cyberDelta);
+        }
+        if (bystanders.length > 0) {
+          log.push({ order: 3, confidence: 'CONFIRMED', actor: 'SYSTEM',
+            text: `[3rd order] EMP burst from ${State.getPower(strike.actor).name} attack on ${State.getPower(strike.target).name} — electromagnetic spillover hits bystander C4ISR. All other powers cyber ${cyberDelta}.`,
+            type: 'systemic_warning' });
+        }
+      }
+    }
+
+    // Biological domain stacking: multiple bio actions in one turn signals pandemic acceleration
+    const bioActions = actions.filter(a => Domains.getById(a.actionId)?.domain === 'biological').length;
+    if (bioActions >= 2) {
+      const marker = 'bio_acceleration_pressure';
+      if (!world.activeSystemicEvents.includes(marker)) {
+        world.activeSystemicEvents.push(marker);
+      }
+      log.push({ order: 3, confidence: 'POSSIBLE (40%)', actor: 'SYSTEM',
+        text: `[3rd order] Multiple biological domain actions this turn — pandemic acceleration risk elevated. Surveillance or countermeasure surge underway.`,
+        type: 'systemic_warning' });
+    }
+
     // Information war feedback: simultaneous counter-narrative + plant_leak triggers epistemic noise
     const infoWarCount = actions.filter(a => a.actionId === 'counter_narrative' || a.actionId === 'plant_leak').length;
     if (infoWarCount >= 2 && !world.activeSystemicEvents.includes('infowar_saturation')) {
@@ -509,6 +542,44 @@ const Cascades = (() => {
       });
     }
 
+    // C4ISR collapse: EMP cascade pressure + multiple powers with degraded cyber
+    const hasEmpCascade = world.activeSystemicEvents.includes('emp_cascade_pressure');
+    const cyberDegradedCount = powers.filter(p => p.trueState.cyber < 30).length;
+    if (hasEmpCascade && cyberDegradedCount >= 2 && !world.activeSystemicEvents.includes('c4isr_collapse')) {
+      world.activeSystemicEvents.push('c4isr_collapse');
+      const milDelta = Math.round(-12 * scale);
+      const infoDelta = Math.round(-8 * scale);
+      const spaceDelta = Math.round(-6 * scale);
+      for (const p of powers) {
+        State.applyStatDelta(p.id, 'military', milDelta);
+        State.applyStatDelta(p.id, 'info', infoDelta);
+        State.applyStatDelta(p.id, 'space', spaceDelta);
+      }
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] C4ISR collapse: cascading EMP effects sever command and control globally. All powers military ${milDelta}, info ${infoDelta}, space ${spaceDelta}.`,
+        type: 'systemic_event'
+      });
+    }
+
+    // Pandemic outbreak: bio acceleration marker + multiple fragile states
+    const hasBioAcceleration = world.activeSystemicEvents.includes('bio_acceleration_pressure');
+    const vulnerablePowers = powers.filter(p => p.trueState.domestic < 40).length;
+    if (hasBioAcceleration && vulnerablePowers >= 2 && !world.activeSystemicEvents.includes('pandemic_outbreak')) {
+      world.activeSystemicEvents.push('pandemic_outbreak');
+      const domDelta = Math.round(-10 * scale);
+      const econDelta = Math.round(-8 * scale);
+      for (const p of powers) {
+        State.applyStatDelta(p.id, 'domestic', domDelta);
+        State.applyStatDelta(p.id, 'economic', econDelta);
+      }
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] Pandemic outbreak: accelerated pathogen spread exploits fragile states. All powers domestic ${domDelta}, economic ${econDelta}.`,
+        type: 'systemic_event'
+      });
+    }
+
     // Nuclear hair-trigger: critical crisis involving nuclear-armed powers
     const criticalCrises = world.crises.filter(c => c.escalationLevel >= 4);
     const nuclearPowerIds = powers.filter(p => p.trueState.nuclear >= 2).map(p => p.id);
@@ -540,11 +611,16 @@ const Cascades = (() => {
 
   function findRelevantCrisis(action, world) {
     const actionDomain = Domains.getById(action.actionId)?.domain;
-    return world.crises.find(c =>
+    const primaryMatch = world.crises.find(c =>
       (c.domain === actionDomain || c.domain === 'compound') &&
       (c.involved.includes(action.actor) || c.involved.includes(action.target))
-    ) || world.crises.find(c =>
-      c.involved.includes(action.actor) || c.involved.includes(action.target)
+    );
+    if (primaryMatch) return primaryMatch;
+    // Fallback: only for targeted actions where both actor and target share a crisis.
+    // Untargeted actions (e.g. public_statement) must match on domain or they don't escalate.
+    if (!action.target) return null;
+    return world.crises.find(c =>
+      c.involved.includes(action.actor) && c.involved.includes(action.target)
     ) || null;
   }
 

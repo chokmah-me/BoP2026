@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.2.3 (2026-05-27)  
+**Current version:** v2.3.0 (2026-05-28)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -19,8 +19,8 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | # | Scenario                              | Core Threat                                      | BoP2026 Coverage                                   | Status |
 |---|---------------------------------------|--------------------------------------------------|----------------------------------------------------|--------|
 | 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | **Supply Chain** domain (4 actions)                | **v2.0.1 ✓** |
-| 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | **EMP Attacks** domain                             | Planned (v2.2) |
-| 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | **Biological Epidemic** domain                     | Planned (v2.2) |
+| 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | **EMP Attacks** domain                             | **v2.3.0 ✓** |
+| 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | **Biological Epidemic** domain                     | **v2.3.0 ✓** |
 | 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + **UCAV/Drone Swarms**      | **v2.0.1 ✓** |
 | 5 | The War for Space                     | Attacks on satellites and space assets          | Space domain (future scenario)                     | Medium |
 | 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Urban Operations (future scenario)                 | Medium |
@@ -29,6 +29,12 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.3.x (2026-05-28)
+
+- **Biological Epidemic domain** `v2.3.0` — 4 actions: `bio_surveillance_network`, `pandemic_response_pact`, `medical_reserve_deployment`, `bio_program_attribution`. 3rd-order bio acceleration marker + 4th-order pandemic outbreak threshold (all: domestic −10, economic −8). 2 new events. `iran_bio_program` crisis added to Iran Nuclear 2026 (IR/US/EU, L1). IR gets `biological` in priorityDomains.
+- **EMP Attacks domain** `v2.3.0` — 4 actions: `emp_hardening`, `emp_capability_signal`, `emp_strike` (most escalatory non-nuclear action: cyber −18/military −10/economic −8/escalation +2), `grid_restoration_aid`. 3rd-order EMP collateral burst (bystander cyber −6) + 4th-order C4ISR collapse threshold (all: military −12, info −8, space −6). 2 new events. `dprk_emp_threat` crisis added to Korean Peninsula 2026 (DPRK/US/CN, L1). DPRK gets `emp` in priorityDomains.
+- **Escalation fix** `v2.3.0` — `findRelevantCrisis` fallback tightened: untargeted escalatory actions no longer cascade into domain-mismatched crises; targeted actions fall back only when both actor and target share the crisis. Eliminated 100% nuclear collapse in LLM-backed Iran runs. Iran LLM chat post-fix: 40% nuclear / 34.5 stability / 4.1 avg turns.
 
 ### v2.0.x (2026-05-25 – 2026-05-26)
 
@@ -67,8 +73,8 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 | Domain / Feature | Description | Krepinevich Link |
 |---|---|---|
-| **Biological Epidemic** | Engineered or natural outbreaks with international response mechanics. Interacts with domestic stability and sanctions. | "Pandemic as Strategic Weapon" |
-| **EMP Attacks** | Nuclear or non-nuclear EMP strikes causing infrastructure collapse, cyber blackouts, and command disruption. | "The EMP Nightmare" |
+| ~~**Biological Epidemic**~~ | ~~Engineered or natural outbreaks with international response mechanics.~~ | **Shipped v2.3.0** |
+| ~~**EMP Attacks**~~ | ~~Nuclear or non-nuclear EMP strikes causing infrastructure collapse, cyber blackouts, and command disruption.~~ | **Shipped v2.3.0** |
 | **Domestic Faction System** | Replace unitary actor model with hardliner vs. moderate factions. Internal politics shapes action selection. | Compound threat modeling |
 | ~~**Korean Peninsula scenario**~~ | ~~Wire DPRK into a Northeast Asia scenario as an active NPC.~~ | **Shipped v2.2.0** |
 
@@ -96,13 +102,13 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 - [x] Compound crisis mechanics: Supply Chain + Autonomous (SCS), Iran proxy + nuclear (Iran) — **met v2.0.x**
 - [x] Model at least 3 compound crises with divergent trajectories — **met v2.0.x**
-- [ ] Cover at least 4 of 7 Krepinevich scenarios with playable domain content (currently 3: Supply Chain, Autonomous, partial Financial)
+- [x] Cover at least 4 of 7 Krepinevich scenarios with playable domain content — **met v2.3.0** (5 of 7: Supply Chain, Autonomous, partial Financial, Biological, EMP)
 - [x] Korean Peninsula scenario playable with DPRK as active NPC — **shipped v2.2.0**
 - [ ] Biological + EMP domains complete and integrated into at least one scenario each
 
 ---
 
-**Next Milestone:** v2.3.0 — Biological Epidemic domain + EMP Attacks + Domestic Faction System
+**Next Milestone:** v2.4.0 — Domestic Faction System
 
 ---
 

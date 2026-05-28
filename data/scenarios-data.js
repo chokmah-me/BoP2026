@@ -72,6 +72,13 @@ window.SCENARIOS_DATA = {
         "description": "Qatar opens back-channel to Tehran. UAE and Saudi diverge on response. Gulf Cooperation Council paralyzed.",
         "region": "persian_gulf", "location": { "x": 572, "y": 182 },
         "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "iran_bio_program", "name": "Iran Biological Weapons Program", "domain": "biological",
+        "involved": ["IR", "US", "EU"], "escalationLevel": 1,
+        "description": "OPCW inspectors report suspicious dual-use fermentation facilities outside Tabriz. Intelligence suggests IRGC-linked biological R&D exceeding medical justification.",
+        "region": "persian_gulf", "location": { "x": 573, "y": 162 },
+        "age": 0, "cascadeLog": []
       }
     ],
     "intelQuality": {
@@ -163,6 +170,13 @@ window.SCENARIOS_DATA = {
         "involved": ["DPRK", "US", "CN"], "escalationLevel": 2,
         "description": "Satellite imagery confirms tactical warheads at Kaesong and Wonsan. Kim signals first-use if regime survival threatened. US-ROK combined exercises suspended under pressure.",
         "region": "korean_peninsula", "location": { "x": 778, "y": 148 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "dprk_emp_threat", "name": "DPRK EMP Threat", "domain": "emp",
+        "involved": ["DPRK", "US", "CN"], "escalationLevel": 1,
+        "description": "DPRK signals intent to detonate a high-altitude nuclear device over the peninsula. KN-23 short-range ballistics repositioned to launch corridors consistent with HAED profile.",
+        "region": "korean_peninsula", "location": { "x": 785, "y": 138 },
         "age": 0, "cascadeLog": []
       }
     ],

@@ -71,7 +71,7 @@ const AI = (() => {
     IR: {
       riskTolerance: 0.7,
       patience: 0.65,
-      priorityDomains: ['military', 'info', 'cyber'],
+      priorityDomains: ['military', 'info', 'cyber', 'biological'],
       flavorText: [
         'Iran activates a proxy network with plausible deniability.',
         'The IRGC escalates in a domain where attribution is unclear.',
@@ -83,7 +83,7 @@ const AI = (() => {
     DPRK: {
       riskTolerance: 0.85,
       patience: 0.35,
-      priorityDomains: ['military', 'nuclear', 'cyber'],
+      priorityDomains: ['military', 'nuclear', 'cyber', 'emp'],
       flavorText: [
         'Pyongyang tests a ballistic missile, daring the world to respond.',
         'The DPRK leverages nuclear ambiguity to extract concessions.',
