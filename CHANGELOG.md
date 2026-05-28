@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-05-28 (v2.4.2)
+
+UI readability and accessibility pass. No engine or research-API behavior
+changes — browser presentation only (plus the game log scroll fix).
+
+### Fixed
+- **Game log is now scrollable** (`css/main.css`, `js/ui.js`): `#log-panel` had
+  `pointer-events: none`, so the mouse could not scroll it even though it had
+  `overflow-y: auto` — during simulation, entries scrolled past unread. Set to
+  `pointer-events: auto`, raised the panel `120px → 200px`, and `renderLog()`
+  now preserves the panel's scroll position across the per-phase re-render
+  (history of up to 200 entries was always retained; it just wasn't reachable).
+  Pause + scroll now let you read back the full turn.
+- **Tiny fonts eliminated** (`css/main.css`, `css/map.css`, `css/panels.css`,
+  `index.html`, `js/ui.js`): no UI text below 11px remains. The 8px relationship
+  matrix and map crisis labels, 9px stat/map labels, and 10px chrome were all
+  raised; base body text `13px → 15px`; the 11px tier → 12px; log entries → 13px.
+- **Low-contrast text** (`css/main.css`, `css/map.css`): `--text-dim` lightened
+  `#5a6278 → #8a93ad` (most labels/values now meet WCAG AA ≈4.5:1 on the dark
+  surface); map/crisis label fill opacity raised to 0.9.
+
+### Added
+- **Keyboard + screen-reader support** (`index.html`, `css/main.css`, `js/ui.js`):
+  global `:focus-visible` outline on interactive elements; the SVG world map has
+  `role="img"`, `aria-label`, and a `<title>`; the Relations matrix toggle (was a
+  click-only `<div>`) is now `role="button"` with `tabindex`, Enter/Space
+  handling, and a live-updating `aria-expanded`.
+- **Reduced-motion support** (`css/main.css`): `@media (prefers-reduced-motion:
+  reduce)` neutralizes the infinite `pulse`/`sim-pulse`/`rice-pulse` animations.
+- **Viewport reflow** (`css/main.css`): `html, body` `overflow: hidden → auto`
+  and `#app` gains `min-height: 100vh`, so the layout no longer clips on short or
+  narrow viewports and tolerates browser zoom; grid rows/columns widened to fit
+  the larger type.
+
 ## 2026-05-28 (v2.4.1)
 
 ### Fixed

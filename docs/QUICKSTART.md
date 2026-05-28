@@ -141,6 +141,8 @@ Play a few turns, then click **Save Log** in the event log panel (bottom-left of
 
 The **Research** button (top-right) runs batch simulations in the browser with a progress bar. Click **JSON** when done to download the analytics file.
 
+The event log (overlay on the bottom of the map) is scrollable — pause the simulation and scroll back to read the full turn-by-turn cascade. Up to 200 entries are retained.
+
 ---
 
 ## 7. Run the tests

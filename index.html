@@ -31,7 +31,9 @@
 
   <!-- main: map -->
   <main id="main-area">
-    <svg id="world-map" viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg">
+    <svg id="world-map" viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg"
+         role="img" aria-label="World map showing eight great-power regions and active crisis markers">
+      <title>World map of great powers and active crises</title>
       <rect class="map-bg" width="900" height="480"/>
 
       <!-- ── non-aligned landmasses (decorative) ──────────────────────────────── -->
@@ -105,7 +107,7 @@
       <g id="crisis-markers"></g>
 
       <!-- compass decoration -->
-      <text x="855" y="460" style="font-size:8px;fill:#1e2535;font-family:monospace">BoP 2026</text>
+      <text x="848" y="460" style="font-size:11px;fill:#5a6480;font-family:monospace">BoP 2026</text>
     </svg>
 
     <!-- log overlay on map -->
@@ -126,7 +128,10 @@
       <div id="advisor-log"></div>
     </div>
     <div class="panel-section rel-matrix-section" id="rel-matrix-section">
-      <div class="panel-title panel-toggle" onclick="UI.toggleRelMatrix()">
+      <div class="panel-title panel-toggle" role="button" tabindex="0"
+        aria-expanded="false" aria-controls="rel-matrix"
+        onclick="UI.toggleRelMatrix()"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();UI.toggleRelMatrix()}">
         Relations <span id="rel-matrix-arrow">▶</span>
       </div>
       <div id="rel-matrix" style="display:none"></div>

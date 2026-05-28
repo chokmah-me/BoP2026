@@ -305,6 +305,8 @@ const UI = (() => {
     const el = document.getElementById('game-log');
     if (!el) return;
 
+    const scroller = el.parentElement || el;  // #log-panel is the scroll container
+    const prevScroll = scroller.scrollTop;
     el.innerHTML = world.log.slice(0, 60).map(entry => {
       const cls = logClass(entry.type);
       const order = entry.order ? `<span class="log-order order-${entry.order}">[${entry.order}°]</span>` : '';
@@ -317,6 +319,7 @@ const UI = (() => {
         </div>
       `;
     }).join('');
+    scroller.scrollTop = prevScroll;
   }
 
   function logClass(type) {
@@ -474,6 +477,8 @@ const UI = (() => {
     const open = el.style.display !== 'none';
     el.style.display = open ? 'none' : 'block';
     if (arrow) arrow.textContent = open ? '▶' : '▼';
+    const toggle = document.querySelector('.panel-toggle[aria-controls="rel-matrix"]');
+    if (toggle) toggle.setAttribute('aria-expanded', String(!open));
     if (!open) renderRelationshipMatrix(State.get());
   }
 
@@ -501,7 +506,7 @@ const UI = (() => {
       ? (doctrine ? `${doctrine.flag} Victory` : '🌐 Stability Maintained')
       : (doctrine ? `${doctrine.flag} Doctrine Failed` : '💀 Order Collapsed');
     const subtitle = doctrine
-      ? `<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-bottom:8px">${doctrine.name} — ${doctrine.tagline}</div>`
+      ? `<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim);margin-bottom:8px">${doctrine.name} — ${doctrine.tagline}</div>`
       : '';
     modal.innerHTML = `
       <div class="modal-box game-over ${result.result}">

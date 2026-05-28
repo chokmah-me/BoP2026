@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.4.1 (2026-05-28)  
+**Current version:** v2.4.2 (2026-05-28)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -50,6 +50,10 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 - **AOM engine fixes** `v2.4.1` — Idempotent pre-delegation, `playerOnly` action filter,
   autonomous-domain game-over check, dormant-crisis AOM context injection, truncated-run
   `draw`/`lose` outcomes, `oracle.setPlayerOverride()`, `--doctrine` CLI flag.
+- **UI readability + accessibility** `v2.4.2` — Browser presentation only. Scrollable game log
+  (fixed `pointer-events`, scroll position preserved across re-renders), no UI text below 11px,
+  lighter `--text-dim` for WCAG-AA contrast, `:focus-visible` outlines, SVG map ARIA, keyboard-
+  operable Relations toggle, `prefers-reduced-motion`, and viewport reflow/zoom tolerance.
 
 ### v2.3.x (2026-05-28)
 
