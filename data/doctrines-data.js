@@ -10,7 +10,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.65,
       patience: 0.25,
-      priorityDomains: ["economic", "military", "diplomatic"]
+      priorityDomains: ["economic", "military", "diplomatic"],
+      t_rat: 180
     },
     winCondition: {
       id: "bilateral_surplus",
@@ -40,7 +41,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.85,
       patience: 0.8,
-      priorityDomains: ["military", "info", "cyber"]
+      priorityDomains: ["military", "info", "cyber"],
+      t_rat: 240
     },
     winCondition: {
       id: "nuclear_threshold",
@@ -70,7 +72,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.15,
       patience: 0.9,
-      priorityDomains: ["diplomatic", "economic", "info"]
+      priorityDomains: ["diplomatic", "economic", "info"],
+      t_rat: 300
     },
     winCondition: {
       id: "multilateral_survival",
@@ -100,7 +103,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.35,
       patience: 0.95,
-      priorityDomains: ["economic", "diplomatic", "cyber"]
+      priorityDomains: ["economic", "diplomatic", "cyber"],
+      t_rat: 120
     },
     winCondition: {
       id: "civilizational_return",

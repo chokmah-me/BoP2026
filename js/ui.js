@@ -272,15 +272,18 @@ const UI = (() => {
     el.innerHTML = `
       ${doctrineSection}
       <div class="stat-row">
-        ${Object.entries(stats).map(([k, v]) => `
-          <div class="stat-item">
-            <div class="stat-label">${statLabel(k)}</div>
-            <div class="stat-bar-wrap">
-              <div class="stat-bar" style="width:${k === 'nuclear' ? v * 20 : v}%; background:${statColor(k, v)}"></div>
+        ${Object.entries(stats).map(([k, v]) => {
+          const masked = world.autonomyMasks?.[world.player]?.includes(k);
+          return `
+            <div class="stat-item">
+              <div class="stat-label">${statLabel(k)}</div>
+              <div class="stat-bar-wrap">
+                ${masked ? '' : `<div class="stat-bar" style="width:${k === 'nuclear' ? v * 20 : v}%; background:${statColor(k, v)}"></div>`}
+              </div>
+              <div class="stat-val${masked ? ' rice-masked' : ''}">${masked ? '???' : (v + (k === 'nuclear' ? '/5' : ''))}</div>
             </div>
-            <div class="stat-val">${v}${k === 'nuclear' ? '/5' : ''}</div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     `;
   }
@@ -326,7 +329,8 @@ const UI = (() => {
       epistemic: 'log-epistemic',
       systemic_warning: 'log-systemic',
       systemic_event: 'log-systemic',
-      relationship: 'log-relationship'
+      relationship: 'log-relationship',
+      sovereignty_void: 'log-systemic'
     }[type] || '';
   }
 

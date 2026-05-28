@@ -667,6 +667,59 @@ const Domains = (() => {
       effects3rd: [],
       domains: ['autonomous'],
       tooltip: 'Intel gain. Improves epistemic accuracy for 2–3 turns.'
+    },
+    {
+      id: 'boost_phase_intercept',
+      domain: 'autonomous',
+      name: 'Boost-Phase Intercept',
+      description: 'Authorize Golden Dome engagement during boost phase. Only registers if your doctrine ratifies faster than the intercept window.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 1,
+      boostPhase: true,
+      effects1st: { self: { military: -1 } },
+      effects2nd: [
+        { prob: 0.6, effect: { crisis_escalation: -2 }, label: 'Kill chain closed within window' },
+        { prob: 0.4, effect: { crisis_escalation: 2 },  label: 'Window expired mid-authorization: uncommanded drift' }
+      ],
+      effects3rd: [],
+      domains: ['autonomous'],
+      tooltip: 'Latency-gated. If t_rat > t_event, sovereignty void fires instead and this action is nullified.'
+    },
+    {
+      id: 'pre_delegate_authority',
+      domain: 'autonomous',
+      name: 'Pre-Delegate Launch Authority',
+      description: 'Grant autonomous systems standing engagement authority. Removes ratification delay entirely. Violates DoDD 3000.09.',
+      cost: 3,
+      requiresTarget: false,
+      escalationDelta: 0,
+      riceMaskStats: ['military', 'autonomous'],
+      triggersCrisis: 'policy_review_tribunal',
+      effects1st: { self: { domestic: -8 } },
+      effects2nd: [
+        { prob: 0.7, effect: { adversary_relationship: -15 }, label: 'Adversaries read pre-delegation as first-strike posture' }
+      ],
+      effects3rd: [],
+      domains: ['autonomous'],
+      tooltip: 'Closes the latency gap permanently. Triggers ally backlash and DoDD review.'
+    },
+    {
+      id: 'revert_midcourse_defense',
+      domain: 'autonomous',
+      name: 'Revert to Midcourse Defense',
+      description: 'Stand down boost-phase posture. Human control preserved. Strategic advantage forfeited.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      cancelsBPI: true,
+      effects1st: { self: { military: -2 } },
+      effects2nd: [
+        { prob: 0.6, effect: { crisis_escalation: 1 }, label: 'Adversary reads stand-down as hesitation' }
+      ],
+      effects3rd: [],
+      domains: ['autonomous'],
+      tooltip: 'No sovereignty void fires this turn. No Rice mask. Adversary notes the hesitation.'
     }
   ];
 
