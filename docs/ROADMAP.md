@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.3.0 (2026-05-28)  
+**Current version:** v2.4.0 (2026-05-28)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -21,7 +21,7 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | **Supply Chain** domain (4 actions)                | **v2.0.1 ✓** |
 | 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | **EMP Attacks** domain                             | **v2.3.0 ✓** |
 | 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | **Biological Epidemic** domain                     | **v2.3.0 ✓** |
-| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + **UCAV/Drone Swarms**      | **v2.0.1 ✓** |
+| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + AOM latency governance + sovereignty void | **v2.4.0 ✓** |
 | 5 | The War for Space                     | Attacks on satellites and space assets          | Space domain (future scenario)                     | Medium |
 | 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Urban Operations (future scenario)                 | Medium |
 | 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via **Economic** + **Supply Chain** domains | Partial ✓ |
@@ -29,6 +29,24 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.4.x (2026-05-28)
+
+- **Sovereignty Void scenario** `v2.4.0` — `sovereignty_void_2026`. Operationalizes the AOM
+  latency-governance framework from [Zenodo 19368682] (Golden Dome / boost-phase intercept).
+  `_latencyGate()` in `js/cascades.js` compares doctrinal `t_rat` against crisis `t_event` each
+  turn; sovereignty void fires (+2 escalation, player action nullified) when the gap is positive.
+  Three resolution paths: intercept (if fast enough), pre-delegate (Rice-Theorem mask on stats),
+  revert to midcourse. Structural gap: no doctrine closes the DPRK window (t_event=90s); MING
+  (t_rat=120s) can close the Taiwan window (t_event=120s).
+- **JUCHE doctrine** `v2.4.0` — DPRK playable for the first time. t_rat=45s (fastest), Expert
+  difficulty. Win condition: nuclear deterrence achieved without triggering exchange.
+- **AOM-aware AI** `v2.4.0` — Heuristic `scoreAction()` and DeepSeek `_buildPrompt()` both
+  understand the latency mechanic. Heuristic selects `boost_phase_intercept` when the window is
+  closeable (score +120 + posture restore); DeepSeek NPCs receive exploit framing for the US
+  player's ratification constraint.
+- **DPRK as full NPC** `v2.4.0` — Active in `sovereignty_void_2026`. Existing DPRK AI personality
+  (riskTolerance 0.85, patience 0.35, priorityDomains: military/nuclear/cyber/emp).
 
 ### v2.3.x (2026-05-28)
 

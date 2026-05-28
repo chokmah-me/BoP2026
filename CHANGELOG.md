@@ -1,5 +1,60 @@
 # Changelog
 
+## 2026-05-28 (v2.4.0)
+
+### Added
+- **Sovereignty Void scenario** (`data/scenarios-data.js`): `sovereignty_void_2026` — models
+  the AOM latency-governance gap from [Zenodo 19368682]. Golden Dome is online; boost-phase
+  physics set the clock. Four crises: DPRK Boost-Phase Launch (`t_event=90s`), PLA Hypersonic
+  Strike (`t_event=120s`), C2 Comms Blackout (`t_rat_penalty=30s` when escalated), DoDD 3000.09
+  Review (dormant; fires on pre-delegation). Player is US.
+- **AOM latency framework** (`js/cascades.js`): `_latencyGate()` runs before every 1st-order
+  cascade pass. Compares `world.doctrine.profile.t_rat` (doctrinal ratification time, seconds)
+  against each active crisis's `t_event` (intercept window, seconds). Three resolution paths:
+  (1) `boost_phase_intercept` — registers only if `t_rat ≤ t_event`; (2) `pre_delegate_authority`
+  — bypasses t_rat, violates DoDD 3000.09, applies Rice-Theorem epistemic mask to military/autonomous
+  stats (renders `???` in UI); (3) `revert_midcourse_defense` — preserves human control, forfeits
+  strategic advantage. If none taken and `t_rat > t_event`, sovereignty void fires: crisis escalates
+  +2 and the player's intercept action is nullified.
+- **Three new autonomous domain actions** (`js/domains.js`): `boost_phase_intercept`,
+  `pre_delegate_authority`, `revert_midcourse_defense`.
+- **`t_rat` on all 4 doctrines** (`data/doctrines-data.js`): MAGA=180s, TWELVER=240s,
+  EU_FATALISM=300s, MING=120s. MING (CN) is the only doctrine that can close the Taiwan
+  hypersonic window (t_event=120s). No doctrine closes the DPRK window (t_event=90s) —
+  the structural gap holds regardless of doctrine choice.
+- **JUCHE doctrine** (`data/doctrines-data.js`): DPRK playable for the first time. Expert
+  difficulty. t_rat=45s (fastest — closes both BPI windows). riskTolerance=0.85, patience=0.35.
+  Win condition: DPRK nuclear ≥ 4 without exchange and US military lead ≤ 30.
+- **DPRK as targetable NPC** (`data/scenarios-data.js`): added to `boost_phase_north_korea.involved`;
+  DPRK now enters `world.powers`, appears in the target selector, and takes NPC turns in
+  `sovereignty_void_2026`. DPRK AI personality was already present in `js/ai.js`.
+- **AOM-aware heuristic AI** (`js/ai.js`): `scoreAction()` adds +120 + posture-restore for
+  `boost_phase_intercept` when `t_rat ≤ t_event`; scores `pre_delegate_authority` by
+  riskTolerance when no window is closeable; scores `revert_midcourse_defense` for low-risk
+  powers.
+- **AOM-aware DeepSeek prompt** (`js/ai-deepseek.js`): `_buildPrompt()` injects a
+  `LATENCY GOVERNANCE (AOM):` block when boost-phase crises are active. Player receives own
+  t_rat, per-crisis void/close verdict, and all three resolution paths. NPCs receive the
+  player's t_rat and explicit exploit framing (escalate BPI crises; escalate c2_blackout to
+  widen the ratification gap).
+- **Rice-Theorem epistemic mask** (`js/epistemic.js`, `css/panels.css`): `applyRiceMask()`
+  marks stats unverifiable after authority delegation. Masked stats render as `???` with
+  pulsing red animation.
+
+### Fixed
+- **Escalation log noise** (`js/cascades.js`): `apply1stOrder()` now guards the log push behind
+  `if (crisis.escalationLevel !== prev)`, suppressing 0→0 and 5→5 no-op entries (eliminated
+  10+ spurious entries per turn in `sovereignty_void_2026`).
+- **DPRK not targetable** (`data/scenarios-data.js`): `boost_phase_north_korea.involved` missing
+  `"DPRK"` — DPRK never entered `world.powers` and never appeared in the target selector.
+
+### Research notes (v2.4.0 baselines)
+- **Heuristic, no doctrine** (10 runs, seed 42): sovereignty_void 0% nuclear / 31.9 avg stability /
+  11.0 avg turns. Both BPI crises void every turn; game ends via domestic fragility cascade.
+- **JUCHE (DPRK player, t_rat=45s)**: closes both BPI windows; heuristic selects
+  `boost_phase_intercept` targeting US every turn it has AP.
+- **DeepSeek**: `DEEPSEEK_API_KEY=... node scripts/run-bop.js --scenario sovereignty_void_2026 --runs 5 --seed 42 --ai-backend deepseek --ai-powers all --log-prompts`
+
 ## 2026-05-28 (v2.3.0)
 
 ### Added

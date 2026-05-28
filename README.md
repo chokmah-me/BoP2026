@@ -16,7 +16,7 @@ BoP2026 models great-power competition across ten domains (military, economic, c
 
 The engine is designed for two uses:
 
-1. **Classroom / wargame**: play as the United States through the Taiwan Strait, Iran Nuclear, or Korean Peninsula scenarios in a browser, no install required.
+1. **Classroom / wargame**: play through five scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, or Sovereignty Void — in a browser, no install required.
 2. **Research companion**: run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
 
 This is a **stylized model**, not an empirically fitted one. Parameters are calibrated for face validity against open-source IR literature, not regression-estimated from historical data. See [docs/model-notes.md](docs/model-notes.md) for assumptions and limitations.
@@ -64,7 +64,8 @@ node scripts/analyze-results.js results.json
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026` |
+| `--doctrine <id>` | scenario default | Doctrine to play: `MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
 | `--out <path>` | `logs/bop-{scenario}-{date}-s{seed}-x{runs}.json` | Output file (`bop2026-analytics-v1`). `logs/` dir created automatically. |
