@@ -120,7 +120,7 @@ if (opts.dryRun) {
   const PRICE_OUT = isThinking ? 2.19 : 0.28;
 
   const world0 = (() => {
-    BoP.init(opts.scenario, {});
+    BoP.init(opts.scenario, { doctrine: opts.doctrine || undefined });
     return BoP.getState();
   })();
   const npcCount = opts.aiPowers === 'all'
