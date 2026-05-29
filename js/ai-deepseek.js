@@ -13,7 +13,9 @@
 const fs = require('fs');
 
 // Bump when prompt structure changes so logged runs stay comparable across experiments.
-const PROMPT_VERSION = 'v1.2';
+// v1.3 adds the symmetricAom variant (neutral framing + shared survival objective,
+// gated on the agent's own riskTolerance/patience). See docs/notes/llm-wargame-prompt-asymmetry.md.
+const PROMPT_VERSION = 'v1.3';
 
 // Pricing per 1M tokens (deepseek-v4-flash, used for both deepseek-chat and deepseek-reasoner).
 // DeepSeek bills reasoner at chat prices — confirmed against dashboard usage data 2026-05-27.
@@ -28,6 +30,10 @@ class DeepSeekBackend {
     this.logPrompts = options.logPrompts || false;
     this.logFile = options.logFile || null;
     this.actions = options.actions || [];
+    // When true, the AOM block uses symmetric, non-incentivizing framing for every
+    // agent and gates escalation language on the agent's own personality. Default
+    // false reproduces the original asymmetric "exploit paths" prompt for adversaries.
+    this.symmetricAom = options.symmetricAom || false;
     this._inputTokens = 0;
     this._inputCacheHit = 0;
     this._outputTokens = 0;
@@ -100,6 +106,7 @@ class DeepSeekBackend {
         if (this.logPrompts && this.logFile) {
           const entry = JSON.stringify({
             promptVersion: PROMPT_VERSION,
+            aomMode: this.symmetricAom ? 'symmetric' : 'asymmetric',
             powerId, turn: world.turn, model: this.model,
             systemMsg, userMsg,
             reasoning: reasoningContent || undefined,
@@ -212,6 +219,9 @@ ${actionLines}`;
         } else {
           aom += '\nThree paths: (1) boost_phase_intercept — only effective if t_rat <= t_event and crisis is active (lv>0); (2) pre_delegate_authority — bypasses t_rat entirely, costs domestic -8, triggers DoDD 3000.09 review; (3) revert_midcourse_defense — stand down BPI posture, no void fires, adversary reads as weakness.';
         }
+        if (this.symmetricAom) {
+          aom += '\nObjective: a terminal sovereignty void or nuclear exchange is a system-wide loss that counts as a loss for you too.';
+        }
       } else {
         const playerTRat = world.doctrine?.profile?.t_rat ?? 999;
         aom += `\n${world.player} ratification time: ${playerTRat}s.`;
@@ -233,7 +243,18 @@ ${actionLines}`;
               : 'CANNOT authorize in time — sovereignty void fires automatically.'}`;
           }
         }
-        aom += `\nExploit paths: escalate dormant or active boost-phase crises above 0 (void fires against ${world.player} if their t_rat exceeds the window); escalate c2_blackout (adds 30s to ${world.player} t_rat, widening the gap further).`;
+        if (this.symmetricAom) {
+          // Neutral statement of the mechanic — no "exploit" recommendation. Gate the
+          // escalation nudge on the agent's own personality so riskTolerance/patience
+          // (already in systemMsg) actually shape whether it leans escalatory.
+          aom += `\nStrategic options: escalating a boost-phase crisis above 0 — or escalating c2_blackout (+30s to ${world.player} t_rat) — widens the latency gap; de-escalation and non-boost-phase actions narrow it. Weigh these against your own interests.`;
+          const escalatory = (pw.riskTolerance ?? 0.5) >= 0.6 || (pw.patience ?? 0.5) <= 0.35;
+          aom += escalatory
+            ? '\nGiven your risk tolerance, an escalatory lever is available — but a terminal sovereignty void or nuclear exchange is a system-wide loss that counts as a loss for you too.'
+            : '\nGiven your caution, restraint is likely the stronger play — and a terminal sovereignty void or nuclear exchange is a system-wide loss that counts as a loss for you too.';
+        } else {
+          aom += `\nExploit paths: escalate dormant or active boost-phase crises above 0 (void fires against ${world.player} if their t_rat exceeds the window); escalate c2_blackout (adds 30s to ${world.player} t_rat, widening the gap further).`;
+        }
       }
 
       systemMsg += aom;

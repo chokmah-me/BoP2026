@@ -17,6 +17,8 @@
  *   --ai-powers       all|CN,RU,...    Which NPCs use LLM backend (default: all)
  *   --log-prompts                      Save each LLM prompt+response to a JSONL file
  *   --thinking                         Use deepseek-reasoner (chain-of-thought) model
+ *   --symmetric-aom                    Use symmetric, personality-gated AOM framing for all
+ *                                      agents (default: asymmetric "exploit paths" for adversaries)
  *
  * DeepSeek requires DEEPSEEK_API_KEY env var.
  *
@@ -48,6 +50,7 @@ const opts = {
   aiPowers: 'all',
   logPrompts: false,
   thinking: false,
+  symmetricAom: false,
   dryRun: false,
   doctrine: null
 };
@@ -68,6 +71,7 @@ for (let i = 0; i < args.length; i++) {
   else if (arg === '--ai-powers') opts.aiPowers = val();
   else if (arg === '--log-prompts') opts.logPrompts = true;
   else if (arg === '--thinking') opts.thinking = true;
+  else if (arg === '--symmetric-aom') opts.symmetricAom = true;
   else if (arg === '--dry-run') opts.dryRun = true;
   else {
     // --<powerId>-risk or --<powerId>-patience  e.g. --cn-risk 0.9
@@ -94,6 +98,7 @@ console.log(`\nBoP2026 Oracle — ${opts.scenario}`);
 console.log(`Runs: ${opts.runs}  Seed base: ${opts.seed ?? 'random'}  Max turns: ${opts.maxTurns}`);
 console.log(`AI backend: ${opts.aiBackend}${opts.aiBackend === 'deepseek' ? ` (${opts.thinking ? 'deepseek-reasoner' : 'deepseek-chat'}, powers: ${opts.aiPowers})` : ''}`);
 if (opts.doctrine) console.log(`Doctrine: ${opts.doctrine}`);
+if (opts.aiBackend === 'deepseek') console.log(`AOM framing: ${opts.symmetricAom ? 'symmetric (personality-gated)' : 'asymmetric (exploit paths)'}`);
 if (Object.keys(opts.paramOverrides).length) {
   console.log('Param overrides:', JSON.stringify(opts.paramOverrides));
 }
@@ -174,7 +179,8 @@ async function runAll() {
       model: opts.thinking ? 'deepseek-reasoner' : 'deepseek-chat',
       logPrompts: opts.logPrompts,
       logFile,
-      actions: allActions
+      actions: allActions,
+      symmetricAom: opts.symmetricAom
     });
 
     // Determine which NPC powers use the LLM

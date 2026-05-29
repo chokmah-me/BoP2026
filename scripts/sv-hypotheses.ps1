@@ -16,16 +16,27 @@
     pwsh scripts/sv-hypotheses.ps1                 # free structural tests only
     pwsh scripts/sv-hypotheses.ps1 -IncludeLLM     # also run the paid DeepSeek doctrine A/B
     pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMDryRun   # estimate DeepSeek cost first, no calls
+
+  Before/after prompt-fix comparison (paid):
+    pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly              # "before": asymmetric prompt
+    pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly -Symmetric   # "after":  symmetric prompt (-sym logs)
+  -LLMOnly skips the free blocks A-C; -Symmetric adds --symmetric-aom and suffixes logs with -sym.
 #>
 
 param(
   [switch]$IncludeLLM,
   [switch]$LLMDryRun,
+  [switch]$LLMOnly,       # skip the free heuristic blocks A-C (paid reruns only)
+  [switch]$Symmetric,     # use symmetric, personality-gated AOM framing (--symmetric-aom)
   [int]$Runs = 25,        # runs per heuristic variant (free)
-  [int]$LLMRuns = 3,      # runs per doctrine for the paid LLM block
+  [int]$LLMRuns = 12,     # runs per cell for the paid LLM blocks (raised from 3 to tighten CIs)
   [int]$Seed = 42,
   [int]$MaxTurns = 8
 )
+
+# When -Symmetric, append the flag and suffix output filenames so before/after don't clobber.
+$llmExtra  = if ($Symmetric) { @('--symmetric-aom') } else { @() }
+$llmSuffix = if ($Symmetric) { '-sym' } else { '' }
 
 $ErrorActionPreference = 'Stop'
 $scn = 'sovereignty_void_2026'
@@ -43,6 +54,8 @@ function Run-BoP {
 #   not strategic.
 # ---------------------------------------------------------------------------
 $doctrines = 'MAGA','TWELVER','EU_FATALISM','MING','JUCHE'
+
+if (-not $LLMOnly) {
 foreach ($d in $doctrines) {
   Run-BoP "A/H1 heuristic — $d" "logs/sv-h1-heur-$($d.ToLower()).json" `
     @('--doctrine', $d, '--runs', $Runs)
@@ -68,6 +81,9 @@ Run-BoP "C/H3 baseline NPC risk (MING)" "logs/sv-h3-npc-default.json" `
   @('--doctrine', 'MING', '--runs', $Runs)
 Run-BoP "C/H3 calm DPRK+RU (risk 0.3)" "logs/sv-h3-npc-calm.json" `
   @('--doctrine', 'MING', '--dprk-risk', '0.3', '--ru-risk', '0.3', '--runs', $Runs)
+} else {
+  Write-Host "`n(Free blocks A-C skipped — -LLMOnly.)" -ForegroundColor DarkGray
+}
 
 # ---------------------------------------------------------------------------
 # Block D (PAID) — H4: doctrine comparison as designed (LLM steers the player).
@@ -77,9 +93,9 @@ if ($IncludeLLM) {
   if (-not $env:DEEPSEEK_API_KEY -and -not $LLMDryRun) { throw 'DEEPSEEK_API_KEY not set — required for Blocks D-E.' }
   foreach ($d in $doctrines) {
     $args = @('--doctrine', $d, '--ai-backend', 'deepseek', '--thinking', '--ai-powers', 'all',
-              '--runs', $LLMRuns, '--log-prompts')
+              '--runs', $LLMRuns, '--log-prompts') + $llmExtra
     if ($LLMDryRun) { $args += '--dry-run' }
-    Run-BoP "D/H4 deepseek+thinking — $d" "logs/sv-h4-llm-$($d.ToLower()).json" $args
+    Run-BoP "D/H4 deepseek+thinking — $d" "logs/sv-h4-llm-$($d.ToLower())$llmSuffix.json" $args
   }
 
   # -------------------------------------------------------------------------
@@ -103,9 +119,10 @@ if ($IncludeLLM) {
   )
   foreach ($c in $roleCases) {
     $args = @('--doctrine', 'MING', '--ai-backend', 'deepseek', '--thinking',
-              '--ai-powers', $c.Powers, '--runs', $LLMRuns, '--log-prompts')
+              '--ai-powers', $c.Powers, '--runs', $LLMRuns, '--log-prompts') + $llmExtra
     if ($LLMDryRun) { $args += '--dry-run' }
-    Run-BoP $c.Label $c.Out $args
+    $outPath = $c.Out -replace '\.json$', "$llmSuffix.json"
+    Run-BoP $c.Label $outPath $args
   }
 } else {
   Write-Host "`n(Blocks D-E / DeepSeek skipped — pass -IncludeLLM to run them.)" -ForegroundColor DarkGray
