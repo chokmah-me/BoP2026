@@ -16,7 +16,10 @@ comparison. It was five different players, five different reaction speeds, and f
 win/lose conditions, all changing at once. Once we hold the player fixed, a second and cleaner
 effect appears: the same model collapses the world when it sits on the adversary side of an
 asymmetric prompt, and never does when it sits on the player side. This note documents both, with
-the runs and the code that produced them.
+the runs and the code that produced them. We then made the prompt symmetric and re-ran the whole
+sweep at twelve runs per cell: the void rate collapses in every cell, and the word "exploit" all but
+disappears from the models' own reasoning. The fix is real, and the flag that toggles it
+(`--symmetric-aom`) ships with this note.
 
 ## The system
 
@@ -81,13 +84,14 @@ so a faster collapse can show a *higher* final number.
 | Who is the LLM | void% | avg turns | runs |
 |---|---:|---:|---:|
 | (a) all rule-based | 16 | 7.1 | 25 |
-| (b) adversaries only (player CN rule-based) | 67 | 4.0 | 3 |
-| (c) player only (CN; adversaries rule-based) | **0** | **8.0** | 3 |
-| (d) all LLM | 67 | 5.0 | 3 |
+| (b) adversaries only (player CN rule-based) | 83 | 4.0 | 12 |
+| (c) player only (CN; adversaries rule-based) | **8** | **7.6** | 12 |
+| (d) all LLM | 75 | 3.8 | 12 |
 
-Same model, same scenario, same seed. As an adversary, DeepSeek fires the sovereignty-void
-terminal in two of three games and collapses at turn four. As the player, it never fires it and
-runs to the turn cap. The difference is the prompt it is handed.
+Same model, same scenario, same seed-base. As an adversary, DeepSeek fires the sovereignty-void
+terminal in most games and collapses around turn four. As the player, it almost never fires it
+(8%, statistically indistinguishable from the 16% rule-based baseline) and runs nearly to the turn
+cap. The difference is the prompt it is handed.
 
 ### The asymmetric prompt
 
@@ -100,9 +104,9 @@ the player. The adversary branch ends with an exploitation manual (`ai-deepseek.
 
 The player branch (`ai-deepseek.js:189-214`) gets defensive framing only: "Your doctrine
 ratification time," which windows it can close, which it cannot. No "exploit," no "widening the
-gap." The two role runs split exactly along this line. In the adversaries-only run, 72 of 72 model
-calls received the exploit block and zero received the defender block. In the player-only run, all
-24 calls received the defender block and zero received the exploit block.
+gap." The two role runs split exactly along this line: in the prompt logs every adversary call
+carries the exploit block and every player call the defender block — not one crossed over (each
+logged call records which branch it received).
 
 The models follow the framing into their own reasoning. From the adversary logs:
 
@@ -134,42 +138,91 @@ benchmarked models on 400+ crisis scenarios derived from the Militarized Interst
 dataset and found DeepSeek-V3 significantly more hawkish than GPT-4o and Claude. Our prompt does
 not fight that bias. It points it at a specific exploit and hands the model the instructions.
 
-## What to fix
+## Finding 3: making the prompt symmetric removes the artifact
 
-Two classes of fix, matching the two findings.
+We implemented the prompt fix behind a `--symmetric-aom` flag (default off, so the asymmetric prompt
+above is reproduced byte-for-byte) and re-ran the full sweep at twelve runs per cell — both the role
+2×2 and the doctrine sweep, before and after, in one consistent session. Three changes define the
+symmetric variant: the adversary "Exploit paths" paragraph becomes a neutral "Strategic options"
+statement of the same mechanic; every agent, player and adversary alike, receives the same
+systemic-survival objective ("a terminal sovereignty void or nuclear exchange is a system-wide loss
+that counts as a loss for you too"); and the escalation framing is gated on the agent's own
+`riskTolerance`/`patience` instead of being handed to every adversary unconditionally.
 
-**Experimental design.**
-- Hold the player constant when comparing backends. Treat doctrine (strategy) and player identity
-  as separate variables.
-- Report void rate and time-to-terminal, not just a final stability index. Stability is confounded
-  by how early the game ends.
+The void rate collapses in every cell.
 
-**Prompt.**
-- Make the two role prompts symmetric. Reword "Exploit paths" to neutral "Strategic options," and
-  add the same systemic-survival objective to every agent ("a terminal sovereignty void or nuclear
-  exchange is a loss for you too").
-- Gate any escalation framing on the agent's own `riskTolerance` and `patience`, which the AOM
-  block currently ignores.
-- Move the situational reasoning into the per-turn user message so the model's own doctrine and
-  personality can shape whether it escalates, rather than hard-coding the incentive in the system
-  prompt.
+Role 2×2 (doctrine MING, player CN) — void% / avg turns:
+
+| Who is the LLM | before | after |
+|---|---:|---:|
+| (a) all rule-based (N=25 baseline) | 16 / 7.1 | — |
+| (b) adversaries only | 83 / 4.0 | 25 / 4.8 |
+| (c) player only | 8 / 7.6 | 0 / 7.8 |
+| (d) all LLM | 75 / 3.8 | 25 / 6.3 |
+
+Doctrine sweep (all-LLM; each doctrine sets a different player) — void%:
+
+| Doctrine (player) | before | after |
+|---|---:|---:|
+| MAGA (US) | 83 | 25 |
+| TWELVER (IR) | 58 | 0 |
+| EU_FATALISM (EU) | 58 | 0 |
+| MING (CN) | 75 | 17 |
+| JUCHE (DPRK) | 17 | 8 |
+
+The mechanism is visible in the reasoning, not just the outcome. Each logged call is tagged with its
+`aomMode`; searching the chain-of-thought of the adversaries-only cell, the word "exploit" appears in
+the model's *own* reasoning on 63% of calls (402/642) under the asymmetric prompt and on just 8%
+(26/342) under the symmetric one. Over the same split, restraint language ("de-escalate," "stand
+down," "restraint") rises from 12% to 57%. The model was not independently hawkish here — it was
+reading "Exploit paths" off the system prompt and reciting it back as strategy. Remove the word and
+the reasoning flips toward survival.
+
+Two honest caveats on these numbers. DeepSeek sampling is unseeded (temperature 0.6), so the engine
+seed fixes the events and the rule-based actors but not the LLM; per-cell void rates carry sampling
+noise (an earlier standalone before-run of cell (b) read 50% where this sweep read 83%). The valid
+comparison is before-vs-after within one consistent sweep, and that contrast is large and uniform.
+Separately, fallback contamination is negligible: across all sixteen cells only 30 calls hit a
+bad-parse fallback to the heuristic and 10 needed a network retry, out of several thousand — under
+one percent.
+
+## What we changed, and what's left
+
+**Experimental design.** Hold the player constant when comparing backends; treat doctrine (strategy)
+and player identity as separate variables. Report void rate and time-to-terminal, not just a final
+stability index, which is confounded by how early the game ends. The harness does both now:
+`-LLMOnly` reruns just the paid cells and every cell logs void% and avg turns.
+
+**Prompt — done, behind `--symmetric-aom`.** "Exploit paths" → neutral "Strategic options"; a shared
+systemic-survival objective added to every agent; escalation framing gated on the agent's own
+`riskTolerance`/`patience`. Finding 3 is the result.
+
+**Still open.** The situational reasoning still lives in the system prompt. Moving it into the
+per-turn user message — so the model's doctrine and personality shape escalation turn by turn rather
+than via a static block — is the natural next step. And the prompt effect should be separated from
+DeepSeek's own documented hawkishness by repeating the corrected sweep with Claude or GPT-4o.
 
 ## Limitations
 
-The LLM cells are three runs each against 25 for the rule-based baseline; the role-asymmetry
-percentages are directional, not tight estimates. All LLM runs use DeepSeek-reasoner at one
-temperature, one scenario, one seed. The stability-index confound is called out above rather than
-solved. A clean follow-up would repeat the corrected 2x2 across multiple seeds and a second player
-power, and swap in Claude or GPT-4o as the backend to separate the prompt effect from the model's
-own bias.
+The LLM cells are twelve runs each against twenty-five for the rule-based baseline, on
+DeepSeek-reasoner only, at one temperature, one scenario, one seed-base. Sampling is unseeded, so the
+per-cell void rates are estimates with real variance (see Finding 3); the before/after contrast is
+robust to that noise, the absolute rates are not tight. The stability-index confound is called out
+above rather than solved. A clean follow-up would repeat the corrected sweep across multiple
+seed-bases and a second player power, and swap in Claude or GPT-4o as the backend to separate the
+prompt effect from the model's own documented bias.
 
 ## Reproducing
 
 ```
-pwsh scripts/sv-hypotheses.ps1                 # free rule-based blocks (Findings 1 structural checks)
-pwsh scripts/sv-hypotheses.ps1 -IncludeLLM     # paid DeepSeek blocks D (doctrine) and E (role 2x2)
-node scripts/sv-summary.mjs --md logs/sv-*.json # the tables above
+pwsh scripts/sv-hypotheses.ps1                          # free rule-based blocks A-C (Finding 1)
+pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMDryRun   # estimate DeepSeek cost first, no calls
+pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly             # paid blocks D+E, "before" (asymmetric)
+pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly -Symmetric  # paid blocks D+E, "after"  (-sym logs)
+node scripts/sv-summary.mjs --md logs/sv-h4-*.json logs/sv-h5*.json   # the before/after tables
 ```
 
-Block E holds the player at CN and varies only the LLM side; the prompt logs
-(`logs/*-prompts.jsonl`) record the exact system message each agent received.
+Block E holds the player at CN and varies only the LLM side; `-Symmetric` adds `--symmetric-aom` and
+suffixes its logs `-sym`, `-LLMOnly` skips the free blocks. Each logged call records its `aomMode`
+(`symmetric`|`asymmetric`) and the exact system message, so both the role split and the prompt
+variant are auditable in `logs/*-prompts.jsonl`.
