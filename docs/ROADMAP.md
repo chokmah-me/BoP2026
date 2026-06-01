@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.6.0 (2026-05-31)  
+**Current version:** v2.7.0 (2026-06-01)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -22,13 +22,31 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | **EMP Attacks** domain                             | **v2.3.0 ✓** |
 | 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | **Biological Epidemic** domain                     | **v2.3.0 ✓** |
 | 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + AOM latency governance + sovereignty void | **v2.4.0 ✓** |
-| 5 | The War for Space                     | Attacks on satellites and space assets          | Space domain (future scenario)                     | Medium |
+| 5 | The War for Space                     | Attacks on satellites and space assets          | **Space** domain (4 actions) + Orbital Warfare scenario + Kessler cascade | **v2.7.0 ✓** |
 | 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Urban Operations (future scenario)                 | Medium |
 | 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via **Economic** + **Supply Chain** domains | Partial ✓ |
 
 ---
 
 ## Shipped
+
+### v2.7.x (2026-06-01)
+
+- **Space (counterspace) domain** `v2.7.0` — closes Krepinevich #5, coverage now 6 of 7. Four
+  actions on the pre-existing `space` stat: `satellite_hardening` (defensive), `orbital_isr_surge`
+  (intel), `asat_strike` (most escalatory — seeds debris), `debris_remediation_pact` (de-escalatory).
+  Registered in the domain lookups (icon 🛰️); surfaces in the browser UI automatically.
+- **Orbital Warfare 2026 scenario** `v2.7.0` — `orbital_warfare_2026`, player US. Four `orbit`-region
+  crises (ASAT demonstration, GNSS denial, comms-sat blackout, cislunar resource claim). NPCs adopt
+  space actions via active-crisis domain matching (no `priorityDomains` change). Heuristic baseline
+  (50 runs, seed 42): 0% nuclear, ~26 stability, ~9 turns.
+- **Kessler-syndrome cascade** `v2.7.0` — `js/cascades.js`, mirroring the EMP collateral→C4ISR
+  pattern: `asat_strike` pushes a `kessler_pressure` marker + bystander `space` bleed (3rd order);
+  `kessler_pressure` + ≥2 powers below space 30 → global `kessler_cascade` (space −12 / military −8 /
+  info −6, 4th order); `orbit+orbit` merges to the `orbital_denial` compound at level 3. Plus two
+  scenario-scoped events (`kessler_debris_alert`, `commercial_constellation_loss`). Adding events
+  shifts seeded baselines for all scenarios (per `Events.drawEvents` rolling once per table entry —
+  same as the v2.0.2 / v2.3.0 event additions); existing scenarios re-baselined and unbroken.
 
 ### v2.6.x (2026-05-31)
 
@@ -151,8 +169,8 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 | **Enhanced Epistemic Model** | Perception drift + intelligence quality decay. Perceived vs. true state divergence accumulates over time. |
 | **Technology Development Track** | R&D investment with delayed capability gains. |
 | **Arms Race Dynamics** | Military stat growth curves based on sustained spending. |
-| **Space domain** | Attacks on satellites and space assets. New military actions + scenario. |
-| **Urban Operations** | Megacity warfare mechanics. Planned for a future scenario. |
+| ~~**Space domain**~~ | ~~Attacks on satellites and space assets. New actions + scenario.~~ | **Shipped v2.7.0** |
+| **Urban Operations** | Megacity warfare mechanics (Krepinevich #6). Needs a new stat or attrition mechanic; the last uncovered scenario. |
 
 ---
 
@@ -168,7 +186,7 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 - [x] Compound crisis mechanics: Supply Chain + Autonomous (SCS), Iran proxy + nuclear (Iran) — **met v2.0.x**
 - [x] Model at least 3 compound crises with divergent trajectories — **met v2.0.x**
-- [x] Cover at least 4 of 7 Krepinevich scenarios with playable domain content — **met v2.3.0** (5 of 7: Supply Chain, Autonomous, partial Financial, Biological, EMP)
+- [x] Cover at least 4 of 7 Krepinevich scenarios with playable domain content — **met v2.3.0** (6 of 7 as of v2.7.0: Supply Chain, Autonomous, partial Financial, Biological, EMP, Space — only Urban Operations remains)
 - [x] Korean Peninsula scenario playable with DPRK as active NPC — **shipped v2.2.0**
 - [ ] Biological + EMP domains complete and integrated into at least one scenario each
 
@@ -176,7 +194,8 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 **Next Milestone:** Domestic Faction System (replace the unitary-actor model with hardliner vs.
 moderate factions), and the LLM-agent methodology follow-ups above (per-turn AOM framing,
-cross-model replication).
+cross-model replication). **Urban Operations (Krepinevich #6)** is now the only uncovered scenario —
+the natural follow-on to v2.7.0's Space work to complete 7-of-7 coverage.
 
 ---
 

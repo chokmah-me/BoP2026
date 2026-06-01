@@ -12,11 +12,11 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across ten domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, pandemic outbreak, C4ISR collapse, compound crises).
+BoP2026 models great-power competition across eleven domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP, space) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, pandemic outbreak, C4ISR collapse, Kessler debris cascade, compound crises).
 
 The engine is designed for two uses:
 
-1. **Classroom / wargame**: play through five scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, or Sovereignty Void — in a browser, no install required.
+1. **Classroom / wargame**: play through six scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, Sovereignty Void, or Orbital Warfare — in a browser, no install required.
 2. **Research companion**: run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
 
 This is a **stylized model**, not an empirically fitted one. Parameters are calibrated for face validity against open-source IR literature, not regression-estimated from historical data. See [docs/model-notes.md](docs/model-notes.md) for assumptions and limitations.
@@ -67,7 +67,7 @@ npm test
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026` |
 | `--doctrine <id>` | scenario default | Doctrine to play: `MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
@@ -237,8 +237,9 @@ Heuristic baseline (default parameters, v2.2.1):
 | Iran Nuclear 2026 | 0% | 14% | 20.7 (σ 5.4) | 4.4 (σ 0.9) |
 | South China Sea 2026 | 0% | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
 | Korean Peninsula 2026† | 0% | 0% | 28.7 | 9.1 |
+| Orbital Warfare 2026‡ | 0% | 0% | 26.8 | 8.9 |
 
-Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance.
+Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance. ‡Orbital Warfare: v2.7.0 baseline (100 runs, seed 0). Heuristic NPCs favor the de-escalatory `debris_remediation_pact`; `asat_strike` is rarely selected under de-escalate posture, so the Kessler cascade is a latent tail risk rather than a baseline outcome (cf. `emp_strike`).
 
 Key findings from the baseline:
 
@@ -275,13 +276,16 @@ PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active 
 Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 1), Hormuz closure threat (level 1), Iran proxy network (level 1), Gulf Bloc fracture (level 1). Iran (IR) is an active NPC — takes actions each turn alongside US, CN, EU, IN, RU, GB. Six scenario-specific stochastic events model the proxy branches: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, and Gulf Bloc alignment choices (US alignment vs. China hedging).
 
 ### South China Sea, 2026
-China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the four scenarios — 4% baseline nuclear rate vs. 0% for Taiwan.
+China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the conventional scenarios — 4% baseline nuclear rate vs. 0% for Taiwan.
 
 ### Korean Peninsula, 2026
 DPRK moves tactical warheads to forward positions after the latest ICBM series. Four active crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK is the primary NPC antagonist — highest riskTolerance (0.85) and lowest patience (0.35) in the game. High starting escalation (sum 5) leaves little diplomatic margin.
 
 ### Sovereignty Void, 2026
 Golden Dome is online and boost-phase physics set the clock. The AOM latency mechanic compares your doctrine's ratification time (`t_rat`) against each crisis's intercept window (`t_event`): if `t_rat > t_event`, the sovereignty void fires and your input doesn't register. **Requires a `--doctrine`** (UI hides it until one is chosen; `BoP.init` throws without one) — the headline mechanic is built around `t_rat`, which defaults to 999s with no doctrine. Crises: DPRK boost-phase launch (autonomous, `t_event` 90s — no doctrine closes it), PLA hypersonic strike (autonomous, 120s — MING can close it), C2 comms blackout (cyber, adds 30s to `t_rat`), and a dormant DoDD 3000.09 review triggered by pre-delegation. Resolution paths: intercept if fast enough, pre-delegate authority (Rice-Theorem stat mask, DoDD review), or revert to midcourse (clears delegation, restores human control).
+
+### Orbital Warfare, 2026
+A destructive ASAT test seeds a debris field as GPS goes dark over a theater and cislunar resource claims harden. Player is US. Four `orbit`-region crises: ASAT Demonstration (space, L1), GNSS Denial (space, L1), Comms Satellite Blackout (cyber, L1), Cislunar Resource Claim (diplomatic, L1). The signature failure mode is the **Kessler-syndrome cascade** — an `asat_strike` seeds orbital debris that bleeds onto bystanders' `space` assets, and once two-plus powers fall below the space threshold, a global `kessler_cascade` renders low Earth orbit unusable (space/military/info degrade for all). Two `orbit`-region crises at level 3 merge into the `orbital_denial` compound. The Space (counterspace) action domain — `satellite_hardening`, `orbital_isr_surge`, `asat_strike`, `debris_remediation_pact` — drives the scenario. Closes Krepinevich's "War for Space" (#5), bringing playable domain coverage to 6 of 7.
 
 ---
 
@@ -311,7 +315,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.6.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.7.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

@@ -393,6 +393,27 @@ const Cascades = (() => {
       }
     }
 
+    // ASAT strike collateral: orbital debris field bleeds onto bystanders' space assets
+    const asatStrikes = actions.filter(a => a.actionId === 'asat_strike');
+    if (asatStrikes.length > 0) {
+      const marker = 'kessler_pressure';
+      if (!world.activeSystemicEvents.includes(marker)) {
+        world.activeSystemicEvents.push(marker);
+      }
+      const spaceDelta = Math.round(-6 * scale);
+      for (const strike of asatStrikes) {
+        const bystanders = getBystanderPowers(strike.actor, strike.target, world);
+        for (const b of bystanders) {
+          State.applyStatDelta(b, 'space', spaceDelta);
+        }
+        if (bystanders.length > 0) {
+          log.push({ order: 3, confidence: 'CONFIRMED', actor: 'SYSTEM',
+            text: `[3rd order] ASAT debris from ${State.getPower(strike.actor).name} strike on ${State.getPower(strike.target).name} — fragment cloud sweeps shared orbits. All other powers space ${spaceDelta}.`,
+            type: 'systemic_warning' });
+        }
+      }
+    }
+
     // Biological domain stacking: multiple bio actions in one turn signals pandemic acceleration
     const bioActions = actions.filter(a => Domains.getById(a.actionId)?.domain === 'biological').length;
     if (bioActions >= 2) {
@@ -483,6 +504,12 @@ const Cascades = (() => {
       name: 'South Seas Blockade',
       domain: 'compound',
       description: 'Island seizure, sea lane closure, and autonomous engagement converge. China declares an air defense identification zone over the South China Sea. Global trade routes buckle. India and the EU are forced off the fence.'
+    },
+    'orbit+orbit': {
+      id: 'orbital_denial',
+      name: 'Orbital Denial Regime',
+      domain: 'compound',
+      description: 'Counterspace strikes and PNT denial merge into a sustained debris-and-jamming environment. Low Earth orbit becomes contested terrain; ISR, navigation, and strategic warning degrade for every power simultaneously.'
     }
   };
 
@@ -629,6 +656,26 @@ const Cascades = (() => {
       log.push({
         order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
         text: `[4th order SYSTEMIC] C4ISR collapse: cascading EMP effects sever command and control globally. All powers military ${milDelta}, info ${infoDelta}, space ${spaceDelta}.`,
+        type: 'systemic_event'
+      });
+    }
+
+    // Kessler cascade: ASAT debris pressure + multiple powers with degraded space assets
+    const hasKesslerPressure = world.activeSystemicEvents.includes('kessler_pressure');
+    const spaceDegradedCount = powers.filter(p => p.trueState.space < 30).length;
+    if (hasKesslerPressure && spaceDegradedCount >= 2 && !world.activeSystemicEvents.includes('kessler_cascade')) {
+      world.activeSystemicEvents.push('kessler_cascade');
+      const spaceDelta = Math.round(-12 * scale);
+      const milDelta = Math.round(-8 * scale);
+      const infoDelta = Math.round(-6 * scale);
+      for (const p of powers) {
+        State.applyStatDelta(p.id, 'space', spaceDelta);
+        State.applyStatDelta(p.id, 'military', milDelta);
+        State.applyStatDelta(p.id, 'info', infoDelta);
+      }
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] Kessler cascade: runaway orbital debris renders low Earth orbit unusable. ISR, PNT, and comms degrade for all. All powers space ${spaceDelta}, military ${milDelta}, info ${infoDelta}.`,
         type: 'systemic_event'
       });
     }

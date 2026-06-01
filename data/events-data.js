@@ -331,6 +331,24 @@ window.EVENT_TABLE = {
       "effects": { "targets": ["GB"], "statDeltas": { "economic": 6 } },
       "advisorText": "Gulf sovereign wealth funds deepening BRI capital flows. Washington's credibility window in the Gulf is narrowing.",
       "cascadeRisk": "financial_fragmentation"
+    },
+    {
+      "id": "kessler_debris_alert", "name": "Kessler Debris Alert",
+      "description": "Conjunction-warning systems flag a self-sustaining collision chain in low Earth orbit. Operators scramble to maneuver surviving assets out of the growing fragment cloud.",
+      "probability": 0.12,
+      "conditions": [{ "crisis": "asat_demonstration", "minEscalation": 2 }],
+      "effects": { "targets": ["all"], "statDeltas": { "space": -12 } },
+      "advisorText": "Fragment density is approaching the runaway threshold. Expect compounding losses across all constellations for several turns.",
+      "cascadeRisk": "kessler_cascade"
+    },
+    {
+      "id": "commercial_constellation_loss", "name": "Commercial Constellation Loss",
+      "description": "A debris strike and a coincident solar event cripple a major commercial LEO broadband constellation. Backhaul, finance, and logistics networks degrade where they had quietly come to depend on it.",
+      "probability": 0.12,
+      "conditions": [{ "crisis": "gnss_jamming" }],
+      "effects": { "targets": ["random_2"], "statDeltas": { "space": -8, "economic": -6 } },
+      "advisorText": "Civil dependence on commercial space has outpaced resilience planning. Economic knock-on effects will lag by a turn or two.",
+      "cascadeRisk": null
     }
   ]
 };
