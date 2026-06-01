@@ -20,8 +20,47 @@ const Cascades = (() => {
     }
   }
 
+  function _latencyGate(actions, world, log) {
+    if (world.bpiReverted) { world.bpiReverted = false; return; }
+
+    const baseTRat = world.doctrine?.profile?.t_rat ?? 999;
+    const c2 = (world.crises || []).find(c => c.id === 'c2_blackout');
+    const penalty = (c2 && c2.escalationLevel > 0) ? (c2.t_rat_penalty || 0) : 0;
+    const t_rat = baseTRat + penalty;
+    const delegated = world.autonomyDelegated?.[world.player];
+
+    for (const crisis of (world.crises || [])) {
+      if (!crisis.t_event || crisis.escalationLevel <= 0) continue;
+      if (!delegated && t_rat <= crisis.t_event) continue;
+
+      const escalationDelta = delegated ? -1 : 2;
+      State.adjustCrisisEscalation(crisis.id, escalationDelta);
+      if (!world.activeSystemicEvents.includes('sovereignty_void_active')) {
+        world.activeSystemicEvents.push('sovereignty_void_active');
+      }
+      log.push({
+        order: 1,
+        confidence: 'CONFIRMED',
+        actor: delegated ? 'AUTONOMOUS AGENT' : 'UNCOMMANDED DRIFT',
+        text: delegated
+          ? `[AUTONOMOUS ENGAGEMENT] ${crisis.name}: Pre-delegated agent acted. t_rat bypassed. DoDD 3000.09 violated.`
+          : `[SOVEREIGNTY VOID] ${crisis.name}: t_rat (${t_rat}s) > t_event (${crisis.t_event}s). Uncommanded drift. Player input not registered.`,
+        type: 'sovereignty_void'
+      });
+      if (!delegated) {
+        const idx = actions.findIndex(a =>
+          a.actor === world.player && a.actionId === 'boost_phase_intercept'
+        );
+        if (idx !== -1) actions.splice(idx, 1);
+      }
+    }
+  }
+
   function resolve(pendingActions, world) {
     const log = [];
+
+    // latency gate: fires before any player input registers on boost-phase crises
+    _latencyGate(pendingActions, world, log);
 
     // drain queued delayed effects from prior turns
     drainDelayedEffects(world, log);
@@ -96,13 +135,15 @@ const Cascades = (() => {
       if (crisis) {
         const prev = crisis.escalationLevel;
         State.adjustCrisisEscalation(crisis.id, def.escalationDelta);
-        log.push({
-          order: 1,
-          confidence: 'CONFIRMED',
-          actor: action.actor,
-          text: `[${crisis.name}] Escalation: ${prev} → ${crisis.escalationLevel}`,
-          type: 'escalation'
-        });
+        if (crisis.escalationLevel !== prev) {
+          log.push({
+            order: 1,
+            confidence: 'CONFIRMED',
+            actor: action.actor,
+            text: `[${crisis.name}] Escalation: ${prev} → ${crisis.escalationLevel}`,
+            type: 'escalation'
+          });
+        }
       }
     }
 
@@ -113,6 +154,36 @@ const Cascades = (() => {
     if ((def.id === 'sanctions' || def.id === 'financial_pressure') && action.target) {
       State.adjustRelationship(action.actor, action.target, -10);
       State.adjustRelationship(action.target, action.actor, -12);
+    }
+
+    // AOM: Rice-Theorem mask — applied when pre-delegating autonomous authority
+    const alreadyDelegated = !!world.autonomyDelegated?.[action.actor];
+    if (def.riceMaskStats && def.riceMaskStats.length > 0 && !alreadyDelegated) {
+      Epistemic.applyRiceMask(action.actor, def.riceMaskStats, world);
+      world.autonomyDelegated = world.autonomyDelegated || {};
+      world.autonomyDelegated[action.actor] = true;
+    }
+
+    // AOM: trigger a dormant crisis (e.g. policy_review_tribunal on DoDD violation)
+    if (def.triggersCrisis && !alreadyDelegated) {
+      const tc = (world.crises || []).find(c => c.id === def.triggersCrisis);
+      if (tc && tc.escalationLevel === 0) {
+        State.adjustCrisisEscalation(tc.id, 1);
+        log.push({
+          order: 1, confidence: 'CONFIRMED', actor: action.actor,
+          text: `[POLICY TRIGGER] ${tc.name} activated — DoDD 3000.09 pre-delegation threshold crossed.`,
+          type: 'escalation'
+        });
+      }
+    }
+
+    // AOM: Path 3 — flag the latency gate to skip this turn, and restore human
+    // control by undoing any prior pre-delegation (clears the autonomy flag and
+    // lifts the Rice mask for this actor).
+    if (def.cancelsBPI) {
+      world.bpiReverted = true;
+      if (world.autonomyDelegated) delete world.autonomyDelegated[action.actor];
+      Epistemic.clearRiceMask(action.actor, world);
     }
   }
 

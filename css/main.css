@@ -1,13 +1,18 @@
 /* ── reset & tokens ──────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 :root {
   --bg:       #0a0c10;
   --surface:  #111520;
   --surface2: #181d2a;
   --border:   #252c3d;
   --text:     #c8d0e0;
-  --text-dim: #5a6278;
+  --text-dim: #8a93ad;
   --text-bright: #e8edf8;
   --accent:   #4a7fc1;
   --accent2:  #7a4fc1;
@@ -25,16 +30,17 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 13px;
-  line-height: 1.4;
-  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.45;
+  overflow: auto;
 }
 
 /* ── layout ──────────────────────────────────────────────────────────────── */
 #app {
   display: grid;
-  grid-template-rows: 36px 1fr 180px;
-  grid-template-columns: 1fr 300px;
+  grid-template-rows: 44px 1fr 230px;
+  grid-template-columns: 1fr 320px;
+  min-height: 100vh;
   height: 100vh;
   gap: 1px;
   background: var(--border);
@@ -74,7 +80,7 @@ html, body {
 /* ── header ──────────────────────────────────────────────────────────────── */
 #game-title {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   color: var(--text-dim);
   text-transform: uppercase;
@@ -97,7 +103,7 @@ html, body {
 .phase-label {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -114,7 +120,7 @@ html, body {
 
 .panel-title {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-dim);
@@ -149,7 +155,7 @@ html, body {
 }
 
 .crisis-name {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-bright);
   font-weight: 600;
 }
@@ -184,7 +190,7 @@ html, body {
 
 .crisis-level {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-dim);
   white-space: nowrap;
 }
@@ -204,7 +210,7 @@ html, body {
   padding: 6px;
   border-radius: 3px;
   margin-bottom: 4px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -213,7 +219,7 @@ html, body {
 .severity-low   { background: #10182a; border-left: 3px solid var(--accent); }
 
 .advisor-text { color: var(--text); flex: 1; }
-.advisor-empty { color: var(--text-dim); font-size: 11px; padding: 8px; }
+.advisor-empty { color: var(--text-dim); font-size: 12px; padding: 8px; }
 
 /* ── bottom panel ─────────────────────────────────────────────────────────── */
 #action-panel {
@@ -234,7 +240,7 @@ html, body {
 
 .ap-display {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-dim);
   white-space: nowrap;
 }
@@ -255,7 +261,7 @@ html, body {
   padding: 3px 8px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
   transition: all 0.15s;
 }
@@ -304,20 +310,20 @@ html, body {
 
 .action-cost {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   color: var(--accent);
   margin-bottom: 4px;
 }
 
 .action-desc {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-dim);
   line-height: 1.4;
   margin-bottom: 4px;
 }
 
 .action-tooltip {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--text-dim);
   font-style: italic;
   border-top: 1px solid var(--border);
@@ -326,7 +332,7 @@ html, body {
 }
 
 .action-escalation {
-  font-size: 9px;
+  font-size: 12px;
   font-family: var(--font-mono);
   margin-top: 3px;
 }
@@ -378,7 +384,7 @@ html, body {
 
 .stat-label {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   color: var(--text-dim);
   text-transform: uppercase;
 }
@@ -398,7 +404,7 @@ html, body {
 
 .stat-val {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   color: var(--text-dim);
   text-align: right;
 }
@@ -409,12 +415,12 @@ html, body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120px;
-  background: rgba(10, 12, 16, 0.92);
+  height: 200px;
+  background: rgba(10, 12, 16, 0.96);
   border-top: 1px solid var(--border);
   overflow-y: auto;
   padding: 4px 8px;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 /* shown separately in bottom area too */
@@ -426,8 +432,8 @@ html, body {
   display: flex;
   gap: 6px;
   align-items: baseline;
-  padding: 2px 0;
-  font-size: 11px;
+  padding: 3px 0;
+  font-size: 13px;
   font-family: var(--font-mono);
   border-bottom: 1px solid rgba(37,44,61,0.4);
 }
@@ -441,7 +447,7 @@ html, body {
 .log-systemic  { color: var(--danger); font-weight: bold; }
 
 .log-order {
-  font-size: 9px;
+  font-size: 12px;
   padding: 1px 4px;
   border-radius: 2px;
   flex-shrink: 0;
@@ -453,14 +459,14 @@ html, body {
 .order-4 { background: #2a1010; color: var(--danger); }
 
 .log-conf {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--text-dim);
   flex-shrink: 0;
 }
 
 .log-text { flex: 1; }
 .log-subtext {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-dim);
   font-style: italic;
   margin-top: 1px;
@@ -490,7 +496,7 @@ html, body {
 }
 
 .modal-box h3 { font-size: 14px; margin-bottom: 12px; color: var(--text-bright); }
-.modal-box h4 { font-size: 11px; color: var(--text-dim); margin: 10px 0 6px; }
+.modal-box h4 { font-size: 12px; color: var(--text-dim); margin: 10px 0 6px; }
 
 .target-list { display: flex; flex-direction: column; gap: 6px; }
 
@@ -532,7 +538,7 @@ html, body {
 .rel-badge {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   padding: 2px 8px;
   border-radius: 3px;
 }
@@ -541,7 +547,7 @@ html, body {
 .rel-hostile  { background: #3a1010; color: var(--danger); }
 .rel-neutral  { background: #1a1a3a; color: var(--accent); }
 
-.band-note { font-size: 9px; color: var(--text-dim); font-weight: normal; }
+.band-note { font-size: 12px; color: var(--text-dim); font-weight: normal; }
 
 .dossier-stat {
   display: grid;
@@ -559,11 +565,11 @@ html, body {
 }
 
 .dossier-bar { height: 100%; border-radius: 2px; }
-.dossier-val { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); }
-.dossier-stat-label { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.dossier-val { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+.dossier-stat-label { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
 
 .memory-entry {
-  font-size: 10px;
+  font-size: 12px;
   font-family: var(--font-mono);
   color: var(--text-dim);
   padding: 2px 0;
@@ -630,7 +636,7 @@ html, body {
 
 #scenario-subtitle {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-dim);
   letter-spacing: 0.08em;
 }
@@ -684,14 +690,14 @@ html, body {
 
 .scenario-crisis-tag {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-dim);
   padding: 2px 0;
 }
 
 .scenario-card-start {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--accent);
   margin-top: 4px;
   text-align: right;
@@ -699,7 +705,7 @@ html, body {
 
 #scenario-footer {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-dim);
   letter-spacing: 0.06em;
 }
@@ -707,7 +713,7 @@ html, body {
 /* ── compound crisis badge ───────────────────────────────────────────────── */
 .compound-badge {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 12px;
   background: #3a1a3a;
   color: #c878c8;
   border: 1px solid #6a3a6a;
@@ -754,7 +760,7 @@ html, body {
   width: auto;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-dim);
   transition: border-color 0.15s, color 0.15s;
   display: flex;
@@ -802,14 +808,14 @@ html, body {
 
 .doctrine-tagline {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--accent2);
   text-align: center;
   font-style: italic;
 }
 
 .doctrine-ideology {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-dim);
   line-height: 1.5;
   border-top: 1px solid var(--border);
@@ -817,7 +823,7 @@ html, body {
 }
 
 .doctrine-win {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--ok);
   font-family: var(--font-mono);
   line-height: 1.4;
@@ -826,7 +832,7 @@ html, body {
 }
 
 .doctrine-briefing {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--accent);
   font-style: italic;
   line-height: 1.4;
@@ -834,7 +840,7 @@ html, body {
 
 .doctrine-difficulty {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   padding: 2px 8px;
   border-radius: 2px;
   align-self: flex-end;
@@ -849,7 +855,7 @@ html, body {
 /* doctrine banner in game header */
 .doctrine-banner {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--accent2);
   padding: 2px 10px;
   border: 1px solid var(--accent2);
@@ -864,7 +870,7 @@ html, body {
 
 /* doctrine objective in player stats panel */
 .doctrine-objective {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--ok);
   font-family: var(--font-mono);
   padding: 6px 8px;
@@ -882,3 +888,12 @@ html, body {
 
 /* log color for doctrine entries */
 .log-doctrine { color: var(--accent2); font-style: italic; }
+
+/* ── reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

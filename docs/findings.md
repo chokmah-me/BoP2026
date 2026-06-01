@@ -4,6 +4,11 @@
 **Runs**: 100 per scenario, seeds 0–99, default parameters, no doctrine  
 **Generated**: May 2026
 
+> These findings are for the **rule-based** (heuristic) AI. For an LLM-backend study — how an
+> asymmetric system prompt drove an artifactual sovereignty-void rate in `sovereignty_void_2026`, and
+> how the now-default symmetric prompt removes it — see
+> [notes/llm-wargame-prompt-asymmetry.md](notes/llm-wargame-prompt-asymmetry.md).
+
 ---
 
 ## Summary

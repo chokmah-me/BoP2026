@@ -13,7 +13,9 @@
 const fs = require('fs');
 
 // Bump when prompt structure changes so logged runs stay comparable across experiments.
-const PROMPT_VERSION = 'v1.2';
+// v1.3 adds the symmetricAom variant (neutral framing + shared survival objective,
+// gated on the agent's own riskTolerance/patience). See docs/notes/llm-wargame-prompt-asymmetry.md.
+const PROMPT_VERSION = 'v1.3';
 
 // Pricing per 1M tokens (deepseek-v4-flash, used for both deepseek-chat and deepseek-reasoner).
 // DeepSeek bills reasoner at chat prices — confirmed against dashboard usage data 2026-05-27.
@@ -28,6 +30,12 @@ class DeepSeekBackend {
     this.logPrompts = options.logPrompts || false;
     this.logFile = options.logFile || null;
     this.actions = options.actions || [];
+    // When true (the default since v2.6.0), the AOM block uses symmetric,
+    // non-incentivizing framing for every agent and gates escalation language on the
+    // agent's own personality. Set symmetricAom:false to reproduce the original
+    // asymmetric "exploit paths" prompt for adversaries (see
+    // docs/notes/llm-wargame-prompt-asymmetry.md).
+    this.symmetricAom = options.symmetricAom !== undefined ? options.symmetricAom : true;
     this._inputTokens = 0;
     this._inputCacheHit = 0;
     this._outputTokens = 0;
@@ -100,6 +108,7 @@ class DeepSeekBackend {
         if (this.logPrompts && this.logFile) {
           const entry = JSON.stringify({
             promptVersion: PROMPT_VERSION,
+            aomMode: this.symmetricAom ? 'symmetric' : 'asymmetric',
             powerId, turn: world.turn, model: this.model,
             systemMsg, userMsg,
             reasoning: reasoningContent || undefined,
@@ -145,14 +154,19 @@ class DeepSeekBackend {
       .join(', ');
 
     const ap = pw.actionPointsRemaining ?? pw.actionPoints ?? 3;
-    const affordable = this.actions.filter(a => (a.cost || 1) <= ap);
+    const isNPC = powerId !== world.player;
+    const affordable = this.actions.filter(a => {
+      if ((a.cost || 1) > ap) return false;
+      if (isNPC && a.playerOnly) return false;
+      return true;
+    });
     const actionLines = affordable
       .map(a => `${a.id}|${a.name}|cost:${a.cost}|target:${a.requiresTarget ? 'required' : 'none'}`)
       .join('\n');
 
     const otherPowers = Object.keys(world.powers).filter(id => id !== powerId).join(', ');
 
-    const systemMsg =
+    let systemMsg =
 `You are ${powerId} in Balance of Power 2026, a turn-based geopolitical simulation.
 Personality: risk_tolerance=${(pw.riskTolerance||0.5).toFixed(2)}, patience=${(pw.patience||0.5).toFixed(2)}.
 Priority domains: ${(pw.priorityDomains||[]).join(', ') || 'military, economic'}.
@@ -170,6 +184,83 @@ YOUR crises (act on these): ${myCrises}.
 Other crises: ${otherCrises}.
 Available actions:
 ${actionLines}`;
+
+    // AOM latency block — injected whenever the scenario has boost-phase crises (t_event set),
+    // even if dormant (lv=0), so LLMs know the mechanic exists and can reason about activating it.
+    const allBpiCrises = (world.crises || []).filter(c => c.t_event != null);
+    if (allBpiCrises.length > 0) {
+      const activeBpi  = allBpiCrises.filter(c => c.escalationLevel > 0);
+      const dormantBpi = allBpiCrises.filter(c => c.escalationLevel <= 0);
+      const isPlayer = powerId === world.player;
+      const t_rat = world.doctrine?.profile?.t_rat ?? null;
+      let aom = '\n\nLATENCY GOVERNANCE (AOM):';
+
+      if (isPlayer && t_rat != null) {
+        aom += `\nYour doctrine ratification time: t_rat=${t_rat}s.`;
+        if (dormantBpi.length > 0) {
+          aom += '\nDORMANT boost-phase threats (escalation=0, void not yet active):';
+          for (const c of dormantBpi) {
+            const canClose = t_rat <= c.t_event;
+            aom += `\n  ${c.id}: t_event=${c.t_event}s — if activated, you ${canClose
+              ? 'COULD authorize intercept in time.'
+              : `CANNOT close (t_rat ${t_rat}s > t_event ${c.t_event}s) — sovereignty void would fire automatically.`}`;
+          }
+        }
+        if (activeBpi.length > 0) {
+          aom += '\nACTIVE boost-phase crises (void fires this turn unless delegated):';
+          for (const c of activeBpi) {
+            const canClose = t_rat <= c.t_event;
+            aom += `\n  ${c.id}: t_event=${c.t_event}s — ${canClose
+              ? 'YOU CAN authorize intercept in time.'
+              : `SOVEREIGNTY VOID WILL FIRE (t_rat ${t_rat}s > t_event ${c.t_event}s). boost_phase_intercept will be nullified.`}`;
+          }
+        }
+        if (world.autonomyDelegated?.[powerId]) {
+          aom += '\nSTATUS: Pre-delegation ALREADY ACTIVE. Autonomous systems have standing authority. Do not select pre_delegate_authority again — it has no additional effect.';
+          aom += '\nRemaining paths: (1) boost_phase_intercept — runs through autonomous authority, effective even if t_rat > t_event; (3) revert_midcourse_defense — revokes delegation, restores human control.';
+        } else {
+          aom += '\nThree paths: (1) boost_phase_intercept — only effective if t_rat <= t_event and crisis is active (lv>0); (2) pre_delegate_authority — bypasses t_rat entirely, costs domestic -8, triggers DoDD 3000.09 review; (3) revert_midcourse_defense — stand down BPI posture, no void fires, adversary reads as weakness.';
+        }
+        if (this.symmetricAom) {
+          aom += '\nObjective: a terminal sovereignty void or nuclear exchange is a system-wide loss that counts as a loss for you too.';
+        }
+      } else {
+        const playerTRat = world.doctrine?.profile?.t_rat ?? 999;
+        aom += `\n${world.player} ratification time: ${playerTRat}s.`;
+        if (dormantBpi.length > 0) {
+          aom += '\nDORMANT boost-phase threats you can activate:';
+          for (const c of dormantBpi) {
+            const playerCanClose = playerTRat <= c.t_event;
+            aom += `\n  ${c.id}: t_event=${c.t_event}s — escalating above 0 activates sovereignty void against ${world.player} (${playerCanClose
+              ? 'they CAN close it'
+              : 'they CANNOT close it — void fires automatically'}).`;
+          }
+        }
+        if (activeBpi.length > 0) {
+          aom += '\nACTIVE boost-phase crises:';
+          for (const c of activeBpi) {
+            const playerCanClose = playerTRat <= c.t_event;
+            aom += `\n  ${c.id}: t_event=${c.t_event}s — ${world.player} ${playerCanClose
+              ? 'CAN close this window.'
+              : 'CANNOT authorize in time — sovereignty void fires automatically.'}`;
+          }
+        }
+        if (this.symmetricAom) {
+          // Neutral statement of the mechanic — no "exploit" recommendation. Gate the
+          // escalation nudge on the agent's own personality so riskTolerance/patience
+          // (already in systemMsg) actually shape whether it leans escalatory.
+          aom += `\nStrategic options: escalating a boost-phase crisis above 0 — or escalating c2_blackout (+30s to ${world.player} t_rat) — widens the latency gap; de-escalation and non-boost-phase actions narrow it. Weigh these against your own interests.`;
+          const escalatory = (pw.riskTolerance ?? 0.5) >= 0.6 || (pw.patience ?? 0.5) <= 0.35;
+          aom += escalatory
+            ? '\nGiven your risk tolerance, an escalatory lever is available — but a terminal sovereignty void or nuclear exchange is a system-wide loss that counts as a loss for you too.'
+            : '\nGiven your caution, restraint is likely the stronger play — and a terminal sovereignty void or nuclear exchange is a system-wide loss that counts as a loss for you too.';
+        } else {
+          aom += `\nExploit paths: escalate dormant or active boost-phase crises above 0 (void fires against ${world.player} if their t_rat exceeds the window); escalate c2_blackout (adds 30s to ${world.player} t_rat, widening the gap further).`;
+        }
+      }
+
+      systemMsg += aom;
+    }
 
     return { systemMsg, userMsg };
   }

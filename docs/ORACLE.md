@@ -53,42 +53,21 @@ Output is always an array in `bop2026-analytics-v1` format. See [Output Schema](
 
 ## Loading the API in Node
 
-For custom scripts that use the Oracle API directly:
+For custom scripts that use the Oracle API directly, use the shared loader. It sets up the VM
+context, rewrites the browser-style IIFE modules so their singletons land on the shared global,
+loads them in `index.html` order, and returns the context:
 
 ```js
 'use strict';
-const vm = require('vm');
-const fs = require('fs');
-const path = require('path');
+const { loadEngine } = require('./load-engine'); // from scripts/
 
-const ROOT = '/path/to/BoP2026';
-global.window = global;
-const ctx = vm.createContext(global);
-
-function load(rel) {
-  const code = fs.readFileSync(path.join(ROOT, rel), 'utf8');
-  // top-level const/let → var so names are visible across script calls
-  const patched = code.replace(/^(const|let) ([A-Z][A-Za-z_]*)\s*=/m, 'var $2 =');
-  vm.runInContext(patched, ctx, { filename: rel });
-}
-
-// Load order matters — matches index.html script order
-load('data/powers-data.js');
-load('data/scenarios-data.js');
-load('data/doctrines-data.js');
-load('data/events-data.js');
-load('js/state.js');
-load('js/domains.js');
-load('js/cascades.js');
-load('js/epistemic.js');
-load('js/events.js');
-load('js/ai.js');
-load('js/oracle.js');
-
+const ctx = loadEngine();   // ctx.BoP, ctx.AI, ctx.Domains, ctx.Events, ctx.State, ...
 const BoP = ctx.BoP;
 ```
 
-After this, `BoP.*` works exactly as described below.
+After this, `BoP.*` works exactly as described below. (Internally the loader rewrites top-level
+`const/let X =` to `var` with a `/gm` regex so names persist across `runInContext` calls;
+indented IIFE-internal declarations are left alone.)
 
 ---
 
@@ -122,6 +101,28 @@ Initialize a new game. Must be called before `step()` or `run()`.
 ```
 
 Returns a `WorldSnapshot` (deep clone of initial world state).
+
+Some scenarios require a doctrine (currently `sovereignty_void_2026`, whose latency mechanic is
+built around the doctrinal `t_rat`). Calling `init()` on one without `options.doctrine` throws,
+listing the valid doctrine ids.
+
+---
+
+### `BoP.seed(n)` / `BoP.unseed()`
+
+Make a run reproducible by replacing `Math.random` with the engine's mulberry32 PRNG, seeded with
+`n`. Call `unseed()` to restore the original `Math.random`. (`runBatch()` does this internally per
+run; use these only when driving `init`/`run` yourself.)
+
+```js
+BoP.seed(42);
+try {
+  BoP.init('taiwan_strait_2026');
+  const result = BoP.run();
+} finally {
+  BoP.unseed();
+}
+```
 
 ---
 
@@ -221,6 +222,25 @@ The override function receives `(powerId, world)` and must return an array of ac
 
 ---
 
+### `BoP.setPlayerOverride(fn)` (async path only)
+
+Override the AI decision function for the player power. Works like `setNPCOverride` but applies to whichever power is `world.player`. Only active in `runAsync()` / `stepAsync()` — the sync `run()` and `runBatch()` paths ignore it.
+
+```js
+// Route the player through an LLM backend
+BoP.setPlayerOverride(async (powerId, world) => {
+  const actions = await myLLM.decide(powerId, world);
+  return actions;
+});
+
+await BoP.runAsync({ maxTurns: 10 });
+BoP.clearOverrides();  // clears both NPC and player overrides
+```
+
+Useful for testing whether an LLM correctly navigates player-specific mechanics (e.g. AOM pre-delegation in `sovereignty_void_2026`) that are filtered from NPC action pools.
+
+---
+
 ### `BoP.exportAnalytics(simResult, meta?)`
 
 Convert a `SimResult` to `bop2026-analytics-v1` format. Strips raw `stateSnapshot` blobs from each turn to keep file size reasonable.
@@ -265,9 +285,14 @@ require('fs').writeFileSync('out.json', JSON.stringify(analytics, null, 2));
   seed:        42 | null,
   paramOverrides: {},                      // from meta arg
   outcome: {
-    result:         "win" | "lose" | "incomplete",
+    result:         "win" | "lose" | "draw",
     reason:         "string",              // human-readable game-over cause
     stabilityIndex: 24,                   // avg domestic stat across powers (0–100)
+    systemicRisk: {                        // second composite metric (see Limitations)
+      index:          12,                  // GSI minus crisis/nuclear penalties, 0–100
+      crisisPressure: 4,                   // sum of escalation levels across crises
+      maxNuclear:     2                    // peak nuclear posture (0–5)
+    },
     turnsPlayed:    6
   },
   initialState: { powers, crises },        // pre-game state (before turn 1)
@@ -563,8 +588,11 @@ while (!BoP.getState().gameOver) {
 | `scripts/run-bop.js` | `node scripts/run-bop.js [flags]` | CLI batch runner, outputs analytics JSON |
 | `scripts/analyze-results.js` | `node scripts/analyze-results.js out.json [--verbose]` | Outcome distribution, stability histogram, top actions by power |
 | `scripts/sensitivity-sweep.js` | `node scripts/sensitivity-sweep.js` | Sweeps RU/CN riskTolerance and cascade severity, outputs markdown tables |
-| `scripts/test-analytics.js` | `node scripts/test-analytics.js` | 8 regression tests for export correctness |
+| `scripts/test-analytics.js` | `node scripts/test-analytics.js` | regression tests for export correctness |
+| `scripts/test-cascades.js` | `node scripts/test-cascades.js` | cascade/threshold/idempotency regression tests |
+| `scripts/load-engine.js` | `require('./load-engine').loadEngine()` | shared VM loader; returns the engine context |
 
+`npm test` runs the dependency-free Node tests (`test-cascades.js` + `test-analytics.js`).
 `analyze-results.js` accepts both the legacy `{ result: SimResult }` format and the current `{ analytics }` format.
 
 ---
@@ -573,7 +601,7 @@ while (!BoP.getState().gameOver) {
 
 - Cascade weights and AI personality values are calibrated for plausibility, not fit to data. Treat outputs as model-internal quantities, not empirical predictions.
 - No leader-level or domestic-coalition modeling. Powers are unitary actors.
-- `stabilityIndex` is the mean domestic stat across all powers — a rough aggregate, not a validated stability metric.
+- `stabilityIndex` is the mean domestic stat across all powers — a rough aggregate, not a validated stability metric. `outcome.systemicRisk` folds in crisis escalation and nuclear posture for a less blind signal, but is likewise calibrated for plausibility, not fit to data.
 - Epistemic noise (perception drift) is stochastic per run; two runs with the same seed but different turn counts will diverge if epistemic updates accumulate differently.
 
 See [docs/model-notes.md](model-notes.md) for theoretical grounding and full limitations.

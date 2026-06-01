@@ -10,7 +10,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.65,
       patience: 0.25,
-      priorityDomains: ["economic", "military", "diplomatic"]
+      priorityDomains: ["economic", "military", "diplomatic"],
+      t_rat: 180
     },
     winCondition: {
       id: "bilateral_surplus",
@@ -40,7 +41,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.85,
       patience: 0.8,
-      priorityDomains: ["military", "info", "cyber"]
+      priorityDomains: ["military", "info", "cyber"],
+      t_rat: 240
     },
     winCondition: {
       id: "nuclear_threshold",
@@ -70,7 +72,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.15,
       patience: 0.9,
-      priorityDomains: ["diplomatic", "economic", "info"]
+      priorityDomains: ["diplomatic", "economic", "info"],
+      t_rat: 300
     },
     winCondition: {
       id: "multilateral_survival",
@@ -100,7 +103,8 @@ window.DOCTRINES_DATA = [
     profile: {
       riskTolerance: 0.35,
       patience: 0.95,
-      priorityDomains: ["economic", "diplomatic", "cyber"]
+      priorityDomains: ["economic", "diplomatic", "cyber"],
+      t_rat: 120
     },
     winCondition: {
       id: "civilizational_return",
@@ -118,5 +122,36 @@ window.DOCTRINES_DATA = [
     openingBriefing: "Every move you make should be legible in 50 years. The long game is the only game.",
     doctrineFailCondition: "China chose force over patience. The century of restoration was interrupted.",
     doctrineWinMessage: "The economy secured. Taiwan quieted. No shots fired by Chinese hands. The restoration proceeds — exactly as planned."
+  },
+  {
+    id: "JUCHE",
+    name: "Juche Self-Reliance",
+    power: "DPRK",
+    flag: "🇰🇵",
+    tagline: "The world will recognize us, or it will fear us.",
+    ideology: "Survival is the only doctrine. Nuclear deterrence is the only guarantee. Every concession is a betrayal. Every provocation is a negotiation by other means.",
+    difficulty: "Expert",
+    profile: {
+      riskTolerance: 0.85,
+      patience: 0.35,
+      priorityDomains: ["military", "nuclear", "cyber"],
+      t_rat: 45
+    },
+    winCondition: {
+      id: "deterrence_achieved",
+      description: "Reach turn 20 with DPRK nuclear ≥ 4 without triggering a nuclear exchange — and without US military stat exceeding DPRK military by more than 30."
+    },
+    advisorVoice: "paranoid",
+    advisorTagline: "KOREAN WORKERS PARTY GENERAL STAFF",
+    advisorLines: [
+      "They will negotiate once they respect our deterrent.",
+      "A test launch is a diplomatic signal. Nothing more.",
+      "The US hesitates. That hesitation is our window.",
+      "Survival requires that they never know our true capabilities.",
+      "Every concession emboldens them. Never concede."
+    ],
+    openingBriefing: "You have one asset: the credible threat of nuclear use. Everything else is leverage built on that foundation.",
+    doctrineFailCondition: "The regime fell before the deterrent was complete. The great experiment ends.",
+    doctrineWinMessage: "The nuclear threshold crossed. The world learned to live with you — not because they wanted to, but because they had no choice."
   }
 ];

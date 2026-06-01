@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.3.0 (2026-05-28)  
+**Current version:** v2.6.0 (2026-05-31)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -21,7 +21,7 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | 1 | The Global Supply Chain War           | Disruption of critical global supply chains     | **Supply Chain** domain (4 actions)                | **v2.0.1 ✓** |
 | 2 | The EMP Nightmare                     | Electromagnetic pulse attack on infrastructure  | **EMP Attacks** domain                             | **v2.3.0 ✓** |
 | 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | **Biological Epidemic** domain                     | **v2.3.0 ✓** |
-| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + **UCAV/Drone Swarms**      | **v2.0.1 ✓** |
+| 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + AOM latency governance + sovereignty void | **v2.4.0 ✓** |
 | 5 | The War for Space                     | Attacks on satellites and space assets          | Space domain (future scenario)                     | Medium |
 | 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Urban Operations (future scenario)                 | Medium |
 | 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via **Economic** + **Supply Chain** domains | Partial ✓ |
@@ -29,6 +29,64 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.6.x (2026-05-31)
+
+- **Symmetric AOM prompt by default** `v2.6.0` — closes a prompt-role artifact in the DeepSeek
+  backend. The `LATENCY GOVERNANCE (AOM)` block previously gave LLM adversaries an "Exploit paths"
+  paragraph the player never saw, driving a 75–83% sovereignty-void rate on the adversary side vs
+  ~8–16% on the player side. The default prompt now gives every agent neutral "Strategic options"
+  framing, a shared systemic-survival objective, and escalation gated on its own
+  `riskTolerance`/`patience`. `--asymmetric-aom` reproduces the old prompt; `aomMode` is logged per
+  call. `PROMPT_VERSION` → `v1.3`. Heuristic outcomes unchanged.
+- **Prompt-asymmetry study + harness** `v2.6.0` — `docs/notes/llm-wargame-prompt-asymmetry.md`
+  documents the doctrine confound (a doctrine silently sets the player power) and the prompt-role
+  artifact, with a 16-cell, N=12 before/after sweep confirming the symmetric prompt collapses the
+  void rate in every cell (e.g. adversaries-only 83→25%, TWELVER/EU 58→0%) and removes "exploit"
+  from the models' reasoning (63→8%). Reproduce via `scripts/sv-hypotheses.ps1` (blocks A–E,
+  `-LLMOnly`/`-Asymmetric`) + `scripts/sv-summary.mjs`.
+
+### v2.5.x (2026-05-28)
+
+- **Sovereignty Void requires a doctrine** `v2.5.0` — `requiresDoctrine` gate. Without a
+  doctrine `t_rat` defaulted to 999s and the void fired every turn (degenerate). `BoP.init()`
+  throws when the scenario needs a doctrine and none is supplied; standard mode hides the
+  scenario until one is chosen.
+- **AOM revert restores human control** `v2.5.0` — `revert_midcourse_defense` now clears
+  `autonomyDelegated` and lifts the Rice mask (`Epistemic.clearRiceMask()`), matching the
+  (corrected) tooltip.
+- **Systemic Risk Index** `v2.5.0` — `State.getSystemicRiskIndex()` folds crisis escalation
+  and nuclear posture into a second outcome metric (`outcome.systemicRisk`), so research isn't
+  keyed on mean-domestic GSI alone. GSI and its thresholds unchanged.
+- **Engine/infra cleanup** `v2.5.0` — shared `scripts/load-engine.js` (regex `/m`→`/gm`),
+  unified oracle turn executors (`_beginTurn`/`_finishTurn`), single mulberry32 via
+  `BoP.seed`/`BoP.unseed`, documented AOM world-field schema in `state.js`, and a
+  zero-dependency `package.json` + GitHub Actions CI wiring `npm test`.
+
+### v2.4.x (2026-05-28)
+
+- **Sovereignty Void scenario** `v2.4.0` — `sovereignty_void_2026`. Operationalizes the AOM
+  latency-governance framework from [Zenodo 19368682] (Golden Dome / boost-phase intercept).
+  `_latencyGate()` in `js/cascades.js` compares doctrinal `t_rat` against crisis `t_event` each
+  turn; sovereignty void fires (+2 escalation, player action nullified) when the gap is positive.
+  Three resolution paths: intercept (if fast enough), pre-delegate (Rice-Theorem mask on stats),
+  revert to midcourse. Structural gap: no doctrine closes the DPRK window (t_event=90s); MING
+  (t_rat=120s) can close the Taiwan window (t_event=120s).
+- **JUCHE doctrine** `v2.4.0` — DPRK playable for the first time. t_rat=45s (fastest), Expert
+  difficulty. Win condition: nuclear deterrence achieved without triggering exchange.
+- **AOM-aware AI** `v2.4.0` — Heuristic `scoreAction()` and DeepSeek `_buildPrompt()` both
+  understand the latency mechanic. Heuristic selects `boost_phase_intercept` when the window is
+  closeable (score +120 + posture restore); DeepSeek NPCs receive exploit framing for the US
+  player's ratification constraint.
+- **DPRK as full NPC** `v2.4.0` — Active in `sovereignty_void_2026`. Existing DPRK AI personality
+  (riskTolerance 0.85, patience 0.35, priorityDomains: military/nuclear/cyber/emp).
+- **AOM engine fixes** `v2.4.1` — Idempotent pre-delegation, `playerOnly` action filter,
+  autonomous-domain game-over check, dormant-crisis AOM context injection, truncated-run
+  `draw`/`lose` outcomes, `oracle.setPlayerOverride()`, `--doctrine` CLI flag.
+- **UI readability + accessibility** `v2.4.2` — Browser presentation only. Scrollable game log
+  (fixed `pointer-events`, scroll position preserved across re-renders), no UI text below 11px,
+  lighter `--text-dim` for WCAG-AA contrast, `:focus-visible` outlines, SVG map ARIA, keyboard-
+  operable Relations toggle, `prefers-reduced-motion`, and viewport reflow/zoom tolerance.
 
 ### v2.3.x (2026-05-28)
 
@@ -78,6 +136,14 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 | **Domestic Faction System** | Replace unitary actor model with hardliner vs. moderate factions. Internal politics shapes action selection. | Compound threat modeling |
 | ~~**Korean Peninsula scenario**~~ | ~~Wire DPRK into a Northeast Asia scenario as an active NPC.~~ | **Shipped v2.2.0** |
 
+### LLM-agent methodology (follow-ups from the prompt-asymmetry study)
+
+| Feature | Description |
+|---|---|
+| **AOM reasoning in the per-turn message** | Move the situational AOM framing out of the static system prompt and into the per-turn user message, so each agent's doctrine and `riskTolerance`/`patience` shape escalation turn by turn rather than via a fixed block. |
+| **Cross-model replication** | Repeat the corrected role 2×2 / doctrine sweep with Claude or GPT-4o to separate the prompt effect from DeepSeek's own documented hawkishness (CSIS Futures Lab, 2025). |
+| **Tighter void-rate estimates** | DeepSeek sampling is unseeded, so per-cell void rates carry noise. Repeat across multiple seed-bases and a second player power for confidence intervals rather than directional contrasts. |
+
 ### Medium Priority (future)
 
 | Feature | Description |
@@ -108,7 +174,9 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 ---
 
-**Next Milestone:** v2.4.0 — Domestic Faction System
+**Next Milestone:** Domestic Faction System (replace the unitary-actor model with hardliner vs.
+moderate factions), and the LLM-agent methodology follow-ups above (per-turn AOM framing,
+cross-model replication).
 
 ---
 

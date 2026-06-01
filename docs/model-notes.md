@@ -84,6 +84,8 @@ These systemic events are designed to represent non-linear tipping dynamics that
 
 7. **Rule-based AI, not learned**: AI behavior is deterministic rules with stochastic noise, not learned from data. It will not discover novel strategies.
 
+8. **LLM-backend behavior is prompt-sensitive**: The optional DeepSeek backend (`--ai-backend deepseek`) follows its system-prompt framing closely — closely enough that wording is a confound. In `sovereignty_void_2026`, an asymmetric prompt that told adversaries to "exploit" the player's ratification gap produced a far higher sovereignty-void rate than a neutral one, with the model reciting the framing in its own reasoning rather than reasoning independently. The symmetric, personality-gated prompt is now the default (v2.6.0); the `--asymmetric-aom` flag preserves the old behavior for study. When using the LLM backend for research, treat the prompt as an experimental variable and hold it fixed across comparisons. See [notes/llm-wargame-prompt-asymmetry.md](notes/llm-wargame-prompt-asymmetry.md).
+
 ---
 
 ## Differences from related tools

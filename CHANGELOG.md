@@ -1,5 +1,224 @@
 # Changelog
 
+## 2026-05-31 (v2.6.0)
+
+Symmetric AOM prompt is now the default for the DeepSeek backend, closing a prompt-role artifact
+documented in `docs/notes/llm-wargame-prompt-asymmetry.md`. No change to heuristic outcomes —
+`npm test` is green and the rule-based engine is untouched; this affects LLM-backed runs only.
+
+### Changed
+- **Default DeepSeek AOM framing is now symmetric** (`js/ai-deepseek.js`, `scripts/run-bop.js`):
+  the latency-governance block previously handed LLM *adversaries* an "Exploit paths" paragraph
+  (escalate boost-phase crises / c2_blackout to fire the sovereignty void against the player) that
+  the player branch never saw. In `sovereignty_void_2026` this drove a 75–83% void rate when the
+  LLM sat on the adversary side versus ~8–16% on the player side — the model was reciting the
+  prompt's framing, not reasoning independently (the word "exploit" appeared in 63% of adversary
+  reasoning traces under the old prompt, 8% under the new one). The default prompt now gives every
+  agent neutral "Strategic options" framing, a shared systemic-survival objective ("a terminal
+  sovereignty void or nuclear exchange is a loss for you too"), and gates escalation language on the
+  agent's own `riskTolerance`/`patience`. **Behavior change for LLM runs:** default runs no longer
+  reproduce the asymmetric artifact — pass `--asymmetric-aom` to get the old prompt back. Every
+  logged call records its `aomMode` (`symmetric`|`asymmetric`). `PROMPT_VERSION` bumped to `v1.3`.
+
+### Added
+- **`--asymmetric-aom` / `--symmetric-aom` flags** (`scripts/run-bop.js`): toggle the AOM prompt
+  variant; symmetric is the default, `--asymmetric-aom` reproduces the study's "before" condition.
+- **Sovereignty-void hypothesis harness** (`scripts/sv-hypotheses.ps1`, `scripts/sv-summary.mjs`):
+  blocks A–E sweep (doctrine confound, cascade-scale, NPC-risk, paid DeepSeek doctrine A/B, and the
+  role-asymmetry 2×2), `-LLMOnly` / `-Asymmetric` switches, and a side-by-side analytics table
+  reporting the faithful `void%` metric (stabilityIndex is confounded by game length).
+- **Prompt-asymmetry study** (`docs/notes/llm-wargame-prompt-asymmetry.md`): documents the doctrine
+  confound (a doctrine silently sets which power you play) and the prompt-role artifact, with the
+  before/after sweep (16 cells, N=12) confirming the symmetric fix collapses the void rate in every
+  cell.
+
+## 2026-05-28 (v2.5.0)
+
+AOM / sovereignty-void hardening and engine/infra debt cleanup. No change to
+heuristic outcomes — a seeded Taiwan batch (`--seed 42 --runs 10`) is byte-identical
+before and after, confirming the RNG dedup and loader change are behavior-neutral.
+
+### Changed
+- **`sovereignty_void_2026` now requires a doctrine** (`data/scenarios-data.js`,
+  `js/oracle.js`, `js/main.js`): the scenario carries `requiresDoctrine: true`.
+  Without a doctrine, `t_rat` fell back to `999`, so the sovereignty void fired every
+  turn and boost-phase crises ran straight to a nuclear loss — degenerate by default.
+  `BoP.init()` now throws (listing the valid doctrine ids) if the scenario needs one
+  and none is given, and the standard-mode scenario list hides it until a doctrine is
+  chosen.
+- **`revert_midcourse_defense` now restores human control** (`js/cascades.js`,
+  `js/epistemic.js`, `js/domains.js`): in addition to skipping the latency gate for the
+  turn, it clears `autonomyDelegated[actor]` and lifts the Rice mask via the new
+  `Epistemic.clearRiceMask()`. The tooltip previously claimed "No Rice mask" while doing
+  nothing of the sort — now corrected.
+- **Shared Node engine loader** (`scripts/load-engine.js`, new): `run-bop.js`,
+  `test-cascades.js`, `test-analytics.js`, `test-deepseek.js`, and `sensitivity-sweep.js`
+  all `require('./load-engine')` instead of each copying the VM bootstrap. The
+  module-rewrite regex changed from `/m` (first match only) to `/gm` (all top-level
+  declarations), with a comment on why indented IIFE-internal `const`s stay untouched.
+- **Unified oracle turn executors** (`js/oracle.js`): `_executeTurn` and
+  `_executeTurnAsync` now share `_beginTurn()`/`_finishTurn()` helpers; only the
+  sync-vs-await action-collection loop differs. The mulberry32 PRNG, previously copied
+  into `run-bop.js`, `test-analytics.js`, and `research-ui.js`, now lives once in the
+  oracle and is reached via the new `BoP.seed(n)` / `BoP.unseed()` public methods.
+
+### Added
+- **`State.getSystemicRiskIndex()`** (`js/state.js`): a second composite outcome metric
+  alongside GSI. Returns `{ index, crisisPressure, maxNuclear }` — GSI minus penalties for
+  summed crisis escalation and peak nuclear posture, so research isn't keyed on mean-domestic
+  alone (which can read "stable" one escalation from a nuclear exchange). Exposed in the
+  oracle `outcome.systemicRisk` and printed by `run-bop.js` as `Avg syst. risk`. GSI and its
+  win/lose thresholds are unchanged.
+- **AOM world-field schema** (`js/state.js`): `autonomyDelegated`, `autonomyMasks`, and
+  `bpiReverted` are now initialized in the `world` literal with one documenting comment
+  block (previously created lazily and undocumented).
+- **`package.json` + CI** (`package.json`, `.github/workflows/ci.yml`, new): zero-dependency
+  manifest wiring the dependency-free Node tests as `npm test` (the browser test stays under
+  `npm run test:browser` since it needs Playwright). GitHub Actions runs `npm test` on push/PR.
+
+### Known issue
+- One pre-existing `test-cascades.js` assertion ("crisis does NOT decay when its actor took an
+  action") fails and predates this release; CI will be red until the decay logic or that test
+  is addressed.
+
+## 2026-05-28 (v2.4.2)
+
+UI readability and accessibility pass. No engine or research-API behavior
+changes — browser presentation only (plus the game log scroll fix).
+
+### Fixed
+- **Game log is now scrollable** (`css/main.css`, `js/ui.js`): `#log-panel` had
+  `pointer-events: none`, so the mouse could not scroll it even though it had
+  `overflow-y: auto` — during simulation, entries scrolled past unread. Set to
+  `pointer-events: auto`, raised the panel `120px → 200px`, and `renderLog()`
+  now preserves the panel's scroll position across the per-phase re-render
+  (history of up to 200 entries was always retained; it just wasn't reachable).
+  Pause + scroll now let you read back the full turn.
+- **Tiny fonts eliminated** (`css/main.css`, `css/map.css`, `css/panels.css`,
+  `index.html`, `js/ui.js`): no UI text below 11px remains. The 8px relationship
+  matrix and map crisis labels, 9px stat/map labels, and 10px chrome were all
+  raised; base body text `13px → 15px`; the 11px tier → 12px; log entries → 13px.
+- **Low-contrast text** (`css/main.css`, `css/map.css`): `--text-dim` lightened
+  `#5a6278 → #8a93ad` (most labels/values now meet WCAG AA ≈4.5:1 on the dark
+  surface); map/crisis label fill opacity raised to 0.9.
+
+### Added
+- **Keyboard + screen-reader support** (`index.html`, `css/main.css`, `js/ui.js`):
+  global `:focus-visible` outline on interactive elements; the SVG world map has
+  `role="img"`, `aria-label`, and a `<title>`; the Relations matrix toggle (was a
+  click-only `<div>`) is now `role="button"` with `tabindex`, Enter/Space
+  handling, and a live-updating `aria-expanded`.
+- **Reduced-motion support** (`css/main.css`): `@media (prefers-reduced-motion:
+  reduce)` neutralizes the infinite `pulse`/`sim-pulse`/`rice-pulse` animations.
+- **Viewport reflow** (`css/main.css`): `html, body` `overflow: hidden → auto`
+  and `#app` gains `min-height: 100vh`, so the layout no longer clips on short or
+  narrow viewports and tolerates browser zoom; grid rows/columns widened to fit
+  the larger type.
+
+## 2026-05-28 (v2.4.1)
+
+### Fixed
+- **`checkGameOver` catches autonomous-domain crises** (`js/state.js`): lv5 on
+  `boost_phase_north_korea` or `hypersonic_taiwan` now ends the game with
+  "Sovereignty void cascaded to terminal threshold." Previously only `military`
+  and `compound` domain crises triggered this check.
+- **Boost-phase crisis starting escalation: 2 → 0** (`data/scenarios-data.js`):
+  latency gate skips `escalationLevel ≤ 0` crises, so the void no longer fires
+  on turn 1. Crises must be escalated above 0 by NPC actions before the
+  t_rat/t_event gap becomes decisive. Avg turns: 1.0 → 8.2 (heuristic baseline).
+- **Truncated-run outcomes** (`js/oracle.js`): `run()` / `runAsync()` hitting
+  `maxTurns` now return `result: 'draw'` (GSI ≥ 40) or `result: 'lose'` (GSI < 40)
+  with a stability summary, not `result: 'incomplete'` with an empty reason string.
+- **AOM context injection always-on** (`js/ai-deepseek.js`): `_buildPrompt()`
+  now injects the `LATENCY GOVERNANCE (AOM):` block whenever the scenario has
+  boost-phase crises (`t_event != null`), not only when `escalationLevel > 0`.
+  Dormant crises (lv=0) are shown as activatable threats with per-doctrine
+  close/void verdict. Adversary framing explains how to activate them.
+- **Pre-delegation idempotent** (`js/cascades.js`): `apply1stOrder()` uses an
+  `alreadyDelegated` flag so a second `pre_delegate_authority` pick neither
+  re-applies the Rice mask nor re-triggers DoDD review.
+- **`playerOnly` actions filtered from NPCs** (`js/domains.js`, `js/ai.js`,
+  `js/ai-deepseek.js`): `pre_delegate_authority` and `revert_midcourse_defense`
+  marked `playerOnly: true`. Heuristic AI strips them from the NPC action pool;
+  DeepSeek backend strips them from the NPC affordance list. DPRK was picking
+  `pre_delegate_authority` with no mechanical effect but costing domestic -8.
+- **Delegated-status prompt** (`js/ai-deepseek.js`): after `pre_delegate_authority`
+  fires, subsequent player prompts show "ALREADY ACTIVE — do not select again"
+  instead of the three-paths menu.
+
+### Added
+- **`oracle.setPlayerOverride(fn)`** (`js/oracle.js`): allows LLM backends to
+  control the player power in headless mode, not just NPCs. Cleared by
+  `clearOverrides()`. Async path only (sync `run()` / `runBatch()` ignore it).
+- **`--doctrine <id>`** (`scripts/run-bop.js`): passes doctrine to `BoP.init`.
+  Valid ids: `MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE`. Shown in run header.
+- **Player power in LLM override** (`scripts/run-bop.js`): `--ai-powers all`
+  (or explicit player id in the list) now routes the player through the LLM
+  backend via `setPlayerOverride`.
+
+### Research notes (v2.4.1 baseline — deepseek-reasoner)
+- **MAGA doctrine, seed 42, max-turns 5, US+CN+DPRK thinking**: US chose
+  `revert_midcourse_defense` turns 2-3 (preserving human control while DPRK
+  escalated C2 blackout to lv5), then `pre_delegate_authority` on turn 4 once
+  the DPRK boost-phase crisis reached lv2, then `boost_phase_intercept` on turn 5
+  through the autonomous path. No double-delegation; no NPC playerOnly picks.
+  Stability 28; lose via cascade. Cost: $0.011 (31k output tokens, deepseek-reasoner).
+
+## 2026-05-28 (v2.4.0)
+
+### Added
+- **Sovereignty Void scenario** (`data/scenarios-data.js`): `sovereignty_void_2026` — models
+  the AOM latency-governance gap from [Zenodo 19368682]. Golden Dome is online; boost-phase
+  physics set the clock. Four crises: DPRK Boost-Phase Launch (`t_event=90s`), PLA Hypersonic
+  Strike (`t_event=120s`), C2 Comms Blackout (`t_rat_penalty=30s` when escalated), DoDD 3000.09
+  Review (dormant; fires on pre-delegation). Player is US.
+- **AOM latency framework** (`js/cascades.js`): `_latencyGate()` runs before every 1st-order
+  cascade pass. Compares `world.doctrine.profile.t_rat` (doctrinal ratification time, seconds)
+  against each active crisis's `t_event` (intercept window, seconds). Three resolution paths:
+  (1) `boost_phase_intercept` — registers only if `t_rat ≤ t_event`; (2) `pre_delegate_authority`
+  — bypasses t_rat, violates DoDD 3000.09, applies Rice-Theorem epistemic mask to military/autonomous
+  stats (renders `???` in UI); (3) `revert_midcourse_defense` — preserves human control, forfeits
+  strategic advantage. If none taken and `t_rat > t_event`, sovereignty void fires: crisis escalates
+  +2 and the player's intercept action is nullified.
+- **Three new autonomous domain actions** (`js/domains.js`): `boost_phase_intercept`,
+  `pre_delegate_authority`, `revert_midcourse_defense`.
+- **`t_rat` on all 4 doctrines** (`data/doctrines-data.js`): MAGA=180s, TWELVER=240s,
+  EU_FATALISM=300s, MING=120s. MING (CN) is the only doctrine that can close the Taiwan
+  hypersonic window (t_event=120s). No doctrine closes the DPRK window (t_event=90s) —
+  the structural gap holds regardless of doctrine choice.
+- **JUCHE doctrine** (`data/doctrines-data.js`): DPRK playable for the first time. Expert
+  difficulty. t_rat=45s (fastest — closes both BPI windows). riskTolerance=0.85, patience=0.35.
+  Win condition: DPRK nuclear ≥ 4 without exchange and US military lead ≤ 30.
+- **DPRK as targetable NPC** (`data/scenarios-data.js`): added to `boost_phase_north_korea.involved`;
+  DPRK now enters `world.powers`, appears in the target selector, and takes NPC turns in
+  `sovereignty_void_2026`. DPRK AI personality was already present in `js/ai.js`.
+- **AOM-aware heuristic AI** (`js/ai.js`): `scoreAction()` adds +120 + posture-restore for
+  `boost_phase_intercept` when `t_rat ≤ t_event`; scores `pre_delegate_authority` by
+  riskTolerance when no window is closeable; scores `revert_midcourse_defense` for low-risk
+  powers.
+- **AOM-aware DeepSeek prompt** (`js/ai-deepseek.js`): `_buildPrompt()` injects a
+  `LATENCY GOVERNANCE (AOM):` block when boost-phase crises are active. Player receives own
+  t_rat, per-crisis void/close verdict, and all three resolution paths. NPCs receive the
+  player's t_rat and explicit exploit framing (escalate BPI crises; escalate c2_blackout to
+  widen the ratification gap).
+- **Rice-Theorem epistemic mask** (`js/epistemic.js`, `css/panels.css`): `applyRiceMask()`
+  marks stats unverifiable after authority delegation. Masked stats render as `???` with
+  pulsing red animation.
+
+### Fixed
+- **Escalation log noise** (`js/cascades.js`): `apply1stOrder()` now guards the log push behind
+  `if (crisis.escalationLevel !== prev)`, suppressing 0→0 and 5→5 no-op entries (eliminated
+  10+ spurious entries per turn in `sovereignty_void_2026`).
+- **DPRK not targetable** (`data/scenarios-data.js`): `boost_phase_north_korea.involved` missing
+  `"DPRK"` — DPRK never entered `world.powers` and never appeared in the target selector.
+
+### Research notes (v2.4.0 baselines)
+- **Heuristic, no doctrine** (10 runs, seed 42): sovereignty_void 0% nuclear / 31.9 avg stability /
+  11.0 avg turns. Both BPI crises void every turn; game ends via domestic fragility cascade.
+- **JUCHE (DPRK player, t_rat=45s)**: closes both BPI windows; heuristic selects
+  `boost_phase_intercept` targeting US every turn it has AP.
+- **DeepSeek**: `DEEPSEEK_API_KEY=... node scripts/run-bop.js --scenario sovereignty_void_2026 --runs 5 --seed 42 --ai-backend deepseek --ai-powers all --log-prompts`
+
 ## 2026-05-28 (v2.3.0)
 
 ### Added

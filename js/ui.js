@@ -272,15 +272,18 @@ const UI = (() => {
     el.innerHTML = `
       ${doctrineSection}
       <div class="stat-row">
-        ${Object.entries(stats).map(([k, v]) => `
-          <div class="stat-item">
-            <div class="stat-label">${statLabel(k)}</div>
-            <div class="stat-bar-wrap">
-              <div class="stat-bar" style="width:${k === 'nuclear' ? v * 20 : v}%; background:${statColor(k, v)}"></div>
+        ${Object.entries(stats).map(([k, v]) => {
+          const masked = world.autonomyMasks?.[world.player]?.includes(k);
+          return `
+            <div class="stat-item">
+              <div class="stat-label">${statLabel(k)}</div>
+              <div class="stat-bar-wrap">
+                ${masked ? '' : `<div class="stat-bar" style="width:${k === 'nuclear' ? v * 20 : v}%; background:${statColor(k, v)}"></div>`}
+              </div>
+              <div class="stat-val${masked ? ' rice-masked' : ''}">${masked ? '???' : (v + (k === 'nuclear' ? '/5' : ''))}</div>
             </div>
-            <div class="stat-val">${v}${k === 'nuclear' ? '/5' : ''}</div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     `;
   }
@@ -302,6 +305,8 @@ const UI = (() => {
     const el = document.getElementById('game-log');
     if (!el) return;
 
+    const scroller = el.parentElement || el;  // #log-panel is the scroll container
+    const prevScroll = scroller.scrollTop;
     el.innerHTML = world.log.slice(0, 60).map(entry => {
       const cls = logClass(entry.type);
       const order = entry.order ? `<span class="log-order order-${entry.order}">[${entry.order}°]</span>` : '';
@@ -314,6 +319,7 @@ const UI = (() => {
         </div>
       `;
     }).join('');
+    scroller.scrollTop = prevScroll;
   }
 
   function logClass(type) {
@@ -326,7 +332,8 @@ const UI = (() => {
       epistemic: 'log-epistemic',
       systemic_warning: 'log-systemic',
       systemic_event: 'log-systemic',
-      relationship: 'log-relationship'
+      relationship: 'log-relationship',
+      sovereignty_void: 'log-systemic'
     }[type] || '';
   }
 
@@ -470,6 +477,8 @@ const UI = (() => {
     const open = el.style.display !== 'none';
     el.style.display = open ? 'none' : 'block';
     if (arrow) arrow.textContent = open ? '▶' : '▼';
+    const toggle = document.querySelector('.panel-toggle[aria-controls="rel-matrix"]');
+    if (toggle) toggle.setAttribute('aria-expanded', String(!open));
     if (!open) renderRelationshipMatrix(State.get());
   }
 
@@ -497,7 +506,7 @@ const UI = (() => {
       ? (doctrine ? `${doctrine.flag} Victory` : '🌐 Stability Maintained')
       : (doctrine ? `${doctrine.flag} Doctrine Failed` : '💀 Order Collapsed');
     const subtitle = doctrine
-      ? `<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-bottom:8px">${doctrine.name} — ${doctrine.tagline}</div>`
+      ? `<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim);margin-bottom:8px">${doctrine.name} — ${doctrine.tagline}</div>`
       : '';
     modal.innerHTML = `
       <div class="modal-box game-over ${result.result}">

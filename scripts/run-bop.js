@@ -17,6 +17,10 @@
  *   --ai-powers       all|CN,RU,...    Which NPCs use LLM backend (default: all)
  *   --log-prompts                      Save each LLM prompt+response to a JSONL file
  *   --thinking                         Use deepseek-reasoner (chain-of-thought) model
+ *   --asymmetric-aom                   Reproduce the original asymmetric AOM prompt ("exploit paths"
+ *                                      for adversaries). Default since v2.6.0 is symmetric,
+ *                                      personality-gated framing for all agents. (--symmetric-aom
+ *                                      is still accepted as the explicit opposite.)
  *
  * DeepSeek requires DEEPSEEK_API_KEY env var.
  *
@@ -27,42 +31,13 @@
  */
 'use strict';
 
-const vm = require('vm');
 const fs = require('fs');
 const path = require('path');
+const { loadEngine } = require('./load-engine');
 
-const ROOT = path.join(__dirname, '..');
-
-// Set up a shared context that mimics the browser global scope.
-// All BoP modules use IIFE pattern and reference each other by name.
-// vm.createContext(global) makes global act as the script's global object.
-global.window = global;
-const ctx = vm.createContext(global);
-
-function load(rel) {
-  const file = path.join(ROOT, rel);
-  const code = fs.readFileSync(file, 'utf8');
-  // vm.runInContext with `const` top-level — rewrite to `var` so names
-  // are available on the context object across subsequent script calls.
-  const patched = code.replace(/^(const|let) ([A-Z][A-Za-z_]*)\s*=/m, 'var $2 =');
-  vm.runInContext(patched, ctx, { filename: file });
-}
-
-// Load in the same order as index.html
-load('data/powers-data.js');
-load('data/scenarios-data.js');
-load('data/doctrines-data.js');
-load('data/events-data.js');
-load('js/state.js');
-load('js/domains.js');
-load('js/cascades.js');
-load('js/epistemic.js');
-load('js/events.js');
-load('js/ai.js');
-load('js/oracle.js');
-
+// Load the browser-style engine modules into a shared VM context.
+const ctx = loadEngine();
 const BoP = ctx.BoP;
-if (!BoP) { console.error('Failed to load BoP oracle.'); process.exit(1); }
 
 // ── Parse CLI args ───────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -77,7 +52,9 @@ const opts = {
   aiPowers: 'all',
   logPrompts: false,
   thinking: false,
-  dryRun: false
+  symmetricAom: true,
+  dryRun: false,
+  doctrine: null
 };
 
 for (let i = 0; i < args.length; i++) {
@@ -85,6 +62,7 @@ for (let i = 0; i < args.length; i++) {
   const val = () => { i++; return args[i]; };
 
   if (arg === '--scenario') opts.scenario = val();
+  else if (arg === '--doctrine') opts.doctrine = val();
   else if (arg === '--runs') opts.runs = parseInt(val());
   else if (arg === '--seed') opts.seed = parseInt(val());
   else if (arg === '--out') opts.out = val();
@@ -95,6 +73,8 @@ for (let i = 0; i < args.length; i++) {
   else if (arg === '--ai-powers') opts.aiPowers = val();
   else if (arg === '--log-prompts') opts.logPrompts = true;
   else if (arg === '--thinking') opts.thinking = true;
+  else if (arg === '--symmetric-aom') opts.symmetricAom = true;
+  else if (arg === '--asymmetric-aom') opts.symmetricAom = false;
   else if (arg === '--dry-run') opts.dryRun = true;
   else {
     // --<powerId>-risk or --<powerId>-patience  e.g. --cn-risk 0.9
@@ -120,6 +100,8 @@ fs.mkdirSync(path.join(process.cwd(), path.dirname(opts.out)), { recursive: true
 console.log(`\nBoP2026 Oracle — ${opts.scenario}`);
 console.log(`Runs: ${opts.runs}  Seed base: ${opts.seed ?? 'random'}  Max turns: ${opts.maxTurns}`);
 console.log(`AI backend: ${opts.aiBackend}${opts.aiBackend === 'deepseek' ? ` (${opts.thinking ? 'deepseek-reasoner' : 'deepseek-chat'}, powers: ${opts.aiPowers})` : ''}`);
+if (opts.doctrine) console.log(`Doctrine: ${opts.doctrine}`);
+if (opts.aiBackend === 'deepseek') console.log(`AOM framing: ${opts.symmetricAom ? 'symmetric (personality-gated)' : 'asymmetric (exploit paths)'}`);
 if (Object.keys(opts.paramOverrides).length) {
   console.log('Param overrides:', JSON.stringify(opts.paramOverrides));
 }
@@ -146,7 +128,7 @@ if (opts.dryRun) {
   const PRICE_OUT = isThinking ? 2.19 : 0.28;
 
   const world0 = (() => {
-    BoP.init(opts.scenario, {});
+    BoP.init(opts.scenario, { doctrine: opts.doctrine || undefined });
     return BoP.getState();
   })();
   const npcCount = opts.aiPowers === 'all'
@@ -180,7 +162,8 @@ for (let i = 0; i < opts.runs; i++) {
 const initOptions = {
   paramOverrides: Object.keys(opts.paramOverrides).length ? opts.paramOverrides : undefined,
   player: opts.player || undefined,
-  cascadeScale: opts.cascadeScale != null ? opts.cascadeScale : undefined
+  cascadeScale: opts.cascadeScale != null ? opts.cascadeScale : undefined,
+  doctrine: opts.doctrine || undefined
 };
 const runOptions = { maxTurns: opts.maxTurns };
 
@@ -199,7 +182,8 @@ async function runAll() {
       model: opts.thinking ? 'deepseek-reasoner' : 'deepseek-chat',
       logPrompts: opts.logPrompts,
       logFile,
-      actions: allActions
+      actions: allActions,
+      symmetricAom: opts.symmetricAom
     });
 
     // Determine which NPC powers use the LLM
@@ -215,17 +199,8 @@ async function runAll() {
       const bar = '='.repeat(Math.round((i) / opts.runs * 30)).padEnd(30, '-');
       process.stdout.write(`\r  [${bar}] ${i}/${opts.runs}`);
 
-      // Seed the RNG (same mulberry32 logic as oracle internals)
-      let s = seed;
-      const origRandom = Math.random;
-      Math.random = (() => {
-        return function () {
-          s |= 0; s = (s + 0x6D2B79F5) | 0;
-          let t = Math.imul(s ^ (s >>> 15), 1 | s);
-          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-        };
-      })();
+      // Seed the RNG via the engine's shared mulberry32.
+      BoP.seed(seed);
 
       try {
         BoP.init(opts.scenario, initOptions);
@@ -241,13 +216,19 @@ async function runAll() {
             );
           }
         }
+        // Also override the player when --ai-powers all or player explicitly listed
+        if (!llmPowers || llmPowers.includes(world0.player)) {
+          BoP.setPlayerOverride((id, world) =>
+            backend.decideTurn(id, world, heuristicFallback)
+          );
+        }
 
         const result = await BoP.runAsync(runOptions);
         results.push({ runId: i, seed, params: {}, result });
       } catch (err) {
         results.push({ runId: i, seed, params: {}, error: err.message });
       } finally {
-        Math.random = origRandom;
+        BoP.unseed();
       }
     }
 
@@ -295,6 +276,9 @@ async function runAll() {
   const avgStab = valid.length
     ? (valid.reduce((s, r) => s + r.result.outcome.stabilityIndex, 0) / valid.length).toFixed(1)
     : 0;
+  const avgRisk = valid.length
+    ? (valid.reduce((s, r) => s + (r.result.outcome.systemicRisk?.index ?? 0), 0) / valid.length).toFixed(1)
+    : 0;
   const avgTurns = valid.length
     ? (valid.reduce((s, r) => s + r.result.outcome.turnsPlayed, 0) / valid.length).toFixed(1)
     : 0;
@@ -303,6 +287,7 @@ async function runAll() {
   console.log(`  Runs completed : ${valid.length} / ${opts.runs}`);
   console.log(`  Win rate       : ${valid.length ? Math.round(wins / valid.length * 100) : 0}%`);
   console.log(`  Avg stability  : ${avgStab}`);
+  console.log(`  Avg syst. risk : ${avgRisk}`);
   console.log(`  Avg turns      : ${avgTurns}`);
   console.log(`  Nuclear events : ${nuclear} (${valid.length ? Math.round(nuclear / valid.length * 100) : 0}%)`);
   console.log('─'.repeat(40));

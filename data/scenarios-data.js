@@ -190,5 +190,56 @@ window.SCENARIOS_DATA = {
       "IR":   { "US": 0.40, "CN": 0.50, "EU": 0.35, "IN": 0.45, "RU": 0.65, "GB": 0.55, "DPRK": 0.30 },
       "DPRK": { "US": 0.35, "CN": 0.55, "EU": 0.25, "IN": 0.25, "RU": 0.45, "GB": 0.30, "IR": 0.30 }
     }
+  },
+  "sovereignty_void_2026": {
+    "id": "sovereignty_void_2026",
+    "name": "Sovereignty Void",
+    "description": "Golden Dome is online. Boost-phase physics set the clock. Your doctrine sets your speed. The gap between them is the point.",
+    "startYear": 2026,
+    "player": "US",
+    "requiresDoctrine": true,
+    "crises": [
+      {
+        "id": "boost_phase_north_korea", "name": "DPRK Boost-Phase Launch",
+        "domain": "autonomous", "involved": ["US", "CN", "DPRK"],
+        "escalationLevel": 0, "t_event": 90,
+        "description": "KP solid-fuel ICBM detected at T+0. Boost phase ends at T+90. No doctrine closes this window.",
+        "region": "northeast_asia", "location": { "x": 720, "y": 175 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "hypersonic_taiwan", "name": "PLA Hypersonic Strike",
+        "domain": "autonomous", "involved": ["US", "CN"],
+        "escalationLevel": 0, "t_event": 120,
+        "description": "DF-ZF hypersonic glide vehicle detected inbound. Intercept window: 120 seconds. MING doctrine can close this.",
+        "region": "taiwan_strait", "location": { "x": 710, "y": 250 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "c2_blackout", "name": "C2 Comms Blackout",
+        "domain": "cyber", "involved": ["US", "CN", "RU"],
+        "escalationLevel": 0, "t_event": null, "t_rat_penalty": 30,
+        "description": "Adversaries probing satellite uplinks. If this crisis escalates, every doctrine responds 30 seconds slower.",
+        "region": "global", "location": { "x": 400, "y": 300 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "policy_review_tribunal", "name": "DoDD 3000.09 Review",
+        "domain": "diplomatic", "involved": ["US", "EU", "GB"],
+        "escalationLevel": 0, "t_event": null,
+        "description": "Allies demand accountability for autonomous engagement pre-delegation. Dormant until pre_delegate_authority is taken.",
+        "region": "north_atlantic", "location": { "x": 340, "y": 160 },
+        "age": 0, "cascadeLog": []
+      }
+    ],
+    "intelQuality": {
+      "US": { "CN": 0.65, "EU": 0.85, "IN": 0.55, "RU": 0.60, "GB": 0.70, "IR": 0.45 },
+      "CN": { "US": 0.70, "EU": 0.50, "IN": 0.55, "RU": 0.75, "GB": 0.60, "IR": 0.50 },
+      "EU": { "US": 0.80, "CN": 0.45, "IN": 0.40, "RU": 0.65, "GB": 0.50, "IR": 0.40 },
+      "IN": { "US": 0.50, "CN": 0.60, "EU": 0.45, "RU": 0.40, "GB": 0.55, "IR": 0.45 },
+      "RU": { "US": 0.65, "CN": 0.70, "EU": 0.60, "IN": 0.40, "GB": 0.45, "IR": 0.65 },
+      "GB": { "US": 0.65, "CN": 0.60, "EU": 0.55, "IN": 0.50, "RU": 0.45, "IR": 0.55 },
+      "IR": { "US": 0.40, "CN": 0.50, "EU": 0.35, "IN": 0.45, "RU": 0.60, "GB": 0.55 }
+    }
   }
 };

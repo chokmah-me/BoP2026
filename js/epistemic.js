@@ -44,9 +44,22 @@ const Epistemic = (() => {
   }
 
   function getPerceivedValue(viewerId, targetId, stat, world) {
+    if (world.autonomyMasks?.[targetId]?.includes(stat)) return null;
     const perceived = world.powers[viewerId]?.perceivedBy?.[targetId];
     if (!perceived) return world.powers[targetId]?.trueState[stat];
     return perceived[stat] ?? world.powers[targetId]?.trueState[stat];
+  }
+
+  function applyRiceMask(powerId, statDomains, world) {
+    if (!world.autonomyMasks) world.autonomyMasks = {};
+    const existing = world.autonomyMasks[powerId] || [];
+    world.autonomyMasks[powerId] = [...new Set([...existing, ...statDomains])];
+  }
+
+  // Lift a power's Rice mask, restoring normal perception of its stats.
+  // Used by revert_midcourse_defense to undo a prior pre-delegation.
+  function clearRiceMask(powerId, world) {
+    if (world.autonomyMasks) delete world.autonomyMasks[powerId];
   }
 
   function getUncertaintyBand(viewerId, targetId, world) {
@@ -54,5 +67,5 @@ const Epistemic = (() => {
     return Math.round((1 - quality) * 20);
   }
 
-  return { update, applyDisinformation, revealIntel, getPerceivedValue, getUncertaintyBand };
+  return { update, applyDisinformation, revealIntel, getPerceivedValue, getUncertaintyBand, applyRiceMask, clearRiceMask };
 })();

@@ -176,14 +176,13 @@ const ResearchUI = (() => {
 
       try {
         BoP.init(scenarioId, { paramOverrides: paramOverridesForRun });
-        // patch RNG manually for this run
-        const savedRandom = Math.random;
-        Math.random = _mulberry32(seed);
+        // Seed this run via the engine's shared PRNG.
+        BoP.seed(seed);
         try {
           const result = BoP.run();
           results.push({ runId: i, seed, params: paramOverridesForRun || {}, result });
         } finally {
-          Math.random = savedRandom;
+          BoP.unseed();
         }
       } catch (e) {
         results.push({ runId: i, seed, error: e.message });
@@ -198,16 +197,6 @@ const ResearchUI = (() => {
     }
 
     setTimeout(runNext, 0);
-  }
-
-  // Inline PRNG copy so research-ui doesn't depend on oracle internals
-  function _mulberry32(seed) {
-    return function () {
-      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
   }
 
   // ── Results display ──────────────────────────────────────────────────────

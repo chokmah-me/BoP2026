@@ -59,6 +59,27 @@ const State = (() => {
       }
     }
 
+    // ── AOM (autonomy / latency) state schema ────────────────────────────────
+    // The Sovereignty Void mechanic (see cascades.js _latencyGate) reads and
+    // writes these fields. They are initialized here so the shape is discoverable
+    // and code can rely on them existing rather than guarding with `?.`/`|| {}`.
+    //
+    //   autonomyDelegated  { [powerId]: true }   set when a power takes a
+    //       riceMaskStats action (pre_delegate_authority). Switches the latency
+    //       gate from "uncommanded drift" to the "autonomous agent acts" branch.
+    //       Cleared for a power by revert_midcourse_defense (cancelsBPI).
+    //   autonomyMasks      { [powerId]: string[] }  stat domains hidden from all
+    //       viewers (Rice-theorem mask). Read by Epistemic.getPerceivedValue,
+    //       written by Epistemic.applyRiceMask, cleared by Epistemic.clearRiceMask.
+    //   bpiReverted        boolean   one-shot flag. When true the latency gate is
+    //       skipped for that turn, then reset back to false.
+    //
+    // Two related AOM fields live on individual crises (scenario data), not here:
+    //   crisis.t_event       boost-phase intercept window in seconds; sovereignty
+    //       void fires when t_rat > t_event on that crisis.
+    //   crisis.t_rat_penalty seconds added to t_rat while that crisis (c2_blackout)
+    //       is escalated.
+    // activeSystemicEvents may carry the 'sovereignty_void_active' marker.
     world = {
       year: scenario.startYear,
       turn: 1,
@@ -77,6 +98,9 @@ const State = (() => {
       multilateralForums: 0,
       multilateralUsed: false,
       playerMilitaryVsUS: 0,
+      autonomyDelegated: {},
+      autonomyMasks: {},
+      bpiReverted: false,
       gameOver: null,
       sim: { active: false, paused: false, speed: 1, cascadeScale: 1.0 }
     };
@@ -208,11 +232,29 @@ const State = (() => {
     return Math.round(avg);
   }
 
+  // Second composite outcome metric. GSI alone keys on mean domestic stability and
+  // ignores live crises and nuclear posture, so it can read "stable" while the
+  // board is one escalation from a nuclear exchange. This folds both in and also
+  // returns the raw components so research can key on any of them.
+  function getSystemicRiskIndex() {
+    const crisisPressure = world.crises.reduce((sum, c) => sum + (c.escalationLevel || 0), 0);
+    const maxNuclear = Object.values(world.powers).reduce(
+      (max, p) => Math.max(max, p.trueState.nuclear || 0), 0
+    );
+    const index = Math.max(0, Math.min(100,
+      getGlobalStabilityIndex() - 4 * crisisPressure - 6 * maxNuclear
+    ));
+    return { index, crisisPressure, maxNuclear };
+  }
+
   function checkGameOver() {
-    // Nuclear exchange: any military or compound crisis at level 5
-    const nuclear = world.crises.find(c => (c.domain === 'military' || c.domain === 'compound') && c.escalationLevel >= 5);
+    // Nuclear exchange: any military, compound, or autonomous (boost-phase) crisis at level 5
+    const nuclear = world.crises.find(c => (c.domain === 'military' || c.domain === 'compound' || c.domain === 'autonomous') && c.escalationLevel >= 5);
     if (nuclear) {
-      world.gameOver = { result: 'lose', reason: 'Nuclear exchange. Civilization does not recover.' };
+      const reason = nuclear.domain === 'autonomous'
+        ? `Sovereignty void cascaded to terminal threshold. ${nuclear.name} exceeded all governance bounds.`
+        : 'Nuclear exchange. Civilization does not recover.';
+      world.gameOver = { result: 'lose', reason };
       return true;
     }
     // Player collapse
@@ -310,7 +352,7 @@ const State = (() => {
     init, get, getPower, getPlayer, getCrisis,
     applyStatDelta, adjustRelationship, adjustCrisisEscalation,
     addCrisis, mergeCrises, addLog, advanceTurn, setPhase, queueAction, clearPendingActions,
-    updatePerception, driftPerceptions, getGlobalStabilityIndex, checkGameOver,
+    updatePerception, driftPerceptions, getGlobalStabilityIndex, getSystemicRiskIndex, checkGameOver,
     applyEpistemicNoise, setSim, restore
   };
 })();

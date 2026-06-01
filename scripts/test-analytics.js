@@ -6,35 +6,10 @@
  */
 'use strict';
 
-const vm = require('vm');
-const fs = require('fs');
-const path = require('path');
+const { loadEngine } = require('./load-engine');
 
-const ROOT = path.join(__dirname, '..');
-
-global.window = global;
-const ctx = vm.createContext(global);
-
-function load(rel) {
-  const code = fs.readFileSync(path.join(ROOT, rel), 'utf8');
-  const patched = code.replace(/^(const|let) ([A-Z][A-Za-z_]*)\s*=/m, 'var $2 =');
-  vm.runInContext(patched, ctx, { filename: rel });
-}
-
-load('data/powers-data.js');
-load('data/scenarios-data.js');
-load('data/doctrines-data.js');
-load('data/events-data.js');
-load('js/state.js');
-load('js/domains.js');
-load('js/cascades.js');
-load('js/epistemic.js');
-load('js/events.js');
-load('js/ai.js');
-load('js/oracle.js');
-
+const ctx = loadEngine();
 const BoP = ctx.BoP;
-if (!BoP) { console.error('Failed to load BoP.'); process.exit(1); }
 
 // ── Test harness ─────────────────────────────────────────────────────────────
 
@@ -55,23 +30,13 @@ function assert(cond, msg) {
   if (!cond) throw new Error(msg || 'assertion failed');
 }
 
-function mulberry32(seed) {
-  return function () {
-    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 function runOne(seed) {
-  const saved = Math.random;
-  Math.random = mulberry32(seed);
+  BoP.seed(seed);
   try {
     BoP.init('taiwan_strait_2026');
     return BoP.run({ maxTurns: 10 });
   } finally {
-    Math.random = saved;
+    BoP.unseed();
   }
 }
 
@@ -211,6 +176,7 @@ test('9. minValue condition blocks below threshold and passes above', () => {
   const world = BoP.getState();
   // hezbollah_degraded: minTurn 3, crisis iran_proxy_escalation minEsc 2, US.military minValue 55
   world.turn = 5; // satisfy minTurn
+  world.crises.find(c => c.id === 'iran_proxy_escalation').escalationLevel = 2; // satisfy minEscalation
   world.powers['US'].trueState.military = 40; // below threshold
   let firedBelow = false;
   for (let i = 0; i < 100; i++) {

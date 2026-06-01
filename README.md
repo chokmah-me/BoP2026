@@ -16,7 +16,7 @@ BoP2026 models great-power competition across ten domains (military, economic, c
 
 The engine is designed for two uses:
 
-1. **Classroom / wargame**: play as the United States through the Taiwan Strait, Iran Nuclear, or Korean Peninsula scenarios in a browser, no install required.
+1. **Classroom / wargame**: play through five scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, or Sovereignty Void — in a browser, no install required.
 2. **Research companion**: run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
 
 This is a **stylized model**, not an empirically fitted one. Parameters are calibrated for face validity against open-source IR literature, not regression-estimated from historical data. See [docs/model-notes.md](docs/model-notes.md) for assumptions and limitations.
@@ -37,11 +37,11 @@ start index.html
 open index.html
 ```
 
-Select a scenario and doctrine on the opening screen. Click **End Turn** to advance. The **Research** button in the top-right opens the in-browser batch runner. A **Save Log** button in the event log panel exports the current game state and event history as JSON. The log also downloads automatically when the game ends (nuclear exchange, collapse, doctrine failure) as a post-mortem file named `bop-{scenario}-{date}-t{turn}-{result}.json`.
+Select a scenario and doctrine on the opening screen. Click **End Turn** to advance. The **Research** button in the top-right opens the in-browser batch runner. A **Save Log** button in the event log panel exports the current game state and event history as JSON. The log also downloads automatically when the game ends (nuclear exchange, collapse, doctrine failure) as a post-mortem file named `bop-{scenario}-{date}-t{turn}-{result}.json`. The event log is scrollable — pause a running simulation and scroll back to read the full turn-by-turn cascade (up to 200 entries retained).
 
 ### Node.js (headless research runs)
 
-Requires Node.js 16+.
+Requires Node.js 18+. No runtime dependencies — `package.json` only wires the test/research scripts.
 
 ```bash
 # Default: 10 runs of Taiwan Strait, random seeds
@@ -58,13 +58,17 @@ node scripts/run-bop.js --scenario iran_nuclear_2026 --runs 50
 
 # Analyze batch output
 node scripts/analyze-results.js results.json
+
+# Run the regression tests (CI runs the same)
+npm test
 ```
 
 **CLI flags:**
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026` |
+| `--doctrine <id>` | scenario default | Doctrine to play: `MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
 | `--out <path>` | `logs/bop-{scenario}-{date}-s{seed}-x{runs}.json` | Output file (`bop2026-analytics-v1`). `logs/` dir created automatically. |
@@ -77,6 +81,7 @@ node scripts/analyze-results.js results.json
 | `--ai-powers <ids>` | `all` | Powers using LLM backend: `all` or comma-list e.g. `CN,RU` |
 | `--log-prompts` | off | Save LLM prompt+response to a `.jsonl` sidecar file |
 | `--thinking` | off | Use `deepseek-reasoner` (chain-of-thought) instead of `deepseek-chat` |
+| `--asymmetric-aom` | off | Reproduce the original asymmetric AOM prompt ("exploit paths" for adversaries). Default since v2.6.0 is symmetric, personality-gated framing for every agent — see [the prompt-asymmetry note](docs/notes/llm-wargame-prompt-asymmetry.md). |
 | `--dry-run` | off | Estimate token cost without making API calls (DeepSeek only) |
 
 ### LLM NPC backend (DeepSeek)
@@ -101,7 +106,9 @@ DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
   --ai-backend deepseek --runs 50 --dry-run
 ```
 
-LLM NPCs use prompt version `v1.2` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
+LLM NPCs use prompt version `v1.3` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
+
+**AOM prompt framing (`sovereignty_void_2026`).** In the latency-governance scenario, the system prompt's `LATENCY GOVERNANCE (AOM)` block is, by default (v2.6.0+), *symmetric*: every agent — player and adversary alike — gets neutral "Strategic options" framing, a shared systemic-survival objective, and escalation language gated on its own `riskTolerance`/`patience`. Earlier versions handed LLM adversaries an "Exploit paths" manual the player never saw, which drove an artificially high sovereignty-void rate (the model recited the framing rather than reasoning independently). Pass `--asymmetric-aom` to reproduce that original prompt; each logged call records its `aomMode`. The full before/after study — including a 16-cell, N=12 sweep showing the symmetric prompt collapses the void rate in every cell — is in [docs/notes/llm-wargame-prompt-asymmetry.md](docs/notes/llm-wargame-prompt-asymmetry.md).
 
 **Chat vs. thinking mode:** the default `deepseek-chat` is fast and cheap (about $0.10/50-run, all NPCs). Use it for parameter sweeps and baseline comparison. `--thinking` switches to `deepseek-reasoner`, which generates a chain-of-thought reasoning trace per NPC per turn. Both models bill at `deepseek-v4-flash` rates ($0.14/$0.28 per 1M input/output, with 50x cache-hit discount). Actual cost: ~$1.40/50-run for Korean Peninsula (6–9 turn games), ~$0.70/50-run for Taiwan/Iran (4–5 turns). Use thinking mode when you want to study *how* an LLM agent reasons about crisis escalation — the traces are logged to the `.jsonl` sidecar via `--log-prompts`. Not worth ~14x over chat for bulk sweeps.
 
@@ -136,7 +143,7 @@ BoP.init('taiwan_strait_2026', {
 
 // Run to completion (returns SimResult)
 const result = BoP.run({ maxTurns: 20 });
-console.log(result.outcome.result);        // 'win' | 'lose' | 'incomplete'
+console.log(result.outcome.result);        // 'win' | 'lose' | 'draw'
 console.log(result.outcome.stabilityIndex);
 console.log(result.outcome.turnsPlayed);
 
@@ -144,11 +151,18 @@ console.log(result.outcome.turnsPlayed);
 const step = BoP.step();   // one turn, AI decides all actions
 console.log(step.cascadeLog);
 
+// Reproducible runs (mulberry32). runBatch seeds internally.
+BoP.seed(42);
+BoP.init('taiwan_strait_2026');
+const seeded = BoP.run();
+BoP.unseed();
+
 // Branching / counterfactuals
 const snap = BoP.getState();
 BoP.run();                   // outcome A
 BoP.setState(snap);          // reset to branch point
 BoP.setNPCOverride('CN', (id, world) => [...]);
+BoP.setPlayerOverride((id, world) => [...]);  // override player power too (async path)
 BoP.run();                   // outcome B under different CN behavior
 
 // Batch sweep
@@ -176,7 +190,12 @@ const batch = BoP.exportBatchAnalytics(results);
   outcome: {
     result: 'win' | 'lose' | 'incomplete',
     reason: string,
-    stabilityIndex: number,   // 0–100
+    stabilityIndex: number,   // 0–100, mean domestic stat
+    systemicRisk: {           // second composite metric
+      index: number,          // 0–100, GSI minus crisis/nuclear penalties
+      crisisPressure: number, // sum of escalation across crises
+      maxNuclear: number      // peak nuclear posture (0–5)
+    },
     turnsPlayed: number
   },
   turns: TurnResult[],        // per-turn cascade logs, actions, events, deltas
@@ -261,6 +280,9 @@ China seizes a contested reef and drone swarms have replaced coast guard skipper
 ### Korean Peninsula, 2026
 DPRK moves tactical warheads to forward positions after the latest ICBM series. Four active crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK is the primary NPC antagonist — highest riskTolerance (0.85) and lowest patience (0.35) in the game. High starting escalation (sum 5) leaves little diplomatic margin.
 
+### Sovereignty Void, 2026
+Golden Dome is online and boost-phase physics set the clock. The AOM latency mechanic compares your doctrine's ratification time (`t_rat`) against each crisis's intercept window (`t_event`): if `t_rat > t_event`, the sovereignty void fires and your input doesn't register. **Requires a `--doctrine`** (UI hides it until one is chosen; `BoP.init` throws without one) — the headline mechanic is built around `t_rat`, which defaults to 999s with no doctrine. Crises: DPRK boost-phase launch (autonomous, `t_event` 90s — no doctrine closes it), PLA hypersonic strike (autonomous, 120s — MING can close it), C2 comms blackout (cyber, adds 30s to `t_rat`), and a dormant DoDD 3000.09 review triggered by pre-delegation. Resolution paths: intercept if fast enough, pre-delegate authority (Rice-Theorem stat mask, DoDD review), or revert to midcourse (clears delegation, restores human control).
+
 ---
 
 ## Adding content
@@ -289,7 +311,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.2.3). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.6.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

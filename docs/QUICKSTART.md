@@ -11,7 +11,8 @@ git clone https://github.com/chokmah-me/BoP2026.git
 cd BoP2026
 ```
 
-No npm, no build step. Node 16+ for headless runs. A modern browser for the game.
+No build step. The game runs straight from `index.html`. Node 18+ for headless runs (`package.json`
+only wires the test/research scripts — no runtime dependencies). A modern browser for the game.
 
 ---
 
@@ -29,7 +30,9 @@ node scripts/run-bop.js --scenario taiwan_strait_2026 --runs 1 --seed 42 --out r
   "schema": "bop2026-analytics-v1",
   "scenarioId": "taiwan_strait_2026",
   "player": "US",
-  "outcome": { "result": "lose", "reason": "...", "stabilityIndex": 24, "turnsPlayed": 6 },
+  "outcome": { "result": "lose", "reason": "...", "stabilityIndex": 24,
+               "systemicRisk": { "index": 12, "crisisPressure": 4, "maxNuclear": 2 },
+               "turnsPlayed": 6 },
   "initialState": { "powers": {...}, "crises": [...] },
   "turns": [
     {
@@ -141,15 +144,20 @@ Play a few turns, then click **Save Log** in the event log panel (bottom-left of
 
 The **Research** button (top-right) runs batch simulations in the browser with a progress bar. Click **JSON** when done to download the analytics file.
 
+The event log (overlay on the bottom of the map) is scrollable — pause the simulation and scroll back to read the full turn-by-turn cascade. Up to 200 entries are retained.
+
 ---
 
 ## 7. Run the tests
 
 ```bash
-node scripts/test-analytics.js
+npm test
+# = node scripts/test-cascades.js && node scripts/test-analytics.js
 ```
 
-10 assertions, covering schema, delta reconstruction, determinism, post-mortem filename, and saveLog payload. Exit 0 = pass.
+`test-analytics.js` covers schema, delta reconstruction, determinism, post-mortem filename, and
+saveLog payload; `test-cascades.js` covers cascade thresholds and idempotency. Exit 0 = pass.
+(The browser smoke test needs Playwright and runs separately via `npm run test:browser`.)
 
 ---
 
@@ -191,6 +199,14 @@ node scripts/run-bop.js --scenario iran_nuclear_2026 --ai-backend deepseek --run
 | Thinking | `--thinking` | `deepseek-reasoner` | $0.80 | Case studies, reasoning-chain analysis, pedagogical use |
 
 `--thinking` adds a chain-of-thought reasoning trace per NPC per turn. It's readable via `--log-prompts` — useful when you want to see *how* the LLM reasons about the crisis, not just what it decides. Eight times more expensive than chat mode, so don't use it for sweeps.
+
+The `sovereignty_void_2026` scenario requires a `--doctrine` (its AOM latency mechanic is built around the doctrinal `t_rat`); a run without one errors out before any API call. To watch a reasoning model navigate the latency gap:
+
+```powershell
+node scripts/run-bop.js --scenario sovereignty_void_2026 --doctrine MING `
+  --ai-backend deepseek --thinking --ai-powers all `
+  --runs 1 --seed 42 --max-turns 5 --log-prompts --out logs/sv-thinking.json
+```
 
 **What the LLM does:** each NPC gets a system prompt with its personality, current crisis levels, stat summary, and available actions. Returns a JSON array of up to 3 actions within its AP budget. Invalid targets are dropped silently. Rate-limit errors retry with exponential backoff before falling back to the heuristic.
 

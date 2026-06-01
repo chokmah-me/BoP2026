@@ -25,6 +25,7 @@ const BoP = (() => {
   }
 
   let _overrides = {};
+  let _playerOverride = null;
   let _origRandom = null;
 
   function _patchRNG(seed) {
@@ -88,29 +89,21 @@ const BoP = (() => {
 
   // ── Headless turn executor ───────────────────────────────────────────────
   // No UI calls, no sleeps. Returns raw turn data.
+  //
+  // The sync (_executeTurn) and async (_executeTurnAsync) variants share the same
+  // setup and teardown; only the action-collection loop differs (the async path
+  // awaits overrides so LLM backends can be injected). A pure sync-adapter-over-
+  // async core isn't possible because step() must stay synchronous for the
+  // heuristic path and Node tests, so the shared work lives in these helpers.
 
-  // Async variant — awaits NPC overrides so LLM backends can be injected.
-  async function _executeTurnAsync(playerActionsOverride) {
-    const world = State.get();
+  function _beginTurn(world) {
     const beforeSnap = _snapshotForDelta(world);
-
     State.clearPendingActions();
     for (const p of Object.values(world.powers)) p.actionPointsRemaining = p.actionPoints;
+    return beforeSnap;
+  }
 
-    const playerActions = playerActionsOverride != null
-      ? playerActionsOverride
-      : AI.decideTurn(world.player, world);
-    for (const a of playerActions) State.queueAction(a);
-
-    const allActions = [...world.pendingActions];
-    const npcActions = [];
-    for (const npcId of Object.keys(world.powers).filter(id => id !== world.player)) {
-      const acts = _overrides[npcId]
-        ? await _overrides[npcId](npcId, world)
-        : AI.decideTurn(npcId, world);
-      for (const a of acts) { allActions.push(a); npcActions.push(a); }
-    }
-
+  function _finishTurn(world, beforeSnap, allActions, playerActions, npcActions) {
     const cascadeLog = Cascades.resolve(allActions, world);
     Epistemic.update(world);
     const events = Events.drawEvents(world);
@@ -125,20 +118,39 @@ const BoP = (() => {
     return { turnNum, yearNum, playerActions, npcActions, cascadeLog, events, over, stateDeltas };
   }
 
+  // Async variant — awaits NPC/player overrides so LLM backends can be injected.
+  async function _executeTurnAsync(playerActionsOverride) {
+    const world = State.get();
+    const beforeSnap = _beginTurn(world);
+
+    const playerActions = playerActionsOverride != null
+      ? playerActionsOverride
+      : _playerOverride
+        ? await _playerOverride(world.player, world)
+        : AI.decideTurn(world.player, world);
+    for (const a of playerActions) State.queueAction(a);
+
+    const allActions = [...world.pendingActions];
+    const npcActions = [];
+    for (const npcId of Object.keys(world.powers).filter(id => id !== world.player)) {
+      const acts = _overrides[npcId]
+        ? await _overrides[npcId](npcId, world)
+        : AI.decideTurn(npcId, world);
+      for (const a of acts) { allActions.push(a); npcActions.push(a); }
+    }
+
+    return _finishTurn(world, beforeSnap, allActions, playerActions, npcActions);
+  }
+
   function _executeTurn(playerActionsOverride) {
     const world = State.get();
-    const beforeSnap = _snapshotForDelta(world);
+    const beforeSnap = _beginTurn(world);
 
-    State.clearPendingActions();
-    for (const p of Object.values(world.powers)) p.actionPointsRemaining = p.actionPoints;
-
-    // Player
     const playerActions = playerActionsOverride != null
       ? playerActionsOverride
       : AI.decideTurn(world.player, world);
     for (const a of playerActions) State.queueAction(a);
 
-    // NPCs
     const allActions = [...world.pendingActions];
     const npcActions = [];
     for (const npcId of Object.keys(world.powers).filter(id => id !== world.player)) {
@@ -148,19 +160,7 @@ const BoP = (() => {
       for (const a of acts) { allActions.push(a); npcActions.push(a); }
     }
 
-    // Cascade + epistemic + events
-    const cascadeLog = Cascades.resolve(allActions, world);
-    Epistemic.update(world);
-    const events = Events.drawEvents(world);
-
-    const turnNum = world.turn;
-    const yearNum = world.year;
-    State.advanceTurn();
-    const over = State.checkGameOver();
-
-    const stateDeltas = _computeDeltas(beforeSnap, State.get());
-
-    return { turnNum, yearNum, playerActions, npcActions, cascadeLog, events, over, stateDeltas };
+    return _finishTurn(world, beforeSnap, allActions, playerActions, npcActions);
   }
 
   // ── Public API ───────────────────────────────────────────────────────────
@@ -181,6 +181,15 @@ const BoP = (() => {
     const scenarios = _data('SCENARIOS_DATA');
     const scenario = scenarios[scenarioId];
     if (!scenario) throw new Error(`Unknown scenario: "${scenarioId}". Available: ${Object.keys(scenarios).join(', ')}`);
+
+    // Some scenarios (e.g. sovereignty_void_2026) are built around the doctrine's
+    // t_rat. Without one, baseTRat falls back to 999 and the sovereignty void fires
+    // every turn — a degenerate run. Require a doctrine for those scenarios.
+    if (scenario.requiresDoctrine && !options.doctrine) {
+      const doctrines = _data('DOCTRINES_DATA') || [];
+      const ids = doctrines.map(d => d.id).join(', ');
+      throw new Error(`Scenario "${scenarioId}" requires a doctrine. Pass options.doctrine (one of: ${ids}).`);
+    }
 
     State.init(_data('POWERS_DATA'), scenario, options.doctrine || null);
     Events.init(_data('EVENT_TABLE'));
@@ -255,13 +264,22 @@ const BoP = (() => {
     }
 
     const fw = State.get();
+    const gsi = State.getGlobalStabilityIndex();
+    const sri = State.getSystemicRiskIndex();
+    const resolvedOutcome = fw.gameOver || {
+      result: gsi >= 40 ? 'draw' : 'lose',
+      reason: gsi >= 40
+        ? `Ran ${turns.length} turns. Stability held at ${gsi} — no decisive outcome.`
+        : `Ran ${turns.length} turns. Stability collapsed to ${gsi}.`
+    };
     return {
       scenarioId,
       initialState,
       outcome: {
-        result: fw.gameOver?.result || 'incomplete',
-        reason: fw.gameOver?.reason || '',
-        stabilityIndex: State.getGlobalStabilityIndex(),
+        result: resolvedOutcome.result,
+        reason: resolvedOutcome.reason,
+        stabilityIndex: gsi,
+        systemicRisk: sri,
         turnsPlayed: turns.length
       },
       turns,
@@ -308,13 +326,22 @@ const BoP = (() => {
     }
 
     const fw = State.get();
+    const gsi = State.getGlobalStabilityIndex();
+    const sri = State.getSystemicRiskIndex();
+    const resolvedOutcome = fw.gameOver || {
+      result: gsi >= 40 ? 'draw' : 'lose',
+      reason: gsi >= 40
+        ? `Ran ${turns.length} turns. Stability held at ${gsi} — no decisive outcome.`
+        : `Ran ${turns.length} turns. Stability collapsed to ${gsi}.`
+    };
     return {
       scenarioId,
       initialState,
       outcome: {
-        result: fw.gameOver?.result || 'incomplete',
-        reason: fw.gameOver?.reason || '',
-        stabilityIndex: State.getGlobalStabilityIndex(),
+        result: resolvedOutcome.result,
+        reason: resolvedOutcome.reason,
+        stabilityIndex: gsi,
+        systemicRisk: sri,
         turnsPlayed: turns.length
       },
       turns,
@@ -392,10 +419,27 @@ const BoP = (() => {
     _overrides[powerId] = fn;
   }
 
-  /** Remove all NPC overrides. */
+  /** Override the AI decision function for the player power (async path only). */
+  function setPlayerOverride(fn) {
+    _playerOverride = fn;
+  }
+
+  /** Remove all NPC and player overrides. */
   function clearOverrides() {
     _overrides = {};
+    _playerOverride = null;
   }
+
+  /**
+   * Seed Math.random with the engine's mulberry32 PRNG for reproducible runs.
+   * The single shared implementation lives here; callers (CLI runner, tests,
+   * research UI) use this rather than copying the generator. Call unseed() to
+   * restore the original Math.random.
+   */
+  function seed(seedVal) { _patchRNG(seedVal); }
+
+  /** Restore the original Math.random saved by seed(). */
+  function unseed() { _restoreRNG(); }
 
   // ── Analytics export ─────────────────────────────────────────────────────
 
@@ -477,7 +521,7 @@ const BoP = (() => {
     }));
   }
 
-  const api = { init, step, stepAsync, run, runAsync, runBatch, getState, setState, setNPCOverride, clearOverrides, exportAnalytics, exportBatchAnalytics };
+  const api = { init, step, stepAsync, run, runAsync, runBatch, getState, setState, setNPCOverride, setPlayerOverride, clearOverrides, seed, unseed, exportAnalytics, exportBatchAnalytics };
 
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = api;
