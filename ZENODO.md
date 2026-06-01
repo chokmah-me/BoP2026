@@ -1,4 +1,4 @@
-# Zenodo Deposit — Balance of Power 2026 v2.4.0
+# Zenodo Deposit — Balance of Power 2026 v2.7.0
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
 **Deposit Date:** 24 May 2026 (updated 31 May 2026)  
@@ -8,9 +8,9 @@
 
 ## Description
 
-Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Eight great powers (US, China, EU, Russia, India, Gulf Bloc, Iran, North Korea) compete across ten domains: military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous systems, biological, and EMP. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
+Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Eight great powers (US, China, EU, Russia, India, Gulf Bloc, Iran, North Korea) compete across eleven domains: military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous systems, biological, EMP, and space. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
 
-Five playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, and Sovereignty Void 2026. The Sovereignty Void scenario operationalizes the AOM latency-governance framework [Zenodo 19368682]: when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves autonomously before the player's action registers. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema.
+Six playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, Sovereignty Void 2026, and Orbital Warfare 2026. The Sovereignty Void scenario operationalizes the AOM latency-governance framework [Zenodo 19368682]: when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves autonomously before the player's action registers. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema.
 
 Calibrated for face validity against open-source IR literature. Not intended for forecasting or policy prescription.
 
@@ -33,7 +33,7 @@ All parameters are calibrated for **face validity** against open-source IR liter
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
 - Complete documentation (`README.md`, `docs/`)
-- Baseline results for all five scenarios
+- Baseline results for all six scenarios
 - Model assumptions and known limitations
 
 ## Release Notes — v2.4.0
@@ -68,9 +68,19 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.6.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.7.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
+
+**v2.7.0 (2026-06-01):** Space (counterspace) action domain — `satellite_hardening`,
+`orbital_isr_surge`, `asat_strike`, `debris_remediation_pact` — on the pre-existing `space` stat, plus
+the **Orbital Warfare 2026** scenario (`orbital_warfare_2026`: ASAT demonstration, GNSS denial,
+comms-sat blackout, cislunar resource claim). Adds the Kessler-syndrome cascade (3rd-order debris
+bleed → 4th-order `kessler_cascade` rendering LEO unusable) and the `orbit+orbit` → `orbital_denial`
+compound crisis, with two scenario-scoped events. Closes Krepinevich scenario #5 ("The War for
+Space"), bringing playable domain coverage to 6 of 7. Adding events shifts the seeded RNG stream for
+all scenarios (as with the v2.0.2 / v2.3.0 event additions); existing scenarios were re-baselined and
+remain in range. Heuristic outcomes for existing scenarios otherwise unchanged.
 
 **v2.6.0 (2026-05-31):** Symmetric AOM prompt is now the default for the DeepSeek backend. The
 latency-governance prompt block previously gave LLM adversaries an "exploit paths" framing the player

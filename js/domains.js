@@ -722,6 +722,77 @@ const Domains = (() => {
       effects3rd: [],
       domains: ['autonomous'],
       tooltip: 'No sovereignty void fires this turn. Clears any pre-delegation and lifts the Rice mask — human control restored. Adversary notes the hesitation.'
+    },
+
+    // ── SPACE ─────────────────────────────────────────────────────────────────
+    {
+      id: 'satellite_hardening',
+      domain: 'space',
+      name: 'Satellite Hardening',
+      description: 'Maneuver reserves, shielding, and on-orbit redundancy for critical ISR/PNT/comms constellations. Reduces counterspace vulnerability.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { space: 8, cyber: 3 } },
+      effects2nd: [
+        { prob: 0.35, effect: { self: { space: 4 } }, label: 'Distributed architecture survives a degraded orbital environment', delay: 2 },
+        { prob: 0.20, effect: { self: { economic: -3 } }, label: 'Rapid constellation replenishment strains the space budget' }
+      ],
+      effects3rd: [],
+      domains: ['space'],
+      tooltip: 'Pure defense. Delayed space payoff when the orbital environment degrades. No escalation risk.'
+    },
+    {
+      id: 'orbital_isr_surge',
+      domain: 'space',
+      name: 'Orbital ISR Surge',
+      description: 'Re-task and densify reconnaissance satellites over a contested theater. Sharpens early warning and battlespace awareness.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { space: 5, info: 8 } },
+      effects2nd: [
+        { prob: 0.30, effect: { adversary_relationship: -6 }, label: 'Adversaries detect persistent overflight and protest' },
+        { prob: 0.20, effect: { self: { space: 4 } }, label: 'Improved space domain awareness aids collision avoidance' }
+      ],
+      effects3rd: [],
+      domains: ['space'],
+      tooltip: 'Intel gain. Improves epistemic accuracy. Mild adversary friction.'
+    },
+    {
+      id: 'asat_strike',
+      domain: 'space',
+      name: 'ASAT Strike',
+      description: 'Destroy or disable an adversary satellite — kinetic interceptor, co-orbital, or directed energy. Blinds their C4ISR and scatters a debris field.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 2,
+      effects1st: { target: { space: -18, military: -8, info: -6 } },
+      effects2nd: [
+        { prob: 0.45, effect: { crisis_escalation: 1 }, label: 'Target reads strike as prelude to broader attack' },
+        { prob: 0.35, effect: { self: { domestic: -6 } }, label: 'International condemnation of debris-generating attack' },
+        { prob: 0.20, effect: { self: { military: 5 } }, label: 'Blinded adversary enables operational exploitation' }
+      ],
+      effects3rd: [],
+      domains: ['space'],
+      tooltip: 'Catastrophic to target. Triggers escalation and seeds Kessler debris that bleeds onto bystanders.'
+    },
+    {
+      id: 'debris_remediation_pact',
+      domain: 'space',
+      name: 'Debris Remediation Pact',
+      description: 'Joint active debris removal and orbital traffic coordination with a partner. Rebuilds the shared orbital commons.',
+      cost: 1,
+      requiresTarget: true,
+      escalationDelta: -1,
+      effects1st: { self: { space: 6 }, target: { space: 6 } },
+      effects2nd: [
+        { prob: 0.55, effect: { relationship_target: 10 }, label: 'Orbital stewardship builds broader strategic trust' },
+        { prob: 0.25, effect: { self: { economic: -4 } }, label: 'Removal tugs and tracking infrastructure are costly' }
+      ],
+      effects3rd: [],
+      domains: ['space'],
+      tooltip: 'De-escalatory. Restores the orbital environment for both sides. Strong relationship payoff.'
     }
   ];
 
@@ -736,7 +807,7 @@ const Domains = (() => {
   }
 
   function getDomainList() {
-    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous', 'biological', 'emp'];
+    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous', 'biological', 'emp', 'space'];
   }
 
   function getDomainLabel(domain) {
@@ -750,7 +821,8 @@ const Domains = (() => {
       supply_chain: 'Supply Chain',
       autonomous: 'Autonomous',
       biological: 'Biological',
-      emp: 'EMP'
+      emp: 'EMP',
+      space: 'Space'
     }[domain] || domain;
   }
 
@@ -765,7 +837,8 @@ const Domains = (() => {
       supply_chain: '⛓️',
       autonomous: '🤖',
       biological: '🧬',
-      emp: '⚡'
+      emp: '⚡',
+      space: '🛰️'
     }[domain] || '●';
   }
 

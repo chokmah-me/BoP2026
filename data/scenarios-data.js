@@ -241,5 +241,51 @@ window.SCENARIOS_DATA = {
       "GB": { "US": 0.65, "CN": 0.60, "EU": 0.55, "IN": 0.50, "RU": 0.45, "IR": 0.55 },
       "IR": { "US": 0.40, "CN": 0.50, "EU": 0.35, "IN": 0.45, "RU": 0.60, "GB": 0.55 }
     }
+  },
+  "orbital_warfare_2026": {
+    "id": "orbital_warfare_2026",
+    "name": "Orbital Warfare, 2026",
+    "description": "A destructive ASAT test seeds a debris field as GPS goes dark over a theater. Cislunar resource claims harden. Low Earth orbit — the substrate of every power's military and economy — becomes contested terrain. The first runaway debris cascade has no exit.",
+    "startYear": 2026,
+    "player": "US",
+    "crises": [
+      {
+        "id": "asat_demonstration", "name": "ASAT Demonstration", "domain": "space",
+        "involved": ["US", "CN"], "escalationLevel": 1,
+        "description": "A destructive direct-ascent ASAT test shatters a defunct satellite into 1,500+ trackable fragments. Conjunction warnings spike across LEO. Both powers blame the other for opening the door.",
+        "region": "orbit", "location": { "x": 700, "y": 60 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "gnss_jamming", "name": "GNSS Denial", "domain": "space",
+        "involved": ["US", "RU", "EU"], "escalationLevel": 1,
+        "description": "Wide-area GPS and Galileo jamming blankets a contested theater. Civil aviation reroutes; precision munitions degrade. Attribution points to mobile electronic-warfare assets.",
+        "region": "orbit", "location": { "x": 470, "y": 70 },
+        "age": 1, "cascadeLog": []
+      },
+      {
+        "id": "commsat_blackout", "name": "Comms Satellite Blackout", "domain": "cyber",
+        "involved": ["US", "CN", "RU"], "escalationLevel": 1,
+        "description": "Uplink interference and a suspected cyber intrusion knock several geostationary comms satellites offline. Strategic-warning links flicker. C2 falls back to brittle terrestrial paths.",
+        "region": "orbit", "location": { "x": 620, "y": 50 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "lunar_resource_claim", "name": "Cislunar Resource Claim", "domain": "diplomatic",
+        "involved": ["US", "CN", "IN"], "escalationLevel": 1,
+        "description": "Competing Artemis Accords and ILRS partners stake overlapping claims to a south-pole ice deposit. A safety-zone declaration is read as a sovereignty grab. The Outer Space Treaty strains.",
+        "region": "orbit", "location": { "x": 560, "y": 40 },
+        "age": 0, "cascadeLog": []
+      }
+    ],
+    "intelQuality": {
+      "US":  { "CN": 0.70, "EU": 0.85, "IN": 0.55, "RU": 0.55, "GB": 0.65, "IR": 0.40 },
+      "CN":  { "US": 0.70, "EU": 0.45, "IN": 0.55, "RU": 0.75, "GB": 0.65, "IR": 0.45 },
+      "EU":  { "US": 0.80, "CN": 0.40, "IN": 0.40, "RU": 0.60, "GB": 0.50, "IR": 0.35 },
+      "IN":  { "US": 0.50, "CN": 0.65, "EU": 0.40, "RU": 0.40, "GB": 0.60, "IR": 0.40 },
+      "RU":  { "US": 0.60, "CN": 0.75, "EU": 0.55, "IN": 0.35, "GB": 0.40, "IR": 0.60 },
+      "GB":  { "US": 0.60, "CN": 0.65, "EU": 0.50, "IN": 0.55, "RU": 0.40, "IR": 0.50 },
+      "IR":  { "US": 0.35, "CN": 0.50, "EU": 0.30, "IN": 0.40, "RU": 0.60, "GB": 0.55 }
+    }
   }
 };

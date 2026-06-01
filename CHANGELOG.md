@@ -1,5 +1,54 @@
 # Changelog
 
+## 2026-06-01 (v2.7.0)
+
+Space (counterspace) domain + **Orbital Warfare 2026** scenario — closes Krepinevich scenario #5
+("The War for Space"), taking domain coverage to 6 of 7. Builds on the `space` stat that already
+existed on every power; no new stat introduced.
+
+### Added
+- **Space action domain** (`js/domains.js`): 4 actions spanning the defensive→escalatory arc,
+  mirroring the EMP domain's shape —
+  `satellite_hardening` (defensive: space +8/cyber +3, delayed resilience payoff, no escalation),
+  `orbital_isr_surge` (intel: space +5/info +8), `asat_strike` (most escalatory counterspace action:
+  target space −18/military −8/info −6, escalationDelta 2, seeds the Kessler debris cascade), and
+  `debris_remediation_pact` (de-escalatory: self+target space +6, strong relationship payoff). The
+  domain is registered in `getDomainList`/`getDomainLabel`/`getDomainIcon` (icon 🛰️) and surfaces
+  automatically in the browser UI (which already renders the `space` stat).
+- **Orbital Warfare 2026 scenario** (`data/scenarios-data.js`): `orbital_warfare_2026`, player US,
+  four `orbit`-region crises — `asat_demonstration` (space), `gnss_jamming` (space),
+  `commsat_blackout` (cyber, ties Space to the existing cyber domain), and `lunar_resource_claim`
+  (diplomatic, cislunar norms). NPCs pick up space actions via active-crisis domain matching, so no
+  `priorityDomains` change was needed (the same mechanism by which non-IR powers adopt bio actions).
+- **Kessler-syndrome cascade** (`js/cascades.js`), mirroring the EMP collateral→C4ISR pattern:
+  - 3rd-order: any `asat_strike` pushes the `kessler_pressure` marker and bleeds bystander `space`
+    (−6 × cascadeScale) via the existing `getBystanderPowers` helper.
+  - 4th-order: `kessler_pressure` + ≥2 powers with `space < 30` → `kessler_cascade`
+    (global space −12, military −8, info −6 — debris renders LEO unusable; ISR/PNT/comms degrade).
+  - Compound: `orbit+orbit` → `orbital_denial` ("Orbital Denial Regime") when two orbit-region
+    crises both reach level 3, matching the `scs_waters+scs_waters` entry.
+- **2 Space events** (`data/events-data.js`): `kessler_debris_alert` (conditioned on
+  `asat_demonstration` ≥ L2; all powers space −12; `cascadeRisk: kessler_cascade`) and
+  `commercial_constellation_loss` (conditioned on `gnss_jamming`; random_2 space −8/economic −6).
+  Both are scoped to orbital-scenario crises so they never *fire* elsewhere.
+
+### Research notes (v2.7.0 baselines, heuristic)
+- **Orbital Warfare** (50 runs, seed 42): 0% nuclear, avg stability 26.x, avg turns ~9.
+  Heuristic NPCs favor the de-escalatory `debris_remediation_pact`; `asat_strike` is rarely selected
+  under de-escalate posture (the same dynamic that keeps `emp_strike` rare in EMP baselines), so the
+  Kessler cascade is a latent tail risk rather than a baseline outcome. The 3rd/4th-order cascade and
+  the `orbital_denial` compound were verified to fire correctly under crafted conditions
+  (asat_strike + ≥2 powers below space 30; two orbit crises at L3).
+
+### Calibration note
+- The two new events are added to the global `EVENT_TABLE`. Because `Events.drawEvents()` rolls
+  `Math.random()` once per event in the table *before* checking conditions, adding any events shifts
+  the seeded RNG stream for **all** scenarios (the same effect noted for the v2.0.2 Iran proxy events
+  and the v2.3.0 bio/EMP events). Existing scenarios are **not** broken — re-baselined at 100 runs,
+  seed 0: Taiwan 27.5 / 0% nuclear, Iran 29.4 / 5%, SCS 25.1 / 0%, Korean Peninsula 33.8 / 0% — all
+  within their established ranges and distributions. `npm test` is green (no test assertions depend
+  on absolute seeded outcomes).
+
 ## 2026-05-31 (v2.6.0)
 
 Symmetric AOM prompt is now the default for the DeepSeek backend, closing a prompt-role artifact
