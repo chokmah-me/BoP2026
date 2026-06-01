@@ -18,25 +18,26 @@
     pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMDryRun   # estimate DeepSeek cost first, no calls
 
   Before/after prompt-fix comparison (paid):
-    pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly              # "before": asymmetric prompt
-    pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly -Symmetric   # "after":  symmetric prompt (-sym logs)
-  -LLMOnly skips the free blocks A-C; -Symmetric adds --symmetric-aom and suffixes logs with -sym.
+    pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly               # "after":  symmetric prompt (default)
+    pwsh scripts/sv-hypotheses.ps1 -IncludeLLM -LLMOnly -Asymmetric   # "before": asymmetric prompt (-asym logs)
+  -LLMOnly skips the free blocks A-C; -Asymmetric adds --asymmetric-aom and suffixes logs with -asym.
 #>
 
 param(
   [switch]$IncludeLLM,
   [switch]$LLMDryRun,
   [switch]$LLMOnly,       # skip the free heuristic blocks A-C (paid reruns only)
-  [switch]$Symmetric,     # use symmetric, personality-gated AOM framing (--symmetric-aom)
+  [switch]$Asymmetric,    # reproduce the original asymmetric "exploit paths" prompt (--asymmetric-aom);
+                          # the default since v2.6.0 is symmetric, personality-gated framing
   [int]$Runs = 25,        # runs per heuristic variant (free)
   [int]$LLMRuns = 12,     # runs per cell for the paid LLM blocks (raised from 3 to tighten CIs)
   [int]$Seed = 42,
   [int]$MaxTurns = 8
 )
 
-# When -Symmetric, append the flag and suffix output filenames so before/after don't clobber.
-$llmExtra  = if ($Symmetric) { @('--symmetric-aom') } else { @() }
-$llmSuffix = if ($Symmetric) { '-sym' } else { '' }
+# When -Asymmetric, append the flag and suffix output filenames so the two variants don't clobber.
+$llmExtra  = if ($Asymmetric) { @('--asymmetric-aom') } else { @() }
+$llmSuffix = if ($Asymmetric) { '-asym' } else { '' }
 
 $ErrorActionPreference = 'Stop'
 $scn = 'sovereignty_void_2026'

@@ -81,6 +81,7 @@ npm test
 | `--ai-powers <ids>` | `all` | Powers using LLM backend: `all` or comma-list e.g. `CN,RU` |
 | `--log-prompts` | off | Save LLM prompt+response to a `.jsonl` sidecar file |
 | `--thinking` | off | Use `deepseek-reasoner` (chain-of-thought) instead of `deepseek-chat` |
+| `--asymmetric-aom` | off | Reproduce the original asymmetric AOM prompt ("exploit paths" for adversaries). Default since v2.6.0 is symmetric, personality-gated framing for every agent — see [the prompt-asymmetry note](docs/notes/llm-wargame-prompt-asymmetry.md). |
 | `--dry-run` | off | Estimate token cost without making API calls (DeepSeek only) |
 
 ### LLM NPC backend (DeepSeek)
@@ -105,7 +106,9 @@ DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
   --ai-backend deepseek --runs 50 --dry-run
 ```
 
-LLM NPCs use prompt version `v1.2` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
+LLM NPCs use prompt version `v1.3` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
+
+**AOM prompt framing (`sovereignty_void_2026`).** In the latency-governance scenario, the system prompt's `LATENCY GOVERNANCE (AOM)` block is, by default (v2.6.0+), *symmetric*: every agent — player and adversary alike — gets neutral "Strategic options" framing, a shared systemic-survival objective, and escalation language gated on its own `riskTolerance`/`patience`. Earlier versions handed LLM adversaries an "Exploit paths" manual the player never saw, which drove an artificially high sovereignty-void rate (the model recited the framing rather than reasoning independently). Pass `--asymmetric-aom` to reproduce that original prompt; each logged call records its `aomMode`. The full before/after study — including a 16-cell, N=12 sweep showing the symmetric prompt collapses the void rate in every cell — is in [docs/notes/llm-wargame-prompt-asymmetry.md](docs/notes/llm-wargame-prompt-asymmetry.md).
 
 **Chat vs. thinking mode:** the default `deepseek-chat` is fast and cheap (about $0.10/50-run, all NPCs). Use it for parameter sweeps and baseline comparison. `--thinking` switches to `deepseek-reasoner`, which generates a chain-of-thought reasoning trace per NPC per turn. Both models bill at `deepseek-v4-flash` rates ($0.14/$0.28 per 1M input/output, with 50x cache-hit discount). Actual cost: ~$1.40/50-run for Korean Peninsula (6–9 turn games), ~$0.70/50-run for Taiwan/Iran (4–5 turns). Use thinking mode when you want to study *how* an LLM agent reasons about crisis escalation — the traces are logged to the `.jsonl` sidecar via `--log-prompts`. Not worth ~14x over chat for bulk sweeps.
 
@@ -308,7 +311,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.2.3). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.6.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

@@ -30,10 +30,12 @@ class DeepSeekBackend {
     this.logPrompts = options.logPrompts || false;
     this.logFile = options.logFile || null;
     this.actions = options.actions || [];
-    // When true, the AOM block uses symmetric, non-incentivizing framing for every
-    // agent and gates escalation language on the agent's own personality. Default
-    // false reproduces the original asymmetric "exploit paths" prompt for adversaries.
-    this.symmetricAom = options.symmetricAom || false;
+    // When true (the default since v2.6.0), the AOM block uses symmetric,
+    // non-incentivizing framing for every agent and gates escalation language on the
+    // agent's own personality. Set symmetricAom:false to reproduce the original
+    // asymmetric "exploit paths" prompt for adversaries (see
+    // docs/notes/llm-wargame-prompt-asymmetry.md).
+    this.symmetricAom = options.symmetricAom !== undefined ? options.symmetricAom : true;
     this._inputTokens = 0;
     this._inputCacheHit = 0;
     this._outputTokens = 0;

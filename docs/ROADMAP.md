@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.5.0 (2026-05-28)  
+**Current version:** v2.6.0 (2026-05-31)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -29,6 +29,22 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.6.x (2026-05-31)
+
+- **Symmetric AOM prompt by default** `v2.6.0` — closes a prompt-role artifact in the DeepSeek
+  backend. The `LATENCY GOVERNANCE (AOM)` block previously gave LLM adversaries an "Exploit paths"
+  paragraph the player never saw, driving a 75–83% sovereignty-void rate on the adversary side vs
+  ~8–16% on the player side. The default prompt now gives every agent neutral "Strategic options"
+  framing, a shared systemic-survival objective, and escalation gated on its own
+  `riskTolerance`/`patience`. `--asymmetric-aom` reproduces the old prompt; `aomMode` is logged per
+  call. `PROMPT_VERSION` → `v1.3`. Heuristic outcomes unchanged.
+- **Prompt-asymmetry study + harness** `v2.6.0` — `docs/notes/llm-wargame-prompt-asymmetry.md`
+  documents the doctrine confound (a doctrine silently sets the player power) and the prompt-role
+  artifact, with a 16-cell, N=12 before/after sweep confirming the symmetric prompt collapses the
+  void rate in every cell (e.g. adversaries-only 83→25%, TWELVER/EU 58→0%) and removes "exploit"
+  from the models' reasoning (63→8%). Reproduce via `scripts/sv-hypotheses.ps1` (blocks A–E,
+  `-LLMOnly`/`-Asymmetric`) + `scripts/sv-summary.mjs`.
 
 ### v2.5.x (2026-05-28)
 
@@ -120,6 +136,14 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 | **Domestic Faction System** | Replace unitary actor model with hardliner vs. moderate factions. Internal politics shapes action selection. | Compound threat modeling |
 | ~~**Korean Peninsula scenario**~~ | ~~Wire DPRK into a Northeast Asia scenario as an active NPC.~~ | **Shipped v2.2.0** |
 
+### LLM-agent methodology (follow-ups from the prompt-asymmetry study)
+
+| Feature | Description |
+|---|---|
+| **AOM reasoning in the per-turn message** | Move the situational AOM framing out of the static system prompt and into the per-turn user message, so each agent's doctrine and `riskTolerance`/`patience` shape escalation turn by turn rather than via a fixed block. |
+| **Cross-model replication** | Repeat the corrected role 2×2 / doctrine sweep with Claude or GPT-4o to separate the prompt effect from DeepSeek's own documented hawkishness (CSIS Futures Lab, 2025). |
+| **Tighter void-rate estimates** | DeepSeek sampling is unseeded, so per-cell void rates carry noise. Repeat across multiple seed-bases and a second player power for confidence intervals rather than directional contrasts. |
+
 ### Medium Priority (future)
 
 | Feature | Description |
@@ -150,7 +174,9 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 ---
 
-**Next Milestone:** v2.4.0 — Domestic Faction System
+**Next Milestone:** Domestic Faction System (replace the unitary-actor model with hardliner vs.
+moderate factions), and the LLM-agent methodology follow-ups above (per-turn AOM framing,
+cross-model replication).
 
 ---
 

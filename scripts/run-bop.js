@@ -17,8 +17,10 @@
  *   --ai-powers       all|CN,RU,...    Which NPCs use LLM backend (default: all)
  *   --log-prompts                      Save each LLM prompt+response to a JSONL file
  *   --thinking                         Use deepseek-reasoner (chain-of-thought) model
- *   --symmetric-aom                    Use symmetric, personality-gated AOM framing for all
- *                                      agents (default: asymmetric "exploit paths" for adversaries)
+ *   --asymmetric-aom                   Reproduce the original asymmetric AOM prompt ("exploit paths"
+ *                                      for adversaries). Default since v2.6.0 is symmetric,
+ *                                      personality-gated framing for all agents. (--symmetric-aom
+ *                                      is still accepted as the explicit opposite.)
  *
  * DeepSeek requires DEEPSEEK_API_KEY env var.
  *
@@ -50,7 +52,7 @@ const opts = {
   aiPowers: 'all',
   logPrompts: false,
   thinking: false,
-  symmetricAom: false,
+  symmetricAom: true,
   dryRun: false,
   doctrine: null
 };
@@ -72,6 +74,7 @@ for (let i = 0; i < args.length; i++) {
   else if (arg === '--log-prompts') opts.logPrompts = true;
   else if (arg === '--thinking') opts.thinking = true;
   else if (arg === '--symmetric-aom') opts.symmetricAom = true;
+  else if (arg === '--asymmetric-aom') opts.symmetricAom = false;
   else if (arg === '--dry-run') opts.dryRun = true;
   else {
     // --<powerId>-risk or --<powerId>-patience  e.g. --cn-risk 0.9

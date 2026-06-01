@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-05-31 (v2.6.0)
+
+Symmetric AOM prompt is now the default for the DeepSeek backend, closing a prompt-role artifact
+documented in `docs/notes/llm-wargame-prompt-asymmetry.md`. No change to heuristic outcomes —
+`npm test` is green and the rule-based engine is untouched; this affects LLM-backed runs only.
+
+### Changed
+- **Default DeepSeek AOM framing is now symmetric** (`js/ai-deepseek.js`, `scripts/run-bop.js`):
+  the latency-governance block previously handed LLM *adversaries* an "Exploit paths" paragraph
+  (escalate boost-phase crises / c2_blackout to fire the sovereignty void against the player) that
+  the player branch never saw. In `sovereignty_void_2026` this drove a 75–83% void rate when the
+  LLM sat on the adversary side versus ~8–16% on the player side — the model was reciting the
+  prompt's framing, not reasoning independently (the word "exploit" appeared in 63% of adversary
+  reasoning traces under the old prompt, 8% under the new one). The default prompt now gives every
+  agent neutral "Strategic options" framing, a shared systemic-survival objective ("a terminal
+  sovereignty void or nuclear exchange is a loss for you too"), and gates escalation language on the
+  agent's own `riskTolerance`/`patience`. **Behavior change for LLM runs:** default runs no longer
+  reproduce the asymmetric artifact — pass `--asymmetric-aom` to get the old prompt back. Every
+  logged call records its `aomMode` (`symmetric`|`asymmetric`). `PROMPT_VERSION` bumped to `v1.3`.
+
+### Added
+- **`--asymmetric-aom` / `--symmetric-aom` flags** (`scripts/run-bop.js`): toggle the AOM prompt
+  variant; symmetric is the default, `--asymmetric-aom` reproduces the study's "before" condition.
+- **Sovereignty-void hypothesis harness** (`scripts/sv-hypotheses.ps1`, `scripts/sv-summary.mjs`):
+  blocks A–E sweep (doctrine confound, cascade-scale, NPC-risk, paid DeepSeek doctrine A/B, and the
+  role-asymmetry 2×2), `-LLMOnly` / `-Asymmetric` switches, and a side-by-side analytics table
+  reporting the faithful `void%` metric (stabilityIndex is confounded by game length).
+- **Prompt-asymmetry study** (`docs/notes/llm-wargame-prompt-asymmetry.md`): documents the doctrine
+  confound (a doctrine silently sets which power you play) and the prompt-role artifact, with the
+  before/after sweep (16 cells, N=12) confirming the symmetric fix collapses the void rate in every
+  cell.
+
 ## 2026-05-28 (v2.5.0)
 
 AOM / sovereignty-void hardening and engine/infra debt cleanup. No change to

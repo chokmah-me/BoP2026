@@ -1,7 +1,7 @@
 # Zenodo Deposit — Balance of Power 2026 v2.4.0
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
-**Deposit Date:** 24 May 2026 (updated 28 May 2026)  
+**Deposit Date:** 24 May 2026 (updated 31 May 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914
@@ -68,9 +68,18 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.4.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.6.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
+
+**v2.6.0 (2026-05-31):** Symmetric AOM prompt is now the default for the DeepSeek backend. The
+latency-governance prompt block previously gave LLM adversaries an "exploit paths" framing the player
+never saw, producing an artifactually high sovereignty-void rate; the default now gives every agent
+neutral framing, a shared systemic-survival objective, and escalation gated on its own
+`riskTolerance`/`patience` (`--asymmetric-aom` reproduces the old prompt; `aomMode` logged per call;
+`PROMPT_VERSION` v1.3). Adds the prompt-asymmetry study (`docs/notes/llm-wargame-prompt-asymmetry.md`)
+and its hypothesis harness (`scripts/sv-hypotheses.ps1`, `scripts/sv-summary.mjs`). Heuristic outcomes
+unchanged.
 
 **v2.5.0 (2026-05-28):** AOM / sovereignty-void hardening and infra cleanup. `sovereignty_void_2026` now requires a doctrine (`requiresDoctrine`; `BoP.init` throws without one). `revert_midcourse_defense` clears pre-delegation and lifts the Rice mask (`Epistemic.clearRiceMask()`). New `State.getSystemicRiskIndex()` second outcome metric (`outcome.systemicRisk`, folds crisis escalation + nuclear posture). Shared Node loader (`scripts/load-engine.js`), unified oracle turn executors, single mulberry32 via `BoP.seed`/`BoP.unseed`, documented AOM world-field schema, zero-dependency `package.json` + GitHub Actions CI.
 
