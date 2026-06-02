@@ -12,11 +12,11 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across twelve domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP, space, urban) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, pandemic outbreak, C4ISR collapse, Kessler debris cascade, urban quagmire, compound crises).
+BoP2026 models great-power competition across twelve domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP, space, urban) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, debt spiral, domestic fragility spirals, pandemic outbreak, C4ISR collapse, Kessler debris cascade, urban quagmire, compound crises).
 
 The engine is designed for two uses:
 
-1. **Classroom / wargame**: play through seven scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, Sovereignty Void, Orbital Warfare, or Megacity Siege — in a browser, no install required.
+1. **Classroom / wargame**: play through eight scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, Sovereignty Void, Orbital Warfare, Megacity Siege, or Financial Contagion — in a browser, no install required.
 2. **Research companion**: run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
 
 This is a **stylized model**, not an empirically fitted one. Parameters are calibrated for face validity against open-source IR literature, not regression-estimated from historical data. See [docs/model-notes.md](docs/model-notes.md) for assumptions and limitations.

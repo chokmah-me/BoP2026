@@ -137,6 +137,39 @@ const Domains = (() => {
       tooltip: 'Effective but accelerates dollar alternatives. Use sparingly.'
     },
 
+    {
+      id: 'emergency_swap_lines',
+      domain: 'economic',
+      name: 'Emergency Swap Lines',
+      description: 'Activate bilateral central bank currency swap arrangements. Inject liquidity into a partner\'s collapsing markets before panic contagion spreads across clearing networks.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: -1,
+      effects1st: { self: { economic: 3 }, target: { economic: 8 } },
+      effects2nd: [
+        { prob: 0.50, effect: { relationship_target: 12 }, label: 'Liquidity lifeline deepens financial solidarity' },
+        { prob: 0.30, effect: { ally_relationships: 6 }, label: 'Swap line leadership signal stabilizes allied confidence' }
+      ],
+      effects3rd: [],
+      tooltip: 'De-escalatory. Financial ceasefire. Best deployed before a partner defaults and contagion spreads.'
+    },
+    {
+      id: 'sovereign_debt_restructuring',
+      domain: 'economic',
+      name: 'Sovereign Debt Restructuring',
+      description: 'Coordinate IMF/G20 debt relief for over-leveraged states. Grants breathing room, but signals systemic stress and costs creditor-nation domestic support.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: -1,
+      effects1st: { target: { economic: 10, domestic: 5 }, self: { economic: -4 } },
+      effects2nd: [
+        { prob: 0.45, effect: { relationship_target: 10 }, label: 'Debt relief earns durable alignment' },
+        { prob: 0.30, effect: { self: { domestic: -4 } }, label: 'Creditor publics resist sovereign bailouts' }
+      ],
+      effects3rd: [],
+      tooltip: 'Expensive and domestically unpopular. Prevents default contagion from spreading to systemic institutions.'
+    },
+
     // ── DIPLOMATIC ────────────────────────────────────────────────────────────
     {
       id: 'bilateral_negotiation',

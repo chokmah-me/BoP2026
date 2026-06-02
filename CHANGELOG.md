@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-06-02 (v2.9.0)
+
+Financial domain depth + **Financial Contagion 2026** scenario — closes Krepinevich scenario #7
+("The Collapse of the Global Financial System"), completing the full Krepinevich suite with a proper
+dedicated scenario. Reuses existing `economic` and `supply_chain` domains; adds 2 new economic
+actions and a novel persistent cascade mechanic.
+
+### Added
+- **2 new economic actions** (`js/domains.js`): `emergency_swap_lines` (bilateral central bank
+  liquidity injection: target economic +8, de-escalatory, relationship payoff) and
+  `sovereign_debt_restructuring` (IMF/G20 debt relief: target economic +10 / domestic +5, self
+  economic −4, de-escalatory, domestically unpopular). Both surface in the browser UI automatically
+  under the Economic domain.
+- **Financial Contagion 2026 scenario** (`data/scenarios-data.js`): `financial_contagion_2026`,
+  player US. Four `global_finance`-region crises — `clearing_network_failure` (economic, L2; the hot
+  SWIFT/CHIPS/Fedwire crisis), `sovereign_debt_crisis` (economic, L1), `dollar_weaponization_backlash`
+  (supply\_chain, L1; BRICS+ reserve-currency shift), and `g20_coordination_collapse` (diplomatic, L1).
+  All 7 powers active. Higher intel quality across the board (financial system is relatively
+  transparent). NPCs adopt economic and supply\_chain actions via active-crisis domain matching.
+- **Debt spiral cascade** (`js/cascades.js`): a *persistent* marker modeling post-fragmentation
+  sovereign contagion. Seeds when `financial_fragmentation` has fired AND ≥2 powers have economic < 35
+  AND a `global_finance` crisis is ≥ L2 (scenario-gated to prevent spillover into other runs). While
+  active, grinds all powers with economic < 55 each turn (economic −5, domestic −3). Lifts when no
+  `global_finance` crisis stays at ≥ L2 and fewer than 2 powers remain critically weak. Modeled on the
+  `urban_quagmire` persistent pattern.
+- **`global_finance+global_finance` compound crisis** (`js/cascades.js`): `great_deleveraging` —
+  "Clearing collapse, sovereign default, and reserve currency fragmentation lock into a self-reinforcing
+  spiral." Fires when two `global_finance` crises both reach escalation 3.
+- **2 scenario-scoped events** (`data/events-data.js`): `sovereign_default_cascade` (conditioned on
+  `clearing_network_failure` ≥ L2; EU/IN/GB economic −10, domestic −7; `cascadeRisk: debt_spiral`) and
+  `petrodollar_unwind` (conditioned on `dollar_weaponization_backlash` ≥ L2; US/GB economic −9,
+  info −5; `cascadeRisk: financial_fragmentation`). Scenario-scoped via crisis conditions.
+
+### Baseline (100 runs, seed 0, heuristic)
+- **Financial Contagion 2026:** 0% nuclear, 32.3 avg stability, 3.1 avg systemic risk, 8.7 avg turns
+- Note: 0% heuristic win rate is expected — financial stabilization requires coordinated swap lines
+  + debt restructuring + multilateral diplomacy that pure heuristic play doesn't optimize; human play
+  is the design target. All prior scenario baselines unaffected (debt spiral is gated on
+  `global_finance` crisis presence).
+
+---
+
 ## 2026-06-01 (v2.8.0)
 
 Urban Operations domain + **Megacity Siege 2026** scenario — closes Krepinevich scenario #6

@@ -525,6 +525,12 @@ const Cascades = (() => {
       name: 'Urban Cauldron',
       domain: 'compound',
       description: 'Siege, insurgency, and infrastructure collapse fuse into a single grinding battle for the megacity. There is no clean front and no quick exit; every power committed to the city is drawn deeper into protracted attrition.'
+    },
+    'global_finance+global_finance': {
+      id: 'great_deleveraging',
+      name: 'The Great Deleveraging',
+      domain: 'compound',
+      description: 'Clearing collapse, sovereign default, and reserve currency fragmentation lock into a self-reinforcing spiral. The dollar-based financial architecture is unwinding in real time. No single power can arrest it alone.'
     }
   };
 
@@ -597,6 +603,44 @@ const Cascades = (() => {
         text: `[4th order SYSTEMIC] Global clearing network fragmentation triggered. All power economies hit ${delta}.`,
         type: 'systemic_event'
       });
+    }
+
+    // Debt spiral: second-wave contagion after clearing fragmentation leaves sovereign debt critically exposed.
+    // Persistent marker (no _pressure suffix) — grinds weakened economies each turn until crises cool.
+    const hasFragmented = world.activeSystemicEvents.includes('financial_fragmentation');
+    const criticalEconCount = powers.filter(p => p.trueState.economic < 35).length;
+    const hotFinancialCrisisExists = world.crises.some(c => c.region === 'global_finance' && c.escalationLevel >= 2);
+    if (hasFragmented && criticalEconCount >= 2 && hotFinancialCrisisExists && !world.activeSystemicEvents.includes('debt_spiral')) {
+      world.activeSystemicEvents.push('debt_spiral');
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] Debt spiral seeded: post-fragmentation sovereign stress passes the point of no return. Contagion will recur until financial crises de-escalate.`,
+        type: 'systemic_warning'
+      });
+    }
+    if (world.activeSystemicEvents.includes('debt_spiral')) {
+      const hotFinancialCrises = world.crises.filter(c => c.region === 'global_finance' && c.escalationLevel >= 2);
+      const weakEconCount = powers.filter(p => p.trueState.economic < 45).length;
+      if (hotFinancialCrises.length === 0 && weakEconCount < 2) {
+        world.activeSystemicEvents = world.activeSystemicEvents.filter(e => e !== 'debt_spiral');
+        log.push({
+          order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+          text: `[4th order SYSTEMIC] Debt spiral unwound: coordinated stabilization has broken the contagion cycle.`,
+          type: 'systemic_event'
+        });
+      } else {
+        const econDelta = Math.round(-5 * scale);
+        const domDelta = Math.round(-3 * scale);
+        for (const p of powers.filter(pw => pw.trueState.economic < 55)) {
+          State.applyStatDelta(p.id, 'economic', econDelta);
+          State.applyStatDelta(p.id, 'domestic', domDelta);
+        }
+        log.push({
+          order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+          text: `[4th order SYSTEMIC] Debt spiral grinds on: sovereign default contagion pulls over-leveraged economies deeper. Weakened powers economic ${econDelta}, domestic ${domDelta}.`,
+          type: 'systemic_event'
+        });
+      }
     }
 
     // Domestic fragility cascade: state failures spread

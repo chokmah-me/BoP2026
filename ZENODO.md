@@ -1,7 +1,7 @@
-# Zenodo Deposit — Balance of Power 2026 v2.8.0
+# Zenodo Deposit — Balance of Power 2026 v2.9.0
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
-**Deposit Date:** 24 May 2026 (updated 31 May 2026)  
+**Deposit Date:** 24 May 2026 (updated 2 June 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914
@@ -10,7 +10,7 @@
 
 Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Eight great powers (US, China, EU, Russia, India, Gulf Bloc, Iran, North Korea) compete across twelve domains: military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous systems, biological, EMP, space, and urban. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
 
-Seven playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, Sovereignty Void 2026, Orbital Warfare 2026, and Megacity Siege 2026. Together they cover all seven of Krepinevich's *7 Deadly Scenarios*. The Sovereignty Void scenario operationalizes the AOM latency-governance framework [Zenodo 19368682]: when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves autonomously before the player's action registers. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema.
+Eight playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, Sovereignty Void 2026, Orbital Warfare 2026, Megacity Siege 2026, and Financial Contagion 2026. Together they cover all seven of Krepinevich's *7 Deadly Scenarios* (Financial Contagion closes Krepinevich #7 with a dedicated scenario). The Sovereignty Void scenario operationalizes the AOM latency-governance framework [Zenodo 19368682]: when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves autonomously before the player's action registers. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema.
 
 Calibrated for face validity against open-source IR literature. Not intended for forecasting or policy prescription.
 

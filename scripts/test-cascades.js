@@ -300,6 +300,125 @@ test('nuclear_hair_trigger fires only once across two resolve calls', () => {
     'crisis should not escalate beyond 5 on second resolve');
 });
 
+// ── new financial domain actions ──────────────────────────────────────────────
+
+console.log('\n=== new financial domain actions ===');
+
+function makeFinancialWorld() {
+  const scenario = ctx.SCENARIOS_DATA['financial_contagion_2026'];
+  ctx.State.init(ctx.POWERS_DATA, scenario);
+  return ctx.State.get();
+}
+
+test('emergency_swap_lines boosts target economic (1st order)', () => {
+  const world = makeWorld();
+  const before = world.powers['CN'].trueState.economic;
+  Math.random = () => 0.99; // suppress all 2nd-order effects
+  ctx.Cascades.resolve([act('emergency_swap_lines', 'US', 'CN')], world);
+  const after = world.powers['CN'].trueState.economic;
+  assert.ok(after > before, `expected CN economic to increase, got ${before} → ${after}`);
+});
+
+test('sovereign_debt_restructuring boosts target economic+domestic, costs self economic (1st order)', () => {
+  const world = makeWorld();
+  const cnEconBefore = world.powers['CN'].trueState.economic;
+  const cnDomBefore = world.powers['CN'].trueState.domestic;
+  const usEconBefore = world.powers['US'].trueState.economic;
+  Math.random = () => 0.99; // suppress all 2nd-order effects
+  ctx.Cascades.resolve([act('sovereign_debt_restructuring', 'US', 'CN')], world);
+  assert.ok(world.powers['CN'].trueState.economic > cnEconBefore,
+    `expected CN economic to increase, got ${cnEconBefore} → ${world.powers['CN'].trueState.economic}`);
+  assert.ok(world.powers['CN'].trueState.domestic > cnDomBefore,
+    `expected CN domestic to increase, got ${cnDomBefore} → ${world.powers['CN'].trueState.domestic}`);
+  assert.ok(world.powers['US'].trueState.economic < usEconBefore,
+    `expected US economic to decrease, got ${usEconBefore} → ${world.powers['US'].trueState.economic}`);
+});
+
+// ── debt_spiral (positive) ────────────────────────────────────────────────────
+
+console.log('\n=== debt_spiral (positive) ===');
+
+test('debt_spiral fires: financial_fragmentation + 2 weak powers + global_finance crisis', () => {
+  const world = makeFinancialWorld(); // clearing_network_failure at L2 in global_finance region
+  world.activeSystemicEvents.push('financial_fragmentation');
+  set(world, 'US', { economic: 30 });
+  set(world, 'CN', { economic: 30 });
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([], world);
+  assert.ok(world.activeSystemicEvents.includes('debt_spiral'),
+    `expected debt_spiral, got: ${JSON.stringify(world.activeSystemicEvents)}`);
+});
+
+test('debt_spiral grinds weakened economies each turn while active', () => {
+  const world = makeFinancialWorld();
+  world.activeSystemicEvents.push('financial_fragmentation');
+  world.activeSystemicEvents.push('debt_spiral'); // seed manually to isolate grind
+  set(world, 'EU', { economic: 50 }); // < 55 grind threshold
+  const euEconBefore = world.powers['EU'].trueState.economic;
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([], world);
+  assert.ok(world.powers['EU'].trueState.economic < euEconBefore,
+    `expected EU economic to drop from grind, got ${euEconBefore} → ${world.powers['EU'].trueState.economic}`);
+});
+
+test('debt_spiral lifts when global_finance crises cool and economies recover', () => {
+  const world = makeFinancialWorld();
+  world.activeSystemicEvents.push('debt_spiral');
+  // Cool all global_finance crises below the L2 grind threshold
+  for (const c of world.crises) { if (c.region === 'global_finance') c.escalationLevel = 1; }
+  // Restore all powers above the weak threshold
+  for (const p of Object.values(world.powers)) p.trueState.economic = 60;
+  Math.random = () => 0.99; // prevent crisis decay
+  ctx.Cascades.resolve([], world);
+  assert.ok(!world.activeSystemicEvents.includes('debt_spiral'),
+    `expected debt_spiral to lift, still active`);
+});
+
+// ── debt_spiral (negative) ────────────────────────────────────────────────────
+
+console.log('\n=== debt_spiral (negative) ===');
+
+test('debt_spiral does NOT fire without a global_finance crisis (taiwan scenario)', () => {
+  const world = makeWorld(); // taiwan_strait_2026 — no global_finance region crises
+  world.activeSystemicEvents.push('financial_fragmentation');
+  set(world, 'US', { economic: 30 });
+  set(world, 'CN', { economic: 30 });
+  set(world, 'EU', { economic: 30 }); // 3 powers critically weak — other conditions fully met
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([], world);
+  assert.ok(!world.activeSystemicEvents.includes('debt_spiral'),
+    `debt_spiral should NOT fire in non-financial scenario (no global_finance crisis)`);
+});
+
+test('debt_spiral does NOT fire with only 1 critically weak power', () => {
+  const world = makeFinancialWorld();
+  world.activeSystemicEvents.push('financial_fragmentation');
+  for (const p of Object.values(world.powers)) p.trueState.economic = 60;
+  set(world, 'US', { economic: 30 }); // only 1 power below 35
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([], world);
+  assert.ok(!world.activeSystemicEvents.includes('debt_spiral'),
+    `debt_spiral should NOT fire with criticalEconCount < 2`);
+});
+
+// ── debt_spiral idempotency ───────────────────────────────────────────────────
+
+console.log('\n=== debt_spiral idempotency ===');
+
+test('debt_spiral seeds only once across two resolve calls', () => {
+  const world = makeFinancialWorld();
+  world.activeSystemicEvents.push('financial_fragmentation');
+  set(world, 'US', { economic: 30 });
+  set(world, 'CN', { economic: 30 });
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([], world);
+  const countAfterFirst = world.activeSystemicEvents.filter(e => e === 'debt_spiral').length;
+  ctx.Cascades.resolve([], world);
+  const countAfterSecond = world.activeSystemicEvents.filter(e => e === 'debt_spiral').length;
+  assert.strictEqual(countAfterFirst, 1, `expected exactly 1 debt_spiral after first call, got ${countAfterFirst}`);
+  assert.strictEqual(countAfterSecond, 1, `expected exactly 1 debt_spiral after second call, got ${countAfterSecond}`);
+});
+
 // ── summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n${'─'.repeat(50)}`);
