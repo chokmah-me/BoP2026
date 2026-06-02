@@ -28,10 +28,21 @@ v2.11.0 (see Baselines).
   proactively, and 0% when broke, mid-crisis, or for personas without a `technology` priority.
 
 ### Tests
-- Replaced the v2.11.0 guard test ("NPCs do not select technology actions by default") with three
-  tests locking in the new contract: a patient NPC with a capability gap invests in R&D on a calm
-  board; personas without `technology` never pick `rd_*`; NPCs do not start R&D mid-crisis or when
-  the economy is too weak. Full suite: 42 cascade + 15 analytics, all green.
+Replaced the v2.11.0 guard test ("NPCs do not select technology actions by default") and built the
+new contract out to the project's **positive + negative + AI-integration** convention (cf. v2.9.0).
+All deterministic — unit tests pin `Math.random`; integration tests use fixed seed lists confirmed to
+fire the asserted actions. Full suite: **45 cascade + 18 analytics**, all green.
+- **Unit, positive** (`scripts/test-cascades.js`, under a new *broadened NPC domain pool (v2.12.0)*
+  banner): a patient NPC with a capability gap invests in R&D on a calm board; R&D targets the
+  *lagging* capability, not a healthy one (locks the weak-stat `+12` term).
+- **Unit, negative**: personas without a `technology` priority never pick `rd_*`; NPCs do not start
+  R&D mid-crisis or when the economy is too weak; no proactive R&D when every capability is healthy
+  (the no-gap guard — matches the ~2% proactive figure above); broadening `priorityDomains` does not
+  displace a persona's top-3 (economic) identity.
+- **AI integration** (`scripts/test-analytics.js`, tests 16–18, mirroring the v2.9.0 13–15 pattern):
+  NPCs select `rd_*` across a 10-run headless batch (R&D branch reachable end-to-end); NPCs select
+  extended-domain (`supply_chain`/`autonomous`/`space`) actions across a batch; pool broadening does
+  not break headless completion across three scenarios.
 
 ### Baselines
 - Re-baselined all seeded scenarios (100 runs / seed 0) — broadening NPC selection realigns the RNG
