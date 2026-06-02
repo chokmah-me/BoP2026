@@ -899,6 +899,66 @@ const Domains = (() => {
       effects3rd: [],
       domains: ['urban'],
       tooltip: 'De-escalatory. Relieves a besieged population and helps lift the quagmire. Strong relationship payoff.'
+    },
+    {
+      id: 'rd_military',
+      domain: 'technology',
+      name: 'Defense R&D Program',
+      description: 'Fund a next-generation weapons and platforms program. Costs budget now; deployable military capability matures after a development cycle. Sustained investment compounds.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { economic: -4 } },
+      effects2nd: [],
+      effects3rd: [],
+      domains: ['technology'],
+      rdProgram: { stat: 'military', baseGain: 6, leadTime: 3, step: 2 },
+      tooltip: 'Delayed capability gain. Non-escalatory. Compounds with repeated investment.'
+    },
+    {
+      id: 'rd_cyber',
+      domain: 'technology',
+      name: 'Cyber R&D Program',
+      description: 'Invest in offensive and defensive cyber tooling, zero-day research, and talent. Shorter development cycle than hardware; capability matures quickly.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { economic: -3 } },
+      effects2nd: [],
+      effects3rd: [],
+      domains: ['technology'],
+      rdProgram: { stat: 'cyber', baseGain: 6, leadTime: 2, step: 2 },
+      tooltip: 'Delayed capability gain (fast cycle). Non-escalatory. Compounds.'
+    },
+    {
+      id: 'rd_space',
+      domain: 'technology',
+      name: 'Aerospace R&D Program',
+      description: 'Fund launch, on-orbit, and counterspace technology. The longest development cycle, but the largest capability step once it matures.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { economic: -5 } },
+      effects2nd: [],
+      effects3rd: [],
+      domains: ['technology'],
+      rdProgram: { stat: 'space', baseGain: 8, leadTime: 4, step: 2 },
+      tooltip: 'Delayed capability gain (long cycle, large step). Non-escalatory. Compounds.'
+    },
+    {
+      id: 'rd_info',
+      domain: 'technology',
+      name: 'ISR & Comms R&D Program',
+      description: 'Develop sensors, data fusion, and resilient communications. Matures into improved information-domain capability after a development cycle.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { economic: -3 } },
+      effects2nd: [],
+      effects3rd: [],
+      domains: ['technology'],
+      rdProgram: { stat: 'info', baseGain: 5, leadTime: 3, step: 2 },
+      tooltip: 'Delayed capability gain. Non-escalatory. Compounds.'
     }
   ];
 
@@ -913,7 +973,7 @@ const Domains = (() => {
   }
 
   function getDomainList() {
-    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous', 'biological', 'emp', 'space', 'urban'];
+    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous', 'biological', 'emp', 'space', 'urban', 'technology'];
   }
 
   function getDomainLabel(domain) {
@@ -929,7 +989,8 @@ const Domains = (() => {
       biological: 'Biological',
       emp: 'EMP',
       space: 'Space',
-      urban: 'Urban'
+      urban: 'Urban',
+      technology: 'Technology'
     }[domain] || domain;
   }
 
@@ -946,7 +1007,8 @@ const Domains = (() => {
       biological: '🧬',
       emp: '⚡',
       space: '🛰️',
-      urban: '🏙️'
+      urban: '🏙️',
+      technology: '🔬'
     }[domain] || '●';
   }
 

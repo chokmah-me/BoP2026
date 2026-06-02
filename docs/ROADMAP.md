@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.10.0 (2026-06-02)  
+**Current version:** v2.11.0 (2026-06-02)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -29,6 +29,18 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.11.x (2026-06-02)
+
+- **Technology Development Track** `v2.11.0` — second engine-realism feature. R&D programs convert
+  economic investment into a delayed, compounding capability gain via the existing
+  `pendingDelayedEffects` queue. New `technology` action domain (🔬) with four programs
+  (`rd_military`/`rd_cyber`/`rd_space`/`rd_info`), each carrying a declarative `rdProgram` field; a
+  per-power `techLevel` ledger compounds the payoff (`baseGain + (tier - 1) * step`) with sustained
+  investment. Deterministic resolution → baselines **byte-identical** to v2.10.0. Player/research-facing
+  (no persona prioritizes `technology`, no crisis uses it; driven by the player or Oracle overrides).
+  4 new tests. Closes the Medium-Priority "Technology Development Track" item below. Natural follow-on:
+  arms-race growth curves can build on the same ledger.
 
 ### v2.10.x (2026-06-02)
 
@@ -217,7 +229,7 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 | Feature | Description |
 |---|---|
 | ~~**Enhanced Epistemic Model**~~ | ~~Perception drift + intelligence quality decay. Perceived vs. true state divergence accumulates over time.~~ **Shipped v2.10.0** |
-| **Technology Development Track** | R&D investment with delayed capability gains. |
+| ~~**Technology Development Track**~~ | ~~R&D investment with delayed capability gains.~~ **Shipped v2.11.0** |
 | **Arms Race Dynamics** | Military stat growth curves based on sustained spending. |
 | ~~**Space domain**~~ | ~~Attacks on satellites and space assets. New actions + scenario.~~ | **Shipped v2.7.0** |
 | ~~**Urban Operations**~~ | ~~Megacity warfare mechanics (Krepinevich #6).~~ | **Shipped v2.8.0** (urban quagmire attrition cascade; no new stat) |

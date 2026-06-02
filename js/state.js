@@ -42,6 +42,9 @@ const State = (() => {
         color: p.color,
         trueState: { ...p.trueState },
         perceivedBy: {},
+        // Technology tier per researchable capability (v2.11.0). Each completed R&D
+        // program raises a tier; sustained investment compounds the delayed payoff.
+        techLevel: { military: 0, cyber: 0, space: 0, info: 0 },
         relationships: { ...p.relationships },
         riskTolerance: p.riskTolerance,
         patience: p.patience,

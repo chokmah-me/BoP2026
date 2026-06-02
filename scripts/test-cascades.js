@@ -490,6 +490,54 @@ test('decay mutates the live matrix, not shared scenario data', () => {
   assert.strictEqual(scenario.intelQuality.US.CN, before, 'scenario data must not be mutated by decay');
 });
 
+// ── technology development track (v2.11.0) ────────────────────────────────────
+
+console.log('\n=== technology development track ===');
+
+test('R&D program raises tech tier and queues a delayed capability gain', () => {
+  const world = makeWorld();
+  assert.strictEqual(world.powers.US.techLevel.military, 0, 'tier should start at 0');
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([act('rd_military', 'US')], world);
+  assert.strictEqual(world.powers.US.techLevel.military, 1, 'tier should increment to 1');
+  const queued = (world.pendingDelayedEffects || []).find(e => e.effect.self && e.effect.self.military != null);
+  assert.ok(queued, 'a delayed military gain should be queued');
+  assert.strictEqual(queued.fireOnTurn, world.turn + 3, 'military program matures after a 3-turn lead time');
+});
+
+test('R&D capability matures into a stat gain after the lead time', () => {
+  const world = makeWorld();
+  set(world, 'US', { military: 50 });
+  Math.random = () => 0.99; // suppress any probabilistic systemic effects
+  ctx.Cascades.resolve([act('rd_military', 'US')], world); // launch at turn 1
+  assert.strictEqual(world.powers.US.trueState.military, 50, 'no immediate military gain at launch');
+  ctx.State.advanceTurn(); ctx.State.advanceTurn(); ctx.State.advanceTurn(); // turn 1 → 4
+  const before = world.powers.US.trueState.military;
+  ctx.Cascades.resolve([], world); // drains the matured effect at turn 4
+  assert.strictEqual(world.powers.US.trueState.military, before + 6, `tier-1 program should mature to +6, got +${world.powers.US.trueState.military - before}`);
+});
+
+test('sustained R&D compounds: tier-2 gain exceeds tier-1', () => {
+  const world = makeWorld();
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([act('rd_cyber', 'US')], world);
+  const firstGain = world.pendingDelayedEffects.filter(e => e.effect.self && e.effect.self.cyber != null).pop().effect.self.cyber;
+  ctx.Cascades.resolve([act('rd_cyber', 'US')], world);
+  const cyberQueued = world.pendingDelayedEffects.filter(e => e.effect.self && e.effect.self.cyber != null);
+  const secondGain = cyberQueued[cyberQueued.length - 1].effect.self.cyber;
+  assert.strictEqual(world.powers.US.techLevel.cyber, 2, 'two programs should reach tier 2');
+  assert.ok(secondGain > firstGain, `tier-2 gain (${secondGain}) should exceed tier-1 (${firstGain})`);
+});
+
+test('NPCs do not select technology actions by default (player/research-facing)', () => {
+  const world = makeWorld();
+  for (const id of ['CN', 'RU', 'EU', 'IN', 'GB']) {
+    const decided = ctx.AI.decideTurn(id, world);
+    assert.ok(!decided.some(a => a.actionId.startsWith('rd_')),
+      `${id} should not pick an R&D action from the default pool, got ${decided.map(a => a.actionId).join(',')}`);
+  }
+});
+
 // ── summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n${'─'.repeat(50)}`);

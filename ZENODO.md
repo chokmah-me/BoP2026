@@ -1,4 +1,4 @@
-# Zenodo Deposit — Balance of Power 2026 v2.10.0
+# Zenodo Deposit — Balance of Power 2026 v2.11.0
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
 **Deposit Date:** 24 May 2026 (updated 2 June 2026)  
@@ -28,7 +28,7 @@ Calibrated for face validity against open-source IR literature. Not intended for
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.10.0)
+## Files Included in This Deposit (v2.11.0)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
@@ -68,9 +68,18 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.10.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.11.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
+
+**v2.11.0 (2026-06-02):** Technology Development Track — the second engine-realism feature. A new
+`technology` action domain (🔬) with four R&D programs (`rd_military`/`rd_cyber`/`rd_space`/`rd_info`)
+converts economic investment now into a delayed, compounding capability gain via the existing
+`pendingDelayedEffects` maturation queue. A per-power `techLevel` ledger compounds the payoff
+(`baseGain + (tier - 1) * step`) with sustained investment in one capability, modeling development
+lead time and learning curves. Resolution is fully deterministic, so seeded baselines are
+byte-identical to v2.10.0. Player/research-facing — no persona prioritizes `technology` and no crisis
+uses it, so default NPCs never select R&D; it is driven by the player (browser) or Oracle overrides.
 
 **v2.10.0 (2026-06-02):** Enhanced epistemic model — the first engine-realism feature past the
 completed Krepinevich suite. Intelligence is now perishable: `State.decayIntelQuality()` pulls every

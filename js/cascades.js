@@ -186,6 +186,34 @@ const Cascades = (() => {
       Epistemic.clearRiceMask(action.actor, world);
     }
 
+    // Technology (R&D) program: an investment now matures into a capability gain
+    // after a lead time. Deterministic (no probability roll) — a committed program
+    // delivers — and reuses the existing pendingDelayedEffects queue for the payoff.
+    // Each program raises the actor's tech tier in that capability, and the delayed
+    // gain scales with the tier, so sustained investment compounds.
+    if (def.rdProgram) {
+      const { stat, baseGain = 6, leadTime = 3, step = 2 } = def.rdProgram;
+      if (actor) {
+        if (!actor.techLevel) actor.techLevel = {};
+        actor.techLevel[stat] = (actor.techLevel[stat] || 0) + 1;
+        const tier = actor.techLevel[stat];
+        const gain = baseGain + (tier - 1) * step;
+        world.pendingDelayedEffects = world.pendingDelayedEffects || [];
+        world.pendingDelayedEffects.push({
+          actor: action.actor,
+          target: null,
+          effect: { self: { [stat]: gain } },
+          label: `${def.name}: ${stat} +${gain} (tech tier ${tier})`,
+          fireOnTurn: world.turn + leadTime
+        });
+        log.push({
+          order: 1, confidence: 'CONFIRMED', actor: action.actor,
+          text: `[R&D] ${actor.name} launches ${def.name} — ${stat} capability matures in ${leadTime} turns (tier ${tier}, +${gain}).`,
+          type: 'rd_program'
+        });
+      }
+    }
+
     // Epistemic: intel-collection actions refresh the actor's perception quality,
     // counteracting the per-turn decay in State.decayIntelQuality. 'all' covers
     // broad grid/ISR sweeps; 'target' covers a focused probe of one adversary.

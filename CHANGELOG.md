@@ -1,5 +1,44 @@
 # Changelog
 
+## 2026-06-02 (v2.11.0)
+
+Technology Development Track — the second engine-realism feature. R&D programs convert economic
+investment now into a **delayed, compounding capability gain**, modeling development lead time and
+sustained-investment returns. Reuses the existing `pendingDelayedEffects` maturation queue (v2.0.5);
+resolution is fully deterministic, so seeded baselines are **byte-identical** to v2.10.0 (no
+re-baseline). Player/research-facing, like the epistemic layer: the new `technology` domain is in no
+persona's `priorityDomains` and no crisis uses it, so default NPCs never select R&D — it is driven by
+the player (browser) or by Oracle overrides (`setPlayerOverride` / `setNPCOverride`).
+
+### Added
+- **Per-power tech ledger** (`js/state.js`): `world.powers[id].techLevel = { military, cyber, space,
+  info }`, all initialized to 0. Each completed program raises a tier; tiers persist and ride along in
+  snapshots/restore automatically.
+- **`technology` action domain** (`js/domains.js`, icon 🔬): four R&D programs, each carrying a
+  declarative `rdProgram: { stat, baseGain, leadTime, step }` — `rd_military` (military, +6 base / 3-turn
+  lead), `rd_cyber` (cyber, +6 / 2-turn — fast cycle), `rd_space` (space, +8 / 4-turn — long cycle,
+  large step), `rd_info` (info, +5 / 3-turn). Each costs 1 AP and an immediate economic draw (the R&D
+  budget), is non-escalatory, and surfaces in the browser UI automatically (registered in
+  `getDomainList`/`getDomainLabel`/`getDomainIcon`).
+- **R&D maturation** (`js/cascades.js`): on a program action, `apply1stOrder` raises the actor's tech
+  tier in that capability and queues a **deterministic** delayed `self` stat gain into
+  `pendingDelayedEffects` with `fireOnTurn = turn + leadTime`. The gain scales with tier
+  (`baseGain + (tier - 1) * step`), so sustained investment in one capability compounds. The existing
+  `drainDelayedEffects` applies the matured gain — no new resolution path, no probability roll.
+
+### Tests
+- 4 new tech-track tests in `scripts/test-cascades.js` (tier increment + queued delayed gain, stat
+  matures after the lead time, tier-2 gain exceeds tier-1, and NPCs never pick `rd_*` from the default
+  pool). Full suite: 40 cascade + 15 analytics, all green.
+
+### Baselines
+- Byte-identical to v2.10.0 — no new `Math.random()` draws and no NPC-behavior change. Verified at
+  100 runs / seed 0: Taiwan 32.1 / 8.3, Korean Peninsula 26.7 / 9.6, Financial Contagion 31.5 / 8.6,
+  all unchanged. (Byte-identity is safe to claim here precisely because nothing touches the RNG stream
+  — cf. the calibration-note convention for changes that do.)
+
+---
+
 ## 2026-06-02 (v2.10.0)
 
 Enhanced epistemic model — the first engine-realism feature past the completed Krepinevich suite.

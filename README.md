@@ -12,7 +12,7 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across twelve domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP, space, urban) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, debt spiral, domestic fragility spirals, pandemic outbreak, C4ISR collapse, Kessler debris cascade, urban quagmire, compound crises).
+BoP2026 models great-power competition across thirteen domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP, space, urban, technology) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, debt spiral, domestic fragility spirals, pandemic outbreak, C4ISR collapse, Kessler debris cascade, urban quagmire, compound crises).
 
 The engine is designed for two uses:
 
@@ -229,7 +229,7 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-Heuristic baseline (default parameters, v2.10.0; 100 runs, seed 0, all on one engine build so rows are directly comparable):
+Heuristic baseline (default parameters, established at v2.10.0 and byte-identical at v2.11.0; 100 runs, seed 0, all on one engine build so rows are directly comparable):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
@@ -312,7 +312,7 @@ See [CLAUDE.md](CLAUDE.md) for full architecture notes.
 - Parameters (cascade weights, AI personality values) are calibrated for plausibility, not fit to historical data.
 - No leader-level agents. Powers act as unitary actors.
 - Domestic politics is a single scalar, not a structured political system.
-- No arms race dynamics or technology development curves.
+- No arms race dynamics yet. Technology development is modeled via the R&D track (v2.11.0) — delayed, compounding capability gains — but capability does not yet erode or trigger competitive build-ups.
 - Nuclear threshold (crisis level 5) ends the game; actual nuclear use mechanics are not modeled.
 
 See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding and appropriate uses.
@@ -323,7 +323,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.10.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.11.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---
