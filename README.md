@@ -67,7 +67,7 @@ npm test
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026`, `megacity_siege_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026`, `megacity_siege_2026`, `financial_contagion_2026` |
 | `--doctrine <id>` | scenario default | Doctrine to play: `MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
@@ -239,8 +239,9 @@ Heuristic baseline (default parameters, v2.2.1):
 | Korean Peninsula 2026† | 0% | 0% | 28.7 | 9.1 |
 | Orbital Warfare 2026‡ | 0% | 0% | 26.8 | 8.9 |
 | Megacity Siege 2026§ | 0% | 0% | 24.4 | 7.5 |
+| Financial Contagion 2026¶ | 0% | 0% | 32.3 | 8.7 |
 
-Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance. ‡Orbital Warfare: v2.7.0 baseline (100 runs, seed 0). Heuristic NPCs favor the de-escalatory `debris_remediation_pact`; `asat_strike` is rarely selected under de-escalate posture, so the Kessler cascade is a latent tail risk rather than a baseline outcome (cf. `emp_strike`). §Megacity Siege: v2.8.0 baseline (100 runs, seed 0). A steady attrition scenario — the urban quagmire grinds rather than spikes, so avg turns sit in the normal band.
+Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance. ‡Orbital Warfare: v2.7.0 baseline (100 runs, seed 0). Heuristic NPCs favor the de-escalatory `debris_remediation_pact`; `asat_strike` is rarely selected under de-escalate posture, so the Kessler cascade is a latent tail risk rather than a baseline outcome (cf. `emp_strike`). §Megacity Siege: v2.8.0 baseline (100 runs, seed 0). A steady attrition scenario — the urban quagmire grinds rather than spikes, so avg turns sit in the normal band. ¶Financial Contagion: v2.9.0 baseline (100 runs, seed 0; systemic risk 3.1). 0% heuristic win is expected — financial stabilization requires coordinated swap lines + debt restructuring + multilateral diplomacy that pure heuristic play doesn't optimize; the debt-spiral cascade is gated on `global_finance` crisis presence, so it never spills into other scenarios.
 
 Key findings from the baseline:
 
@@ -291,6 +292,9 @@ A destructive ASAT test seeds a debris field as GPS goes dark over a theater and
 ### Megacity Siege, 2026
 A coastal megacity of 20 million fractures as its host state collapses; a US-led stabilization force, a rival-backed faction, and entrenched insurgents grind block by block. Player is US. Four `megacity`-region crises: Coastal Megacity Siege (urban, L2), Insurgent Network (urban, L1), Humanitarian Corridor Crisis (diplomatic, L1), Urban Infrastructure Collapse (economic, L1). The signature mechanic is the **urban quagmire** — a `siege_encirclement` seeds a *persistent* attrition cascade that grinds the engaged powers' military/domestic/info every turn the urban front stays hot, and lifts only when the crises de-escalate (or a `civil_evacuation_corridor` relieves them); sustained quagmire with multiple fragile states triggers a one-shot `urban_humanitarian_catastrophe`, and two `megacity` crises at level 3 merge into the `urban_cauldron` compound. The Urban Operations domain — `urban_stabilization`, `precision_clearance_ops`, `siege_encirclement`, `civil_evacuation_corridor` — drives the scenario. Closes Krepinevich's "Urban Insurgency" (#6), completing playable domain coverage at 7 of 7.
 
+### Financial Contagion, 2026
+A clearing-network failure freezes SWIFT/CHIPS/Fedwire as sovereign defaults and a BRICS+ reserve-currency shift compound into systemic collapse. Player is US. Four `global_finance`-region crises: Clearing Network Failure (economic, L2 — the hot crisis), Sovereign Debt Crisis (economic, L1), Dollar Weaponization Backlash (supply_chain, L1), G20 Coordination Collapse (diplomatic, L1). All seven NPC-capable powers active, with higher intel quality across the board (the financial system is relatively transparent). The signature mechanic is the **debt spiral** — a *persistent* cascade (modeled on the urban quagmire) that seeds once `financial_fragmentation` has fired, ≥2 powers fall below economic 35, and a `global_finance` crisis sits at ≥ L2; while active it grinds every economy below 55 each turn (economic −5 / domestic −3) and lifts only when the financial crises de-escalate. Two `global_finance` crises at level 3 merge into the `great_deleveraging` compound. The scenario reuses the Economic and Supply Chain domains plus two new financial actions — `emergency_swap_lines` (bilateral central-bank liquidity) and `sovereign_debt_restructuring` (IMF/G20 relief). Closes Krepinevich's "Collapse of the Global Financial System" (#7) with a dedicated scenario, completing the full 7-of-7 Krepinevich suite.
+
 ---
 
 ## Adding content
@@ -319,7 +323,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.8.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.9.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

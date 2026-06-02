@@ -28,12 +28,12 @@ Calibrated for face validity against open-source IR literature. Not intended for
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.4.0)
+## Files Included in This Deposit (v2.9.0)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
 - Complete documentation (`README.md`, `docs/`)
-- Baseline results for all seven scenarios
+- Baseline results for all eight scenarios
 - Model assumptions and known limitations
 
 ## Release Notes — v2.4.0
@@ -68,9 +68,21 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.8.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.9.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
+
+**v2.9.0 (2026-06-02):** Financial domain depth — two new economic-domain actions
+(`emergency_swap_lines`, `sovereign_debt_restructuring`) — plus the **Financial Contagion 2026**
+scenario (`financial_contagion_2026`: clearing-network failure, sovereign debt crisis, dollar
+weaponization backlash, G20 coordination collapse). Adds the **debt-spiral cascade** — a *persistent*
+contagion marker (modeled on the urban quagmire) that seeds after `financial_fragmentation` with ≥2
+weak economies and a live `global_finance` crisis, grinds every economy below 55 each turn, and lifts
+on de-escalation — plus the `great_deleveraging` compound and two scenario-scoped events. **Closes
+Krepinevich scenario #7 ("The Collapse of the Global Financial System") with a dedicated scenario,
+completing the full 7-of-7 Deadly Scenarios suite.** Heuristic baseline (100 runs, seed 0): 0%
+nuclear, 32.3 stability, 3.1 systemic risk, 8.7 avg turns. The debt spiral is gated on
+`global_finance` crisis presence, so prior scenario baselines are unaffected.
 
 **v2.8.0 (2026-06-01):** Urban Operations action domain — `urban_stabilization`,
 `precision_clearance_ops`, `siege_encirclement`, `civil_evacuation_corridor` — on existing stats (no
