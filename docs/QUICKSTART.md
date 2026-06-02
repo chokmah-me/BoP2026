@@ -20,7 +20,7 @@ only wires the test/research scripts — no runtime dependencies). A modern brow
 
 ```bash
 node scripts/run-bop.js --scenario taiwan_strait_2026 --runs 1 --seed 42 --out run.json
-# or: south_china_sea_2026, iran_nuclear_2026, korean_peninsula_2026, sovereignty_void_2026 (needs --doctrine), orbital_warfare_2026
+# or: south_china_sea_2026, iran_nuclear_2026, korean_peninsula_2026, sovereignty_void_2026 (needs --doctrine), orbital_warfare_2026, megacity_siege_2026
 ```
 
 `run.json` is an array with one element. The analytics object inside it looks like:

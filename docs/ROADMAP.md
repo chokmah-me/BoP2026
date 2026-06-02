@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.7.0 (2026-06-01)  
+**Current version:** v2.8.0 (2026-06-01)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -23,12 +23,29 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | 3 | Pandemic as Strategic Weapon          | Biological attack or engineered pandemic        | **Biological Epidemic** domain                     | **v2.3.0 ✓** |
 | 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + AOM latency governance + sovereignty void | **v2.4.0 ✓** |
 | 5 | The War for Space                     | Attacks on satellites and space assets          | **Space** domain (4 actions) + Orbital Warfare scenario + Kessler cascade | **v2.7.0 ✓** |
-| 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | Urban Operations (future scenario)                 | Medium |
+| 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | **Urban** domain (4 actions) + Megacity Siege scenario + urban quagmire cascade | **v2.8.0 ✓** |
 | 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via **Economic** + **Supply Chain** domains | Partial ✓ |
 
 ---
 
 ## Shipped
+
+### v2.8.x (2026-06-01)
+
+- **Urban Operations domain** `v2.8.0` — closes Krepinevich #6, completing **7 of 7** scenario
+  coverage. Four actions on existing stats (no new stat): `urban_stabilization` (hold-and-build),
+  `precision_clearance_ops` (targeted clearance), `siege_encirclement` (most escalatory — seeds the
+  quagmire), `civil_evacuation_corridor` (de-escalatory). Icon 🏙️.
+- **Megacity Siege 2026 scenario** `v2.8.0` — `megacity_siege_2026`, player US. Four
+  `megacity`-region crises (coastal siege, insurgent network, humanitarian corridor, infrastructure
+  collapse). NPCs adopt urban actions via active-crisis domain matching. Heuristic baseline
+  (100 runs, seed 0): 0% nuclear, 24.4 stability, 7.5 turns.
+- **Urban quagmire cascade** `v2.8.0` — `js/cascades.js`. Unlike the one-shot systemic events, a
+  *persistent* marker: `siege_encirclement` seeds `urban_quagmire`, which grinds the engaged powers
+  each turn (military/domestic/info) while an urban crisis stays ≥ L2 and lifts on de-escalation; a
+  `urban_humanitarian_catastrophe` one-shot fires with ≥2 fragile states; `megacity+megacity` merges
+  to the `urban_cauldron` compound. Plus two scenario-scoped events. Adding events shifts seeded
+  baselines for all scenarios (per `Events.drawEvents`); existing scenarios re-baselined and unbroken.
 
 ### v2.7.x (2026-06-01)
 
@@ -170,7 +187,7 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 | **Technology Development Track** | R&D investment with delayed capability gains. |
 | **Arms Race Dynamics** | Military stat growth curves based on sustained spending. |
 | ~~**Space domain**~~ | ~~Attacks on satellites and space assets. New actions + scenario.~~ | **Shipped v2.7.0** |
-| **Urban Operations** | Megacity warfare mechanics (Krepinevich #6). Needs a new stat or attrition mechanic; the last uncovered scenario. |
+| ~~**Urban Operations**~~ | ~~Megacity warfare mechanics (Krepinevich #6).~~ | **Shipped v2.8.0** (urban quagmire attrition cascade; no new stat) |
 
 ---
 
@@ -186,16 +203,17 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 - [x] Compound crisis mechanics: Supply Chain + Autonomous (SCS), Iran proxy + nuclear (Iran) — **met v2.0.x**
 - [x] Model at least 3 compound crises with divergent trajectories — **met v2.0.x**
-- [x] Cover at least 4 of 7 Krepinevich scenarios with playable domain content — **met v2.3.0** (6 of 7 as of v2.7.0: Supply Chain, Autonomous, partial Financial, Biological, EMP, Space — only Urban Operations remains)
+- [x] Cover at least 4 of 7 Krepinevich scenarios with playable domain content — **met v2.3.0; complete 7/7 as of v2.8.0** (Supply Chain, Autonomous, Financial, Biological, EMP, Space, Urban)
 - [x] Korean Peninsula scenario playable with DPRK as active NPC — **shipped v2.2.0**
 - [ ] Biological + EMP domains complete and integrated into at least one scenario each
 
 ---
 
-**Next Milestone:** Domestic Faction System (replace the unitary-actor model with hardliner vs.
-moderate factions), and the LLM-agent methodology follow-ups above (per-turn AOM framing,
-cross-model replication). **Urban Operations (Krepinevich #6)** is now the only uncovered scenario —
-the natural follow-on to v2.7.0's Space work to complete 7-of-7 coverage.
+**Krepinevich coverage is now complete (7 of 7)** as of v2.8.0. With the scenario-breadth arc closed,
+the **Next Milestone** shifts to depth: the Domestic Faction System (replace the unitary-actor model
+with hardliner vs. moderate factions — directly attacks the unitary-actor limitation in
+`docs/findings.md`), and the LLM-agent methodology follow-ups above (per-turn AOM framing,
+cross-model replication, tighter void-rate CIs).
 
 ---
 

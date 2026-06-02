@@ -287,5 +287,51 @@ window.SCENARIOS_DATA = {
       "GB":  { "US": 0.60, "CN": 0.65, "EU": 0.50, "IN": 0.55, "RU": 0.40, "IR": 0.50 },
       "IR":  { "US": 0.35, "CN": 0.50, "EU": 0.30, "IN": 0.40, "RU": 0.60, "GB": 0.55 }
     }
+  },
+  "megacity_siege_2026": {
+    "id": "megacity_siege_2026",
+    "name": "Megacity Siege, 2026",
+    "description": "A coastal megacity of 20 million fractures as the host state collapses. A US-led stabilization force, a rival-backed faction, and entrenched insurgents grind block by block. There is no clean front — only a protracted siege, a humanitarian catastrophe in the making, and no quick way out.",
+    "startYear": 2026,
+    "player": "US",
+    "crises": [
+      {
+        "id": "coastal_megacity_siege", "name": "Coastal Megacity Siege", "domain": "urban",
+        "involved": ["US", "CN", "EU"], "escalationLevel": 2,
+        "description": "Block-by-block fighting locks down the old port district. A US-led stabilization force and a rival-backed faction hold opposite banks of the river. Neither can clear the city; neither will leave it.",
+        "region": "megacity", "location": { "x": 600, "y": 235 },
+        "age": 1, "cascadeLog": []
+      },
+      {
+        "id": "insurgent_network", "name": "Insurgent Network", "domain": "urban",
+        "involved": ["US", "IN"], "escalationLevel": 1,
+        "description": "A decentralized insurgent cell network controls the informal settlements ringing the city. IED campaigns and ambushes erode any force that tries to hold ground.",
+        "region": "megacity", "location": { "x": 615, "y": 248 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "humanitarian_corridor_crisis", "name": "Humanitarian Corridor Crisis", "domain": "diplomatic",
+        "involved": ["US", "EU", "IN"], "escalationLevel": 1,
+        "description": "Two million civilians are trapped without water or power. Negotiations over evacuation corridors stall as each party suspects the others of exploiting the routes militarily.",
+        "region": "megacity", "location": { "x": 588, "y": 250 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "urban_infrastructure_collapse", "name": "Urban Infrastructure Collapse", "domain": "economic",
+        "involved": ["US", "CN"], "escalationLevel": 1,
+        "description": "The megacity's port, grid, and water treatment have failed under the siege. The regional economy seizes; the humanitarian clock accelerates.",
+        "region": "megacity", "location": { "x": 605, "y": 222 },
+        "age": 0, "cascadeLog": []
+      }
+    ],
+    "intelQuality": {
+      "US":  { "CN": 0.65, "EU": 0.85, "IN": 0.55, "RU": 0.55, "GB": 0.60, "IR": 0.45 },
+      "CN":  { "US": 0.70, "EU": 0.45, "IN": 0.55, "RU": 0.75, "GB": 0.60, "IR": 0.50 },
+      "EU":  { "US": 0.80, "CN": 0.40, "IN": 0.45, "RU": 0.60, "GB": 0.50, "IR": 0.40 },
+      "IN":  { "US": 0.55, "CN": 0.60, "EU": 0.45, "RU": 0.40, "GB": 0.55, "IR": 0.45 },
+      "RU":  { "US": 0.60, "CN": 0.70, "EU": 0.55, "IN": 0.40, "GB": 0.45, "IR": 0.60 },
+      "GB":  { "US": 0.65, "CN": 0.60, "EU": 0.55, "IN": 0.55, "RU": 0.45, "IR": 0.55 },
+      "IR":  { "US": 0.40, "CN": 0.50, "EU": 0.35, "IN": 0.45, "RU": 0.60, "GB": 0.55 }
+    }
   }
 };

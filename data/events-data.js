@@ -349,6 +349,24 @@ window.EVENT_TABLE = {
       "effects": { "targets": ["random_2"], "statDeltas": { "space": -8, "economic": -6 } },
       "advisorText": "Civil dependence on commercial space has outpaced resilience planning. Economic knock-on effects will lag by a turn or two.",
       "cascadeRisk": null
+    },
+    {
+      "id": "mass_displacement_wave", "name": "Mass Displacement Wave",
+      "description": "Hundreds of thousands flee the besieged megacity overnight. Camps overwhelm the region's capacity; disease and disorder follow the displaced.",
+      "probability": 0.13,
+      "conditions": [{ "crisis": "coastal_megacity_siege", "minEscalation": 2 }],
+      "effects": { "targets": ["all"], "statDeltas": { "domestic": -10, "info": -5 } },
+      "advisorText": "The displacement curve is past the inflection point. Regional domestic strain will compound until the siege eases.",
+      "cascadeRisk": "urban_humanitarian_catastrophe"
+    },
+    {
+      "id": "insurgent_ied_campaign", "name": "Insurgent IED Campaign",
+      "description": "A coordinated wave of IED and ambush attacks strikes forces operating in the urban periphery. Casualties mount and the political cost of the deployment rises.",
+      "probability": 0.10,
+      "conditions": [{ "crisis": "insurgent_network" }],
+      "effects": { "targets": ["random_2"], "statDeltas": { "military": -6, "domestic": -5 } },
+      "advisorText": "The network adapts faster than we can clear it. Expect sustained attrition on any force holding ground.",
+      "cascadeRisk": null
     }
   ]
 };

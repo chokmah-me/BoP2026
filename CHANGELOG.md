@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-06-01 (v2.8.0)
+
+Urban Operations domain + **Megacity Siege 2026** scenario — closes Krepinevich scenario #6
+("The Urban Insurgency"), completing **7 of 7** scenario coverage. No new stat: urban actions act on
+the existing `military`/`domestic`/`economic`/`info` stats, which the GSI and win/lose checks already
+read.
+
+### Added
+- **Urban Operations action domain** (`js/domains.js`): 4 actions on the defensive→escalatory arc —
+  `urban_stabilization` (hold-and-build, defensive, delayed domestic payoff), `precision_clearance_ops`
+  (targeted clearance: target military −8, self domestic −5), `siege_encirclement` (most escalatory:
+  target economic −10/domestic −8/military −5, escalationDelta 2; seeds the urban quagmire), and
+  `civil_evacuation_corridor` (de-escalatory/humanitarian: target domestic +8, helps lift the
+  quagmire). Registered in the domain lookups (icon 🏙️); surfaces in the browser UI automatically.
+- **Megacity Siege 2026 scenario** (`data/scenarios-data.js`): `megacity_siege_2026`, player US.
+  Four `megacity`-region crises — `coastal_megacity_siege` (urban, L2), `insurgent_network` (urban),
+  `humanitarian_corridor_crisis` (diplomatic), `urban_infrastructure_collapse` (economic). NPCs adopt
+  urban actions via active-crisis domain matching (no `priorityDomains` change).
+- **Urban quagmire cascade** (`js/cascades.js`): unlike the one-shot systemic events, this is a
+  *persistent* marker modeling protracted megacity combat. `siege_encirclement` seeds `urban_quagmire`
+  (3rd order); while active and an urban crisis stays at escalation ≥2, it grinds the engaged powers
+  each turn (military −4 / domestic −3 / info −2, 4th order); the marker **lifts** once no urban crisis
+  is ≥2 (de-escalation or `civil_evacuation_corridor`). A `urban_humanitarian_catastrophe` one-shot
+  fires when the quagmire coincides with ≥2 powers below domestic 35 (global domestic −10 / info −6).
+  `megacity+megacity` merges to the `urban_cauldron` compound at level 3.
+- **2 scenario-scoped events** (`data/events-data.js`): `mass_displacement_wave` (conditioned on
+  `coastal_megacity_siege` ≥ L2; all powers domestic −10 / info −5; `cascadeRisk:
+  urban_humanitarian_catastrophe`) and `insurgent_ied_campaign` (conditioned on `insurgent_network`;
+  random_2 military −6 / domestic −5). Both scoped so they never fire outside the scenario.
+
+### Research notes (v2.8.0 baseline, heuristic, 100 runs, seed 0)
+- **Megacity Siege**: 0% nuclear, avg stability 24.4, avg turns 7.5. The quagmire grind makes this a
+  steady attrition scenario rather than a spike-to-collapse one; avg turns sit in the normal band
+  (no degenerate every-turn collapse). The quagmire seed/grind/lift and the `urban_cauldron` compound
+  were verified to fire correctly under crafted conditions.
+
+### Calibration note
+- The two new events are added to the global `EVENT_TABLE`; because `Events.drawEvents()` rolls
+  `Math.random()` once per event before checking conditions, this shifts the seeded RNG stream for all
+  scenarios (as with the v2.0.2 / v2.3.0 / v2.7.0 event additions). Existing scenarios re-baselined
+  (100 runs, seed 0) and unbroken: Taiwan 27.2 / 0%, Iran 28.8 / 8%, SCS 25.7 / 0%, Korean Peninsula
+  33.6 / 0%, Orbital Warfare 27.7 / 0%. `npm test` green.
+
 ## 2026-06-01 (v2.7.0)
 
 Space (counterspace) domain + **Orbital Warfare 2026** scenario — closes Krepinevich scenario #5
