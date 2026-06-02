@@ -334,4 +334,51 @@ window.SCENARIOS_DATA = {
       "IR":  { "US": 0.40, "CN": 0.50, "EU": 0.35, "IN": 0.45, "RU": 0.60, "GB": 0.55 }
     }
   }
+,
+  "financial_contagion_2026": {
+    "id": "financial_contagion_2026",
+    "name": "Financial Contagion, 2026",
+    "description": "The global dollar-clearing architecture is seizing. Three sovereign defaults are imminent, BRICS+ is accelerating a reserve-currency alternative, and the G20 has no communiqué. The US can stabilize the system — or let rivals exploit the fractures.",
+    "startYear": 2026,
+    "player": "US",
+    "crises": [
+      {
+        "id": "clearing_network_failure", "name": "Clearing Network Failure", "domain": "economic",
+        "involved": ["US", "EU", "GB", "CN"], "escalationLevel": 2,
+        "description": "The SWIFT-CHIPS-Fedwire interbank settlement layer is under coordinated cyberattack. Clearing has frozen in three jurisdictions simultaneously. $4 trillion in daily transactions are at risk of cascade default.",
+        "region": "global_finance", "location": { "x": 410, "y": 145 },
+        "age": 0, "cascadeLog": []
+      },
+      {
+        "id": "sovereign_debt_crisis", "name": "Sovereign Debt Cascade", "domain": "economic",
+        "involved": ["IN", "GB", "EU", "US"], "escalationLevel": 1,
+        "description": "Emerging market sovereign debt is collapsing as dollar-denominated obligations come due in a rising-rate environment. Three G20 members face imminent default. IMF reserves are insufficient at this scale.",
+        "region": "global_finance", "location": { "x": 490, "y": 175 },
+        "age": 1, "cascadeLog": []
+      },
+      {
+        "id": "dollar_weaponization_backlash", "name": "Dollar Weaponization Backlash", "domain": "supply_chain",
+        "involved": ["CN", "RU", "GB", "US"], "escalationLevel": 1,
+        "description": "BRICS+ announces a commodity settlement basket backed by gold and energy reserves. Yuan clearing volumes surge. The dollar's reserve currency share drops 8% in 60 days — the fastest realignment since Bretton Woods.",
+        "region": "global_finance", "location": { "x": 360, "y": 160 },
+        "age": 2, "cascadeLog": []
+      },
+      {
+        "id": "g20_coordination_collapse", "name": "G20 Coordination Collapse", "domain": "diplomatic",
+        "involved": ["US", "CN", "EU", "IN"], "escalationLevel": 1,
+        "description": "The G20 emergency session ends without communiqué. The US-China split paralyzes the multilateral response. Each major economy is now acting unilaterally to insulate itself — accelerating the fragmentation it was convened to arrest.",
+        "region": "global_finance", "location": { "x": 450, "y": 130 },
+        "age": 0, "cascadeLog": []
+      }
+    ],
+    "intelQuality": {
+      "US":  { "CN": 0.70, "EU": 0.90, "IN": 0.65, "RU": 0.60, "GB": 0.85, "IR": 0.45 },
+      "CN":  { "US": 0.70, "EU": 0.55, "IN": 0.55, "RU": 0.70, "GB": 0.65, "IR": 0.50 },
+      "EU":  { "US": 0.85, "CN": 0.50, "IN": 0.50, "RU": 0.60, "GB": 0.65, "IR": 0.45 },
+      "IN":  { "US": 0.60, "CN": 0.65, "EU": 0.55, "RU": 0.45, "GB": 0.65, "IR": 0.45 },
+      "RU":  { "US": 0.60, "CN": 0.70, "EU": 0.60, "IN": 0.45, "GB": 0.50, "IR": 0.65 },
+      "GB":  { "US": 0.80, "CN": 0.65, "EU": 0.70, "IN": 0.60, "RU": 0.50, "IR": 0.55 },
+      "IR":  { "US": 0.40, "CN": 0.50, "EU": 0.35, "IN": 0.45, "RU": 0.60, "GB": 0.55 }
+    }
+  }
 };

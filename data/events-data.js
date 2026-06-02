@@ -360,6 +360,24 @@ window.EVENT_TABLE = {
       "cascadeRisk": "urban_humanitarian_catastrophe"
     },
     {
+      "id": "sovereign_default_cascade", "name": "Sovereign Default Cascade",
+      "description": "Three emerging-market sovereigns simultaneously fail to roll dollar-denominated debt. IMF emergency lending capacity is exhausted. Contagion spreads to G20 banking systems.",
+      "probability": 0.15,
+      "conditions": [{ "crisis": "clearing_network_failure", "minEscalation": 2 }],
+      "effects": { "targets": ["EU", "IN", "GB"], "statDeltas": { "economic": -10, "domestic": -7 } },
+      "advisorText": "Three sovereigns can't roll their dollar-denominated debt. IMF resources are insufficient at this scale. Contagion is now structural, not episodic.",
+      "cascadeRisk": "debt_spiral"
+    },
+    {
+      "id": "petrodollar_unwind", "name": "Petrodollar Unwind",
+      "description": "Saudi Arabia confirms yuan pricing for 20% of oil exports. The petrodollar covenant anchoring reserve currency status since 1974 is visibly fraying. Dollar-denominated global trade contracts are being renegotiated.",
+      "probability": 0.12,
+      "conditions": [{ "crisis": "dollar_weaponization_backlash", "minEscalation": 2 }],
+      "effects": { "targets": ["US", "GB"], "statDeltas": { "economic": -9, "info": -5 } },
+      "advisorText": "Riyadh confirmed yuan pricing for 20% of oil exports. The petrodollar was the anchor of US financial power projection since 1974. Its partial unwinding is irreversible.",
+      "cascadeRisk": "financial_fragmentation"
+    },
+    {
       "id": "insurgent_ied_campaign", "name": "Insurgent IED Campaign",
       "description": "A coordinated wave of IED and ambush attacks strikes forces operating in the urban periphery. Casualties mount and the political cost of the deployment rises.",
       "probability": 0.10,

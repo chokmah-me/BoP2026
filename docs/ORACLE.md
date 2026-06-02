@@ -19,7 +19,7 @@ node scripts/run-bop.js [options]
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario. Also: `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026`, `megacity_siege_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario. Also: `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026`, `megacity_siege_2026`, `financial_contagion_2026` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
 | `--out <path>` | `bop-results.json` | Output file (analytics format) |

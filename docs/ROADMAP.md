@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.8.0 (2026-06-01)  
+**Current version:** v2.9.0 (2026-06-02)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -24,11 +24,30 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 | 4 | The Rise of the Machines              | Autonomous weapons and AI-driven warfare        | **Autonomous** domain + AOM latency governance + sovereignty void | **v2.4.0 ✓** |
 | 5 | The War for Space                     | Attacks on satellites and space assets          | **Space** domain (4 actions) + Orbital Warfare scenario + Kessler cascade | **v2.7.0 ✓** |
 | 6 | The Urban Insurgency                  | Megacity warfare and prolonged urban combat     | **Urban** domain (4 actions) + Megacity Siege scenario + urban quagmire cascade | **v2.8.0 ✓** |
-| 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | Covered via **Economic** + **Supply Chain** domains | Partial ✓ |
+| 7 | The Collapse of the Global Financial System | Systemic financial warfare and economic collapse | **Financial** domain actions + **Financial Contagion 2026** scenario + debt spiral cascade | **v2.9.0 ✓** |
 
 ---
 
 ## Shipped
+
+### v2.9.x (2026-06-02)
+
+- **Financial domain actions** `v2.9.0` — 2 new economic-domain actions: `emergency_swap_lines`
+  (bilateral central bank liquidity injection, de-escalatory, relationship payoff) and
+  `sovereign_debt_restructuring` (IMF/G20 debt relief: target economic +10 / domestic +5, self
+  economic −4). Both surface automatically in the browser UI under the Economic domain (icon 💰).
+- **Financial Contagion 2026 scenario** `v2.9.0` — `financial_contagion_2026`, player US. Four
+  `global_finance`-region crises: `clearing_network_failure` (economic, L2), `sovereign_debt_crisis`
+  (economic, L1), `dollar_weaponization_backlash` (supply\_chain, L1), `g20_coordination_collapse`
+  (diplomatic, L1). Closes Krepinevich #7 (Financial System Collapse) with a dedicated scenario
+  (previously "Partial" — only domains existed, no scenario). Heuristic baseline (100 runs, seed 0):
+  0% nuclear, 32.3 stability, 3.1 systemic risk, 8.7 avg turns.
+- **Debt spiral cascade** `v2.9.0` — `js/cascades.js`. A *persistent* marker modeled on
+  `urban_quagmire`: seeds when `financial_fragmentation` has fired AND ≥2 powers have economic < 35
+  AND a `global_finance` crisis is ≥ L2 (scenario-gated). Grinds weakened economies each turn
+  (economic −5, domestic −3 for all powers with economic < 55). Lifts when financial crises
+  de-escalate and economic weakness abates. `great_deleveraging` compound crisis fires when two
+  `global_finance` crises both hit escalation 3. Plus 2 scenario-scoped events.
 
 ### v2.8.x (2026-06-01)
 
@@ -209,11 +228,11 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 ---
 
-**Krepinevich coverage is now complete (7 of 7)** as of v2.8.0. With the scenario-breadth arc closed,
-the **Next Milestone** shifts to depth: the Domestic Faction System (replace the unitary-actor model
-with hardliner vs. moderate factions — directly attacks the unitary-actor limitation in
-`docs/findings.md`), and the LLM-agent methodology follow-ups above (per-turn AOM framing,
-cross-model replication, tighter void-rate CIs).
+**Krepinevich coverage is now complete (7 of 7)** as of v2.9.0, with dedicated scenarios for all
+seven scenarios. With the scenario-breadth arc closed, the **Next Milestone** shifts to depth: the
+Domestic Faction System (replace the unitary-actor model with hardliner vs. moderate factions —
+directly attacks the unitary-actor limitation in `docs/findings.md`), and the LLM-agent methodology
+follow-ups above (per-turn AOM framing, cross-model replication, tighter void-rate CIs).
 
 ---
 
