@@ -529,6 +529,17 @@ test('sustained R&D compounds: tier-2 gain exceeds tier-1', () => {
   assert.ok(secondGain > firstGain, `tier-2 gain (${secondGain}) should exceed tier-1 (${firstGain})`);
 });
 
+// ── broadened NPC domain pool (v2.12.0) ───────────────────────────────────────
+// NPCs now pool + select the technology (R&D) domain and the other extended
+// priority domains, not just their five-domain core. Positive: the rdProgram
+// scoring branch fires for a patient, solvent, gap-facing tech-power and targets
+// the weak capability. Negative: it stays off for non-tech personas, mid-crisis,
+// when broke, or with no capability gap — and the broadening does not displace
+// each persona's top-3 identity.
+
+console.log('\n=== broadened NPC domain pool (v2.12.0) ===');
+
+// ── positive (the pool broadening fires) ──────────────────────────────────────
 test('a patient NPC invests in R&D to close a capability gap on a calm board', () => {
   const world = makeWorld();
   for (const c of world.crises) c.escalationLevel = 0; // calm: no active crisis
@@ -539,6 +550,19 @@ test('a patient NPC invests in R&D to close a capability gap on a calm board', (
     `CN should invest in cyber R&D to close the gap, got ${decided.map(a => a.actionId).join(',')}`);
 });
 
+test('R&D targets the lagging capability, not a healthy one', () => {
+  const world = makeWorld();
+  for (const c of world.crises) c.escalationLevel = 0;
+  set(world, 'CN', { cyber: 20, space: 80, military: 70 }); // only cyber is below the 50 floor
+  Math.random = () => 0.5;
+  const ids = ctx.AI.decideTurn('CN', world).map(a => a.actionId);
+  assert.ok(ids.includes('rd_cyber'),
+    `CN should fund the weak capability (cyber), got ${ids.join(',')}`);
+  assert.ok(!ids.includes('rd_space'),
+    `CN should not fund an already-healthy capability (space), got ${ids.join(',')}`);
+});
+
+// ── negative (the pool broadening stays off) ──────────────────────────────────
 test('NPCs without a technology priority never select R&D', () => {
   const world = makeWorld();
   for (const c of world.crises) c.escalationLevel = 0;
@@ -563,6 +587,27 @@ test('NPCs do not start R&D mid-crisis or when the economy is too weak', () => {
   set(w2, 'CN', { economic: 20, cyber: 20 });
   assert.ok(!ctx.AI.decideTurn('CN', w2).some(a => a.actionId.startsWith('rd_')),
     'CN should not fund R&D when the economy is too weak to absorb the cost');
+});
+
+test('a tech-power does not proactively fund R&D with no capability gap', () => {
+  const world = makeWorld();
+  for (const c of world.crises) c.escalationLevel = 0;
+  set(world, 'CN', { cyber: 75, space: 75, military: 75, economic: 75, info: 75 }); // every stat healthy
+  Math.random = () => 0.5;
+  const ids = ctx.AI.decideTurn('CN', world).map(a => a.actionId);
+  assert.ok(!ids.some(id => id.startsWith('rd_')),
+    `CN should not spend a calm turn on R&D when no capability lags, got ${ids.join(',')}`);
+});
+
+test('broadening priorityDomains does not displace a persona\'s core identity', () => {
+  const world = makeWorld();
+  for (const c of world.crises) c.escalationLevel = 0;
+  set(world, 'CN', { cyber: 20 }); // a reason to also invest in R&D this turn
+  Math.random = () => 0.5;
+  const ids = ctx.AI.decideTurn('CN', world).map(a => a.actionId);
+  const domains = ids.map(id => { const d = ctx.Domains.getById(id); return d && d.domain; });
+  assert.ok(domains.includes('economic'),
+    `CN's #1 priority domain (economic) should still drive its turn, got domains ${domains.join(',')}`);
 });
 
 // ── summary ───────────────────────────────────────────────────────────────────

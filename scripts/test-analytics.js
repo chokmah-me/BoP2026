@@ -322,6 +322,63 @@ test('15. financial scenario-scoped events fire in 20-run batch', () => {
   assert(found, 'No financial scenario events fired across 20 runs — check event conditions or Events.init');
 });
 
+// 12. broadened NPC domain pool (v2.12.0) — AI / headless engine tests
+test('16. NPCs select R&D (technology domain) across a headless batch', () => {
+  const results = BoP.runBatch({
+    scenarioId: 'taiwan_strait_2026',
+    runs: 10,
+    seeds: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    runOptions: { maxTurns: 20 }
+  });
+  const batch = BoP.exportBatchAnalytics(results);
+  let found = false;
+  outer: for (const r of batch) {
+    for (const t of r.analytics.turns) {
+      for (const a of (t.actions.npc || [])) {
+        if (a.actionId.startsWith('rd_')) { found = true; break outer; }
+      }
+    }
+  }
+  assert(found, 'No rd_* NPC actions found across 10 runs — the R&D scoring branch is unreachable end-to-end');
+});
+
+test('17. NPCs select extended Krepinevich-domain actions across a headless batch', () => {
+  const results = BoP.runBatch({
+    scenarioId: 'taiwan_strait_2026',
+    runs: 10,
+    seeds: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+    runOptions: { maxTurns: 20 }
+  });
+  const batch = BoP.exportBatchAnalytics(results);
+  const extendedDomains = new Set(['supply_chain', 'autonomous', 'space']);
+  let found = false;
+  outer: for (const r of batch) {
+    for (const t of r.analytics.turns) {
+      for (const a of (t.actions.npc || [])) {
+        const def = ctx.Domains.getById(a.actionId);
+        if (def && extendedDomains.has(def.domain)) { found = true; break outer; }
+      }
+    }
+  }
+  assert(found, 'No extended-domain (supply_chain/autonomous/space) NPC actions found across 10 runs — pool broadening is not reaching NPC play');
+});
+
+test('18. pool broadening does not break headless completion across scenarios', () => {
+  for (const scenarioId of ['taiwan_strait_2026', 'orbital_warfare_2026', 'south_china_sea_2026']) {
+    const results = BoP.runBatch({
+      scenarioId,
+      runs: 5,
+      seeds: [1, 2, 3, 4, 5],
+      runOptions: { maxTurns: 20 }
+    });
+    const batch = BoP.exportBatchAnalytics(results);
+    assert(batch.length === 5, `${scenarioId}: expected 5 runs, got ${batch.length}`);
+    for (const r of batch) {
+      assert(r.analytics.turns.length >= 1, `${scenarioId} run ${r.runId} produced 0 turns`);
+    }
+  }
+});
+
 // ── Summary ──────────────────────────────────────────────────────────────────
 
 console.log('');
