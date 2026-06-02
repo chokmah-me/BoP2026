@@ -262,6 +262,66 @@ test('12. saveLog payload shape: schema, outcome, log, finalState, filename patt
     `filename does not match pattern: ${filename}`);
 });
 
+// 11. financial scenario integration — AI / headless engine tests
+test('13. financial_contagion_2026 completes 10 headless runs without error', () => {
+  const results = BoP.runBatch({
+    scenarioId: 'financial_contagion_2026',
+    runs: 10,
+    seeds: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+    runOptions: { maxTurns: 20 }
+  });
+  assert(Array.isArray(results) && results.length === 10,
+    `expected 10 results, got ${Array.isArray(results) ? results.length : typeof results}`);
+  const batch = BoP.exportBatchAnalytics(results);
+  assert(batch.length === 10, `exportBatchAnalytics produced ${batch.length} entries, expected 10`);
+  for (const r of batch) {
+    assert(r.analytics.turns.length >= 1, `run ${r.runId} produced 0 turns`);
+  }
+});
+
+test('14. AI uses economic-domain actions in financial_contagion_2026', () => {
+  const results = BoP.runBatch({
+    scenarioId: 'financial_contagion_2026',
+    runs: 10,
+    seeds: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+    runOptions: { maxTurns: 20 }
+  });
+  const batch = BoP.exportBatchAnalytics(results);
+  const financialActionIds = new Set([
+    'sanctions', 'financial_pressure', 'trade_deal',
+    'emergency_swap_lines', 'sovereign_debt_restructuring',
+    'supply_chain_chokepoint', 'tech_export_ban', 'critical_minerals_deal'
+  ]);
+  let found = false;
+  outer: for (const r of batch) {
+    for (const t of r.analytics.turns) {
+      for (const a of (t.actions.npc || [])) {
+        if (financialActionIds.has(a.actionId)) { found = true; break outer; }
+      }
+    }
+  }
+  assert(found, 'No financial-domain NPC actions found across 10 runs — AI is not responding to financial crises');
+});
+
+test('15. financial scenario-scoped events fire in 20-run batch', () => {
+  const seeds = Array.from({ length: 20 }, (_, i) => i);
+  const results = BoP.runBatch({
+    scenarioId: 'financial_contagion_2026',
+    runs: 20,
+    seeds,
+    runOptions: { maxTurns: 20 }
+  });
+  const batch = BoP.exportBatchAnalytics(results);
+  const scenarioEvents = new Set(['sovereign_default_cascade', 'petrodollar_unwind']);
+  let found = false;
+  outer: for (const r of batch) {
+    for (const t of r.analytics.turns) {
+      if ((t.events || []).some(e => scenarioEvents.has(e.id))) { found = true; break outer; }
+    }
+  }
+  assert(found, 'No financial scenario events fired across 20 runs — check event conditions or Events.init');
+});
+
 // ── Summary ──────────────────────────────────────────────────────────────────
 
 console.log('');
