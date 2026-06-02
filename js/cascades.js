@@ -414,6 +414,15 @@ const Cascades = (() => {
       }
     }
 
+    // Urban siege: an encirclement seeds a persistent quagmire (recurring attrition resolved in 4th order)
+    const siegeActions = actions.filter(a => a.actionId === 'siege_encirclement');
+    if (siegeActions.length > 0 && !world.activeSystemicEvents.includes('urban_quagmire')) {
+      world.activeSystemicEvents.push('urban_quagmire');
+      log.push({ order: 3, confidence: 'LIKELY (65%)', actor: 'SYSTEM',
+        text: `[3rd order] Siege locks in — the urban front becomes a protracted quagmire. Expect recurring attrition until it de-escalates.`,
+        type: 'systemic_warning' });
+    }
+
     // Biological domain stacking: multiple bio actions in one turn signals pandemic acceleration
     const bioActions = actions.filter(a => Domains.getById(a.actionId)?.domain === 'biological').length;
     if (bioActions >= 2) {
@@ -510,6 +519,12 @@ const Cascades = (() => {
       name: 'Orbital Denial Regime',
       domain: 'compound',
       description: 'Counterspace strikes and PNT denial merge into a sustained debris-and-jamming environment. Low Earth orbit becomes contested terrain; ISR, navigation, and strategic warning degrade for every power simultaneously.'
+    },
+    'megacity+megacity': {
+      id: 'urban_cauldron',
+      name: 'Urban Cauldron',
+      domain: 'compound',
+      description: 'Siege, insurgency, and infrastructure collapse fuse into a single grinding battle for the megacity. There is no clean front and no quick exit; every power committed to the city is drawn deeper into protracted attrition.'
     }
   };
 
@@ -676,6 +691,56 @@ const Cascades = (() => {
       log.push({
         order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
         text: `[4th order SYSTEMIC] Kessler cascade: runaway orbital debris renders low Earth orbit unusable. ISR, PNT, and comms degrade for all. All powers space ${spaceDelta}, military ${milDelta}, info ${infoDelta}.`,
+        type: 'systemic_event'
+      });
+    }
+
+    // Urban quagmire: a seeded siege grinds the urban front each turn until it de-escalates.
+    // Unlike the one-shot systemic events above, this is a *persistent* marker (no `_pressure`
+    // suffix, so it survives the start-of-resolve sweep) that recurs while an urban crisis stays hot.
+    if (world.activeSystemicEvents.includes('urban_quagmire')) {
+      const hotUrbanCrises = world.crises.filter(c => c.domain === 'urban' && c.escalationLevel >= 2);
+      if (hotUrbanCrises.length === 0) {
+        // De-escalation (or a civil evacuation corridor) has cooled the front — the grind ends.
+        world.activeSystemicEvents = world.activeSystemicEvents.filter(e => e !== 'urban_quagmire');
+        log.push({ order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+          text: `[4th order SYSTEMIC] Urban quagmire lifts: the contested front has de-escalated. Recurring attrition ends.`,
+          type: 'systemic_event' });
+      } else {
+        const milDelta = Math.round(-4 * scale);
+        const domDelta = Math.round(-3 * scale);
+        const infoDelta = Math.round(-2 * scale);
+        const ground = new Set();
+        for (const c of hotUrbanCrises) {
+          for (const pid of c.involved) {
+            if (pid in world.powers) ground.add(pid);
+          }
+        }
+        for (const pid of ground) {
+          State.applyStatDelta(pid, 'military', milDelta);
+          State.applyStatDelta(pid, 'domestic', domDelta);
+          State.applyStatDelta(pid, 'info', infoDelta);
+        }
+        log.push({ order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+          text: `[4th order SYSTEMIC] Urban quagmire grinds on: protracted megacity combat attrits the combatants. Engaged powers military ${milDelta}, domestic ${domDelta}, info ${infoDelta}.`,
+          type: 'systemic_event' });
+      }
+    }
+
+    // Urban humanitarian catastrophe: quagmire + multiple fragile states → mass displacement (one-shot)
+    const hasQuagmire = world.activeSystemicEvents.includes('urban_quagmire');
+    const fragileFromWar = powers.filter(p => p.trueState.domestic < 35).length;
+    if (hasQuagmire && fragileFromWar >= 2 && !world.activeSystemicEvents.includes('urban_humanitarian_catastrophe')) {
+      world.activeSystemicEvents.push('urban_humanitarian_catastrophe');
+      const domDelta = Math.round(-10 * scale);
+      const infoDelta = Math.round(-6 * scale);
+      for (const p of powers) {
+        State.applyStatDelta(p.id, 'domestic', domDelta);
+        State.applyStatDelta(p.id, 'info', infoDelta);
+      }
+      log.push({
+        order: 4, confidence: 'CONFIRMED', actor: 'SYSTEM',
+        text: `[4th order SYSTEMIC] Urban humanitarian catastrophe: mass displacement from the besieged megacity overwhelms the region. All powers domestic ${domDelta}, info ${infoDelta}.`,
         type: 'systemic_event'
       });
     }

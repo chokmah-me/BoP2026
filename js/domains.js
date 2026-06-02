@@ -793,6 +793,76 @@ const Domains = (() => {
       effects3rd: [],
       domains: ['space'],
       tooltip: 'De-escalatory. Restores the orbital environment for both sides. Strong relationship payoff.'
+    },
+
+    // ── URBAN ─────────────────────────────────────────────────────────────────
+    {
+      id: 'urban_stabilization',
+      domain: 'urban',
+      name: 'Urban Stabilization',
+      description: 'Hold-and-build: restore governance, utilities, and policing block by block. Slow, manpower-intensive, but the only durable path out of a contested megacity.',
+      cost: 1,
+      requiresTarget: false,
+      escalationDelta: 0,
+      effects1st: { self: { domestic: 6, military: 3 } },
+      effects2nd: [
+        { prob: 0.35, effect: { self: { domestic: 4 } }, label: 'Restored services win local cooperation', delay: 2 },
+        { prob: 0.20, effect: { self: { economic: -3 } }, label: 'Sustained urban garrison is costly' }
+      ],
+      effects3rd: [],
+      domains: ['urban'],
+      tooltip: 'Hold-and-build. Delayed domestic payoff. No escalation. The way out of a quagmire.'
+    },
+    {
+      id: 'precision_clearance_ops',
+      domain: 'urban',
+      name: 'Precision Clearance Ops',
+      description: 'Targeted block-by-block clearance of fortified positions. Degrades the adversary in the city, but urban combat exacts a domestic toll.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 1,
+      effects1st: { target: { military: -8 }, self: { domestic: -5 } },
+      effects2nd: [
+        { prob: 0.40, effect: { crisis_escalation: 1 }, label: 'House-to-house fighting intensifies the urban front' },
+        { prob: 0.25, effect: { self: { info: -5 } }, label: 'Collateral damage footage damages the narrative' }
+      ],
+      effects3rd: [],
+      domains: ['urban'],
+      tooltip: 'Degrades the adversary in the city. Casualties cost domestic support.'
+    },
+    {
+      id: 'siege_encirclement',
+      domain: 'urban',
+      name: 'Siege & Encirclement',
+      description: 'Cordon and starve a contested district. Maximal coercive pressure, but a protracted siege grinds both sides down and devastates the civilian population.',
+      cost: 2,
+      requiresTarget: true,
+      escalationDelta: 2,
+      effects1st: { target: { economic: -10, domestic: -8, military: -5 }, self: { military: -3 } },
+      effects2nd: [
+        { prob: 0.45, effect: { crisis_escalation: 1 }, label: 'Siege hardens resistance and draws in outside backers' },
+        { prob: 0.35, effect: { self: { domestic: -6 } }, label: 'Humanitarian toll fuels domestic and allied backlash' }
+      ],
+      effects3rd: [],
+      domains: ['urban'],
+      tooltip: 'Maximal pressure. Seeds an urban quagmire — recurring attrition until the front de-escalates.'
+    },
+    {
+      id: 'civil_evacuation_corridor',
+      domain: 'urban',
+      name: 'Civil Evacuation Corridor',
+      description: 'Negotiate and secure humanitarian corridors for civilians to leave the contested zone. De-escalatory; relieves the siege and the narrative.',
+      cost: 1,
+      requiresTarget: true,
+      escalationDelta: -1,
+      effects1st: { target: { domestic: 8 }, self: { info: 5 } },
+      effects2nd: [
+        { prob: 0.55, effect: { relationship_target: 10 }, label: 'Brokered corridors build trust and ease the front' },
+        { prob: 0.25, effect: { self: { economic: -4 } }, label: 'Relief logistics and security are costly' }
+      ],
+      effects3rd: [],
+      domains: ['urban'],
+      tooltip: 'De-escalatory. Relieves a besieged population and helps lift the quagmire. Strong relationship payoff.'
     }
   ];
 
@@ -807,7 +877,7 @@ const Domains = (() => {
   }
 
   function getDomainList() {
-    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous', 'biological', 'emp', 'space'];
+    return ['military', 'economic', 'diplomatic', 'cyber', 'info', 'domestic', 'supply_chain', 'autonomous', 'biological', 'emp', 'space', 'urban'];
   }
 
   function getDomainLabel(domain) {
@@ -822,7 +892,8 @@ const Domains = (() => {
       autonomous: 'Autonomous',
       biological: 'Biological',
       emp: 'EMP',
-      space: 'Space'
+      space: 'Space',
+      urban: 'Urban'
     }[domain] || domain;
   }
 
@@ -838,7 +909,8 @@ const Domains = (() => {
       autonomous: '🤖',
       biological: '🧬',
       emp: '⚡',
-      space: '🛰️'
+      space: '🛰️',
+      urban: '🏙️'
     }[domain] || '●';
   }
 

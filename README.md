@@ -12,11 +12,11 @@ A turn-based multipolar crisis simulation for IR research and war studies pedago
 
 ## What it is
 
-BoP2026 models great-power competition across eleven domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP, space) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, pandemic outbreak, C4ISR collapse, Kessler debris cascade, compound crises).
+BoP2026 models great-power competition across twelve domains (military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous, biological, EMP, space, urban) with eight major actors: US, China, EU, Russia, India, the Gulf Bloc, Iran, and North Korea. Iran is active in the Iran Nuclear scenario; DPRK is active in the Korean Peninsula scenario. Each turn, AI-driven powers select actions based on risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, domestic fragility spirals, pandemic outbreak, C4ISR collapse, Kessler debris cascade, urban quagmire, compound crises).
 
 The engine is designed for two uses:
 
-1. **Classroom / wargame**: play through six scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, Sovereignty Void, or Orbital Warfare — in a browser, no install required.
+1. **Classroom / wargame**: play through seven scenarios — Taiwan Strait, Iran Nuclear, South China Sea, Korean Peninsula, Sovereignty Void, Orbital Warfare, or Megacity Siege — in a browser, no install required.
 2. **Research companion**: run hundreds of parameterized simulations headless, explore counterfactuals via branching, and analyze outcomes with the Oracle API.
 
 This is a **stylized model**, not an empirically fitted one. Parameters are calibrated for face validity against open-source IR literature, not regression-estimated from historical data. See [docs/model-notes.md](docs/model-notes.md) for assumptions and limitations.
@@ -67,7 +67,7 @@ npm test
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026` |
+| `--scenario <id>` | `taiwan_strait_2026` | Scenario to run: `taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026`, `megacity_siege_2026` |
 | `--doctrine <id>` | scenario default | Doctrine to play: `MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE` |
 | `--runs <n>` | `10` | Number of simulation runs |
 | `--seed <n>` | random | Base seed; run i uses seed+i |
@@ -238,8 +238,9 @@ Heuristic baseline (default parameters, v2.2.1):
 | South China Sea 2026 | 0% | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
 | Korean Peninsula 2026† | 0% | 0% | 28.7 | 9.1 |
 | Orbital Warfare 2026‡ | 0% | 0% | 26.8 | 8.9 |
+| Megacity Siege 2026§ | 0% | 0% | 24.4 | 7.5 |
 
-Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance. ‡Orbital Warfare: v2.7.0 baseline (100 runs, seed 0). Heuristic NPCs favor the de-escalatory `debris_remediation_pact`; `asat_strike` is rarely selected under de-escalate posture, so the Kessler cascade is a latent tail risk rather than a baseline outcome (cf. `emp_strike`).
+Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance. ‡Orbital Warfare: v2.7.0 baseline (100 runs, seed 0). Heuristic NPCs favor the de-escalatory `debris_remediation_pact`; `asat_strike` is rarely selected under de-escalate posture, so the Kessler cascade is a latent tail risk rather than a baseline outcome (cf. `emp_strike`). §Megacity Siege: v2.8.0 baseline (100 runs, seed 0). A steady attrition scenario — the urban quagmire grinds rather than spikes, so avg turns sit in the normal band.
 
 Key findings from the baseline:
 
@@ -287,6 +288,9 @@ Golden Dome is online and boost-phase physics set the clock. The AOM latency mec
 ### Orbital Warfare, 2026
 A destructive ASAT test seeds a debris field as GPS goes dark over a theater and cislunar resource claims harden. Player is US. Four `orbit`-region crises: ASAT Demonstration (space, L1), GNSS Denial (space, L1), Comms Satellite Blackout (cyber, L1), Cislunar Resource Claim (diplomatic, L1). The signature failure mode is the **Kessler-syndrome cascade** — an `asat_strike` seeds orbital debris that bleeds onto bystanders' `space` assets, and once two-plus powers fall below the space threshold, a global `kessler_cascade` renders low Earth orbit unusable (space/military/info degrade for all). Two `orbit`-region crises at level 3 merge into the `orbital_denial` compound. The Space (counterspace) action domain — `satellite_hardening`, `orbital_isr_surge`, `asat_strike`, `debris_remediation_pact` — drives the scenario. Closes Krepinevich's "War for Space" (#5), bringing playable domain coverage to 6 of 7.
 
+### Megacity Siege, 2026
+A coastal megacity of 20 million fractures as its host state collapses; a US-led stabilization force, a rival-backed faction, and entrenched insurgents grind block by block. Player is US. Four `megacity`-region crises: Coastal Megacity Siege (urban, L2), Insurgent Network (urban, L1), Humanitarian Corridor Crisis (diplomatic, L1), Urban Infrastructure Collapse (economic, L1). The signature mechanic is the **urban quagmire** — a `siege_encirclement` seeds a *persistent* attrition cascade that grinds the engaged powers' military/domestic/info every turn the urban front stays hot, and lifts only when the crises de-escalate (or a `civil_evacuation_corridor` relieves them); sustained quagmire with multiple fragile states triggers a one-shot `urban_humanitarian_catastrophe`, and two `megacity` crises at level 3 merge into the `urban_cauldron` compound. The Urban Operations domain — `urban_stabilization`, `precision_clearance_ops`, `siege_encirclement`, `civil_evacuation_corridor` — drives the scenario. Closes Krepinevich's "Urban Insurgency" (#6), completing playable domain coverage at 7 of 7.
+
 ---
 
 ## Adding content
@@ -315,7 +319,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.7.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.8.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

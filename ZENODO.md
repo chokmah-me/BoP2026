@@ -1,4 +1,4 @@
-# Zenodo Deposit — Balance of Power 2026 v2.7.0
+# Zenodo Deposit — Balance of Power 2026 v2.8.0
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
 **Deposit Date:** 24 May 2026 (updated 31 May 2026)  
@@ -8,9 +8,9 @@
 
 ## Description
 
-Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Eight great powers (US, China, EU, Russia, India, Gulf Bloc, Iran, North Korea) compete across eleven domains: military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous systems, biological, EMP, and space. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
+Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Eight great powers (US, China, EU, Russia, India, Gulf Bloc, Iran, North Korea) compete across twelve domains: military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous systems, biological, EMP, space, and urban. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
 
-Six playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, Sovereignty Void 2026, and Orbital Warfare 2026. The Sovereignty Void scenario operationalizes the AOM latency-governance framework [Zenodo 19368682]: when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves autonomously before the player's action registers. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema.
+Seven playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, Sovereignty Void 2026, Orbital Warfare 2026, and Megacity Siege 2026. Together they cover all seven of Krepinevich's *7 Deadly Scenarios*. The Sovereignty Void scenario operationalizes the AOM latency-governance framework [Zenodo 19368682]: when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves autonomously before the player's action registers. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema.
 
 Calibrated for face validity against open-source IR literature. Not intended for forecasting or policy prescription.
 
@@ -33,7 +33,7 @@ All parameters are calibrated for **face validity** against open-source IR liter
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
 - Complete documentation (`README.md`, `docs/`)
-- Baseline results for all six scenarios
+- Baseline results for all seven scenarios
 - Model assumptions and known limitations
 
 ## Release Notes — v2.4.0
@@ -68,9 +68,20 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.7.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.8.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
+
+**v2.8.0 (2026-06-01):** Urban Operations action domain — `urban_stabilization`,
+`precision_clearance_ops`, `siege_encirclement`, `civil_evacuation_corridor` — on existing stats (no
+new stat), plus the **Megacity Siege 2026** scenario (`megacity_siege_2026`: coastal siege, insurgent
+network, humanitarian corridor, infrastructure collapse). Adds the urban-quagmire cascade — a
+*persistent* attrition marker that grinds the engaged powers each turn the urban front stays hot and
+lifts on de-escalation — plus the `urban_humanitarian_catastrophe` one-shot and the
+`megacity+megacity` → `urban_cauldron` compound, with two scenario-scoped events. **Closes Krepinevich
+scenario #6 ("The Urban Insurgency"), completing all 7 of the 7 Deadly Scenarios.** Adding events
+shifts the seeded RNG stream for all scenarios (as with the v2.0.2 / v2.3.0 / v2.7.0 event additions);
+existing scenarios re-baselined and remain in range.
 
 **v2.7.0 (2026-06-01):** Space (counterspace) action domain — `satellite_hardening`,
 `orbital_isr_surge`, `asat_strike`, `debris_remediation_pact` — on the pre-existing `space` stat, plus
