@@ -1,6 +1,7 @@
 const Epistemic = (() => {
 
   function update(world) {
+    State.decayIntelQuality();   // intel goes stale before this turn's perceptions settle
     State.driftPerceptions();
     checkForLeaks(world);
   }

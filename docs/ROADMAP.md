@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.9.0 (2026-06-02)  
+**Current version:** v2.10.0 (2026-06-02)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -29,6 +29,20 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.10.x (2026-06-02)
+
+- **Enhanced epistemic model** `v2.10.0` — first engine-realism feature past the Krepinevich suite.
+  Intelligence is now perishable: `State.decayIntelQuality()` pulls every `world.intelQuality`
+  viewer→target link toward a 0.15 floor each turn (~11-turn half-life); collection actions
+  (`ai_surveillance_grid`, `orbital_isr_surge`, `cyber_infrastructure_probe`, via a declarative
+  `intelRefresh` field applied in `js/cascades.js`) refresh quality back toward a per-scenario
+  ceiling. `driftPerceptions()` adds a `(1 - quality)`-scaled per-turn random walk on top of the
+  convergence-toward-truth term, so high-quality viewers track truth while near-blind viewers
+  accumulate divergence. Player/research-facing only (NPC heuristics still read `trueState`). Fixes a
+  latent bug where `world.intelQuality` aliased `SCENARIOS_DATA` (now cloned at init). 7 new tests.
+  Re-baselined all seeded scenarios — see the v2.10.0 calibration note in `CHANGELOG.md`. Closes the
+  Medium-Priority "Enhanced Epistemic Model" item below.
 
 ### v2.9.x (2026-06-02)
 
@@ -202,7 +216,7 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 | Feature | Description |
 |---|---|
-| **Enhanced Epistemic Model** | Perception drift + intelligence quality decay. Perceived vs. true state divergence accumulates over time. |
+| ~~**Enhanced Epistemic Model**~~ | ~~Perception drift + intelligence quality decay. Perceived vs. true state divergence accumulates over time.~~ **Shipped v2.10.0** |
 | **Technology Development Track** | R&D investment with delayed capability gains. |
 | **Arms Race Dynamics** | Military stat growth curves based on sustained spending. |
 | ~~**Space domain**~~ | ~~Attacks on satellites and space assets. New actions + scenario.~~ | **Shipped v2.7.0** |

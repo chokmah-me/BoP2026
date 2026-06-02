@@ -1,4 +1,4 @@
-# Zenodo Deposit — Balance of Power 2026 v2.9.0
+# Zenodo Deposit — Balance of Power 2026 v2.10.0
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
 **Deposit Date:** 24 May 2026 (updated 2 June 2026)  
@@ -28,7 +28,7 @@ Calibrated for face validity against open-source IR literature. Not intended for
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.9.0)
+## Files Included in This Deposit (v2.10.0)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
@@ -68,9 +68,21 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.9.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.10.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
+
+**v2.10.0 (2026-06-02):** Enhanced epistemic model — the first engine-realism feature past the
+completed Krepinevich suite. Intelligence is now perishable: `State.decayIntelQuality()` pulls every
+`world.intelQuality` collection link toward a 0.15 floor each turn (~11-turn half-life), and intel
+actions (`ai_surveillance_grid`, `orbital_isr_surge`, `cyber_infrastructure_probe`, via a declarative
+`intelRefresh` field) restore quality toward a per-scenario ceiling. `driftPerceptions()` adds a
+`(1 - quality)`-scaled per-turn random walk on top of convergence-toward-truth, so high-quality
+viewers track truth while near-blind viewers accumulate divergence; the UI uncertainty bands widen
+automatically. Player/research-facing only — NPC heuristics still decide on `trueState`. Fixes a
+latent aliasing bug (`world.intelQuality` shared `SCENARIOS_DATA`; now cloned at init). The per-turn
+noise draws share the global RNG stream, so seeded baselines realign for every scenario (same
+mechanism as prior event additions); re-baselined 100 runs/seed 0, all green, no playability change.
 
 **v2.9.0 (2026-06-02):** Financial domain depth — two new economic-domain actions
 (`emergency_swap_lines`, `sovereign_debt_restructuring`) — plus the **Financial Contagion 2026**

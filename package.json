@@ -1,6 +1,6 @@
 {
   "name": "bop2026",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "private": true,
   "description": "Balance of Power 2026 — vanilla HTML/JS geopolitical crisis simulation. The game runs from index.html with no build step; this manifest only wires the headless Node test/research scripts.",
   "scripts": {

@@ -185,6 +185,18 @@ const Cascades = (() => {
       if (world.autonomyDelegated) delete world.autonomyDelegated[action.actor];
       Epistemic.clearRiceMask(action.actor, world);
     }
+
+    // Epistemic: intel-collection actions refresh the actor's perception quality,
+    // counteracting the per-turn decay in State.decayIntelQuality. 'all' covers
+    // broad grid/ISR sweeps; 'target' covers a focused probe of one adversary.
+    if (def.intelRefresh) {
+      const gain = def.intelRefresh.gain ?? 0.5;
+      if (def.intelRefresh.scope === 'all') {
+        State.refreshIntelAll(action.actor, gain);
+      } else if (action.target) {
+        State.refreshIntel(action.actor, action.target, gain);
+      }
+    }
   }
 
   function apply2ndOrder(action, world, log) {

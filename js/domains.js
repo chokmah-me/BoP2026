@@ -269,6 +269,7 @@ const Domains = (() => {
       effects3rd: [
         { condition: 'multiple_cyber_active', effect: { systemic: 'internet_balkanization' }, label: 'Multiple probes accelerate Balkanization pressure' }
       ],
+      intelRefresh: { scope: 'target', gain: 0.5 },
       tooltip: 'Intel gain. Detection risk. May trigger retaliatory probe.'
     },
     {
@@ -699,6 +700,7 @@ const Domains = (() => {
       ],
       effects3rd: [],
       domains: ['autonomous'],
+      intelRefresh: { scope: 'all', gain: 0.5 },
       tooltip: 'Intel gain. Improves epistemic accuracy for 2–3 turns.'
     },
     {
@@ -790,6 +792,7 @@ const Domains = (() => {
       ],
       effects3rd: [],
       domains: ['space'],
+      intelRefresh: { scope: 'all', gain: 0.4 },
       tooltip: 'Intel gain. Improves epistemic accuracy. Mild adversary friction.'
     },
     {

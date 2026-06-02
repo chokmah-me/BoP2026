@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-06-02 (v2.10.0)
+
+Enhanced epistemic model — the first engine-realism feature past the completed Krepinevich suite.
+Intelligence is now **perishable**: collection quality decays each turn unless refreshed, and
+low-quality perceptions accumulate divergence from truth instead of always converging on it.
+Player/research-facing only — NPC heuristics still decide on `trueState`, so AI behavior is
+unchanged; the model drives the player intelligence briefing (`js/ai.js`) and the UI uncertainty
+bands (`js/ui.js`).
+
+### Added
+- **Intel quality decay** (`js/state.js`): `State.decayIntelQuality()` pulls every viewer→target
+  link in `world.intelQuality` toward a floor (`INTEL_FLOOR` 0.15) each turn at `INTEL_DECAY_RATE`
+  0.06 (~11-turn half-life). Called from `Epistemic.update()` before perceptions settle.
+- **Intel refresh** (`js/state.js`, `js/cascades.js`): collection actions restore a viewer's quality
+  back toward its scenario ceiling. `State.refreshIntel(viewer, target, gain)` /
+  `refreshIntelAll(viewer, gain)`; the cascade applies it for any action def carrying an
+  `intelRefresh` field. Wired on `ai_surveillance_grid` (scope all, gain 0.5), `orbital_isr_surge`
+  (all, 0.4), and `cyber_infrastructure_probe` (target, 0.5).
+- **Estimation noise in perception drift** (`js/state.js`): `driftPerceptions()` now adds a per-turn
+  random walk of amplitude `(1 - quality) * PERCEPTION_NOISE` (4) on top of the existing convergence
+  toward truth. High-quality viewers track truth tightly; near-blind viewers wander, so perceived↔true
+  divergence accumulates over time. `Epistemic.getUncertaintyBand()` widens automatically as quality
+  decays. Closes the Medium-Priority "Enhanced Epistemic Model" roadmap item.
+
+### Fixed
+- **`world.intelQuality` is now cloned at init** (`js/state.js`): it was assigned by reference from
+  `scenario.intelQuality`, so in-place decay would have corrupted the shared `SCENARIOS_DATA` across
+  batch runs. Init now deep-copies into a live matrix plus an `intelQualityBase` ceiling.
+
+### Tests
+- 7 new epistemic tests in `scripts/test-cascades.js` (decay toward floor, floor never breached,
+  refresh capped at base, cascade-driven refresh, divergence accumulation, high-quality convergence,
+  no scenario-data mutation). Full suite: 36 cascade + 15 analytics, all green.
+
+### Calibration note
+- The per-turn noise draws share the global RNG stream (consumed before `Events.drawEvents`), so
+  seeded baselines realign for every scenario — same mechanism as prior event additions (see the
+  v2.8.0 note). Re-baselined (100 runs, seed 0, heuristic): Taiwan 32.1 / 0%, Iran 28.4 / 14%,
+  SCS 26.7 / 0%, Korean Peninsula 26.7 / 0%, Orbital Warfare 27.5 / 0%, Megacity Siege 24.8 / 0%,
+  Financial Contagion 31.5 / 0%. No scenario changed playability; no byte-identity with prior tags.
+
+---
+
 ## 2026-06-02 (v2.9.0)
 
 Financial domain depth + **Financial Contagion 2026** scenario — closes Krepinevich scenario #7

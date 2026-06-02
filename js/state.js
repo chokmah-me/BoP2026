@@ -1,6 +1,25 @@
 const State = (() => {
   let world = null;
 
+  // ── Epistemic model tuning (v2.10.0) ─────────────────────────────────────────
+  // Intel is perishable. Each turn every viewer→target collection link decays
+  // toward INTEL_FLOOR (sources go cold, networks roll up, the adversary changes
+  // posture) unless an intel action refreshes it. Lower live quality slows the
+  // convergence of perceptions toward truth (driftPerceptions) and widens the
+  // estimation noise band, so perceived↔true divergence accumulates over time.
+  const INTEL_FLOOR = 0.15;       // quality never decays below this
+  const INTEL_DECAY_RATE = 0.06;  // fraction of the gap-above-floor lost per turn (~11-turn half-life)
+  const PERCEPTION_NOISE = 4;     // max per-turn random-walk amplitude at quality 0 (scaled by 1 - quality)
+
+  // intelQuality is a nested { viewer: { target: q } } matrix. Scenario data hands
+  // it to us by reference; clone it so per-turn decay never mutates SCENARIOS_DATA
+  // (which would corrupt later runs in a batch).
+  function cloneIntelMatrix(src) {
+    const out = {};
+    for (const viewerId of Object.keys(src || {})) out[viewerId] = { ...src[viewerId] };
+    return out;
+  }
+
   function init(powersData, scenario, doctrineId = null) {
     const doctrine = doctrineId && window.DOCTRINES_DATA
       ? window.DOCTRINES_DATA.find(d => d.id === doctrineId) || null
@@ -91,7 +110,8 @@ const State = (() => {
       pendingActions: [],
       pendingDelayedEffects: [],
       activeSystemicEvents: [],
-      intelQuality: intel,
+      intelQuality: cloneIntelMatrix(intel),       // live, decays/refreshes each turn
+      intelQualityBase: cloneIntelMatrix(intel),   // ceiling a viewer can be refreshed back toward
       scenarioId: scenario.id,
       doctrine: doctrine || null,
       bilateralDeals: 0,
@@ -209,6 +229,37 @@ const State = (() => {
     power.perceivedBy[targetId][statKey] = newValue;
   }
 
+  // Perishable intel: pull every collection link toward INTEL_FLOOR. Called once
+  // per turn (Epistemic.update) before driftPerceptions, so the slower convergence
+  // takes effect the same turn the source goes stale.
+  function decayIntelQuality() {
+    for (const viewerId of Object.keys(world.intelQuality)) {
+      const row = world.intelQuality[viewerId];
+      for (const targetId of Object.keys(row)) {
+        const q = row[targetId];
+        row[targetId] = Math.max(INTEL_FLOOR, q - (q - INTEL_FLOOR) * INTEL_DECAY_RATE);
+      }
+    }
+  }
+
+  // Fresh collection (an intel action) restores a viewer's quality on a target
+  // back toward its scenario ceiling. gainFrac is the fraction of the gap closed.
+  function refreshIntel(viewerId, targetId, gainFrac = 0.5) {
+    const base = world.intelQualityBase?.[viewerId]?.[targetId];
+    if (base == null) return;
+    if (!world.intelQuality[viewerId]) world.intelQuality[viewerId] = {};
+    const q = world.intelQuality[viewerId][targetId] ?? base;
+    world.intelQuality[viewerId][targetId] = Math.min(base, q + (base - q) * gainFrac);
+  }
+
+  // Broad collection (a non-targeted grid/ISR action) refreshes the viewer's
+  // quality on every target it has a baseline link to.
+  function refreshIntelAll(viewerId, gainFrac = 0.5) {
+    const targets = world.intelQualityBase?.[viewerId];
+    if (!targets) return;
+    for (const targetId of Object.keys(targets)) refreshIntel(viewerId, targetId, gainFrac);
+  }
+
   function driftPerceptions() {
     for (const [viewerId, viewer] of Object.entries(world.powers)) {
       for (const [targetId, target] of Object.entries(world.powers)) {
@@ -219,8 +270,13 @@ const State = (() => {
         if (!perceived) continue;
         for (const [stat, trueVal] of Object.entries(target.trueState)) {
           if (stat === 'nuclear') continue;
-          const diff = trueVal - (perceived[stat] || trueVal);
-          perceived[stat] = Math.round((perceived[stat] || trueVal) + diff * driftRate);
+          const cur = perceived[stat] ?? trueVal;
+          // (1) convergence toward truth, sharpened by intel quality
+          let next = cur + (trueVal - cur) * driftRate;
+          // (2) estimation noise: poor collection wanders, so divergence
+          //     accumulates each turn the viewer can't see clearly
+          const noise = (Math.random() * 2 - 1) * (1 - quality) * PERCEPTION_NOISE;
+          perceived[stat] = Math.max(0, Math.min(100, Math.round(next + noise)));
         }
       }
     }
@@ -352,7 +408,8 @@ const State = (() => {
     init, get, getPower, getPlayer, getCrisis,
     applyStatDelta, adjustRelationship, adjustCrisisEscalation,
     addCrisis, mergeCrises, addLog, advanceTurn, setPhase, queueAction, clearPendingActions,
-    updatePerception, driftPerceptions, getGlobalStabilityIndex, getSystemicRiskIndex, checkGameOver,
+    updatePerception, driftPerceptions, decayIntelQuality, refreshIntel, refreshIntelAll,
+    getGlobalStabilityIndex, getSystemicRiskIndex, checkGameOver,
     applyEpistemicNoise, setSim, restore
   };
 })();

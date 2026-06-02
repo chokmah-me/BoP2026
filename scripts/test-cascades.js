@@ -419,6 +419,77 @@ test('debt_spiral seeds only once across two resolve calls', () => {
   assert.strictEqual(countAfterSecond, 1, `expected exactly 1 debt_spiral after second call, got ${countAfterSecond}`);
 });
 
+// ── enhanced epistemic model (v2.10.0) ────────────────────────────────────────
+
+console.log('\n=== enhanced epistemic model ===');
+
+test('decayIntelQuality pulls quality toward the floor', () => {
+  const world = makeWorld();
+  world.intelQuality.US.CN = 0.80;
+  ctx.State.decayIntelQuality();
+  assert.ok(world.intelQuality.US.CN < 0.80, `expected decay below 0.80, got ${world.intelQuality.US.CN}`);
+  assert.ok(world.intelQuality.US.CN > 0.15, `should not undershoot the floor in one step, got ${world.intelQuality.US.CN}`);
+});
+
+test('decayIntelQuality never drops below the floor', () => {
+  const world = makeWorld();
+  world.intelQuality.US.CN = 0.15; // already at floor
+  for (let i = 0; i < 50; i++) ctx.State.decayIntelQuality();
+  assert.ok(world.intelQuality.US.CN >= 0.15 - 1e-9, `floor breached: ${world.intelQuality.US.CN}`);
+});
+
+test('refreshIntel restores toward base, capped at base', () => {
+  const world = makeWorld();
+  world.intelQualityBase.US.CN = 0.80;
+  world.intelQuality.US.CN = 0.30;
+  ctx.State.refreshIntel('US', 'CN', 0.5);
+  assert.ok(world.intelQuality.US.CN > 0.30, 'refresh should raise quality');
+  ctx.State.refreshIntel('US', 'CN', 1.0); // close the whole gap
+  assert.ok(world.intelQuality.US.CN <= 0.80 + 1e-9, `must not exceed base, got ${world.intelQuality.US.CN}`);
+  assert.ok(Math.abs(world.intelQuality.US.CN - 0.80) < 1e-9, `gain 1.0 should reach base, got ${world.intelQuality.US.CN}`);
+});
+
+test('intel-collection action refreshes quality via the cascade', () => {
+  const world = makeWorld();
+  world.intelQualityBase.US.CN = 0.80;
+  world.intelQuality.US.CN = 0.30;
+  Math.random = () => 0.99; // suppress probabilistic 2nd-order effects
+  ctx.Cascades.resolve([act('cyber_infrastructure_probe', 'US', 'CN')], world);
+  assert.ok(world.intelQuality.US.CN > 0.30, `probe should refresh US→CN intel, got ${world.intelQuality.US.CN}`);
+});
+
+test('low-quality perception accumulates divergence from truth', () => {
+  const world = makeWorld();
+  world.intelQuality.US.CN = 0.15; // near-blind
+  world.powers.US.perceivedBy.CN.economic = world.powers.CN.trueState.economic; // start exactly on truth
+  Math.random = () => 0.99; // deterministic positive noise each turn
+  for (let i = 0; i < 8; i++) ctx.State.driftPerceptions();
+  const divergence = Math.abs(world.powers.US.perceivedBy.CN.economic - world.powers.CN.trueState.economic);
+  assert.ok(divergence > 5, `expected accumulated divergence, got ${divergence}`);
+});
+
+test('high-quality perception converges tightly on truth', () => {
+  const world = makeWorld();
+  world.intelQuality.US.CN = 0.95;
+  world.powers.US.perceivedBy.CN.economic = world.powers.CN.trueState.economic - 30; // start far off
+  Math.random = () => 0.5; // zero noise (0.5*2-1 = 0)
+  for (let i = 0; i < 20; i++) ctx.State.driftPerceptions();
+  const divergence = Math.abs(world.powers.US.perceivedBy.CN.economic - world.powers.CN.trueState.economic);
+  // converges from 30 off to within a few points (integer-rounded drift stalls
+  // once the per-turn step rounds to zero — a small, pre-existing asymptote)
+  assert.ok(divergence <= 4, `expected convergence to truth, got divergence ${divergence}`);
+});
+
+test('decay mutates the live matrix, not shared scenario data', () => {
+  const scenario = ctx.SCENARIOS_DATA['taiwan_strait_2026'];
+  const before = scenario.intelQuality.US.CN;
+  ctx.State.init(ctx.POWERS_DATA, scenario);
+  const world = ctx.State.get();
+  for (let i = 0; i < 20; i++) ctx.State.decayIntelQuality();
+  assert.ok(world.intelQuality.US.CN < before, 'live matrix should have decayed');
+  assert.strictEqual(scenario.intelQuality.US.CN, before, 'scenario data must not be mutated by decay');
+});
+
 // ── summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n${'─'.repeat(50)}`);

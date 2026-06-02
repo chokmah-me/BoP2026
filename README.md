@@ -229,25 +229,25 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-Heuristic baseline (default parameters, v2.2.1):
+Heuristic baseline (default parameters, v2.10.0; 100 runs, seed 0, all on one engine build so rows are directly comparable):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
-| Taiwan Strait 2026 | 0% | 0% | 22.5 (σ 2.8) | 4.7 (σ 0.8) |
-| Iran Nuclear 2026 | 0% | 14% | 20.7 (σ 5.4) | 4.4 (σ 0.9) |
-| South China Sea 2026 | 0% | 4% | 21.2 (σ 6.4) | 4.7 (σ 1.2) |
-| Korean Peninsula 2026† | 0% | 0% | 28.7 | 9.1 |
-| Orbital Warfare 2026‡ | 0% | 0% | 26.8 | 8.9 |
-| Megacity Siege 2026§ | 0% | 0% | 24.4 | 7.5 |
-| Financial Contagion 2026¶ | 0% | 0% | 32.3 | 8.7 |
+| Taiwan Strait 2026 | 0% | 0% | 32.1 | 8.3 |
+| Iran Nuclear 2026 | 0% | 14% | 28.4 | 7.9 |
+| South China Sea 2026 | 0% | 0% | 26.7 | 8.7 |
+| Korean Peninsula 2026 | 0% | 0% | 26.7 | 9.6 |
+| Orbital Warfare 2026 | 0% | 0% | 27.5 | 8.9 |
+| Megacity Siege 2026 | 0% | 0% | 24.8 | 7.6 |
+| Financial Contagion 2026 | 0% | 0% | 31.5 | 8.6 |
 
-Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. †KP: 25-run post-fix baseline (seed 42). Pre-fix avg turns were 2.8 — scenario was unplayable until the v2.2.1 entanglement cap and escalation rebalance. ‡Orbital Warfare: v2.7.0 baseline (100 runs, seed 0). Heuristic NPCs favor the de-escalatory `debris_remediation_pact`; `asat_strike` is rarely selected under de-escalate posture, so the Kessler cascade is a latent tail risk rather than a baseline outcome (cf. `emp_strike`). §Megacity Siege: v2.8.0 baseline (100 runs, seed 0). A steady attrition scenario — the urban quagmire grinds rather than spikes, so avg turns sit in the normal band. ¶Financial Contagion: v2.9.0 baseline (100 runs, seed 0; systemic risk 3.1). 0% heuristic win is expected — financial stabilization requires coordinated swap lines + debt restructuring + multilateral diplomacy that pure heuristic play doesn't optimize; the debt-spiral cascade is gated on `global_finance` crisis presence, so it never spills into other scenarios.
+Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. These numbers were re-baselined at v2.10.0: the enhanced epistemic model adds per-turn perception-noise draws to the shared RNG stream, which realigns every seeded scenario (as with prior event additions). The shifts are small and no scenario changed playability — see the v2.10.0 calibration note in [CHANGELOG.md](CHANGELOG.md).
 
 Key findings from the baseline:
 
-- **Taiwan** is now the tightest scenario (σ 2.8 stability, σ 0.8 turns). Nuclear escalation dropped to 0% — the v2.0.4 posture system de-escalates at crisis level 4+, which consistently prevents Taiwan from reaching nuclear threshold.
-- **Iran** nuclear rate is 14% with Iran (IR) now an active NPC (v2.1.1). Prior v2.0.6 baseline (0% nuclear, 4.7 turns) had IR absent from the world — Iran never acted. With IR active, escalation is higher but controlled: the scenario starting levels were reduced from 2 to 1 and the crisis involved lists narrowed to direct actors to prevent multi-power escalation stacking. σ 5.4 stability reflects wider outcome spread as IR's brinkmanship doctrine creates divergent trajectories.
-- **SCS** retains the highest nuclear rate at 4%, reflecting the direct US-China military confrontation dynamic. Stability spread (σ 6.4) is still the widest of the three, driven by the autonomous engagement and semiconductor chokepoint crises creating divergent trajectories.
+- **Iran** carries the only non-zero nuclear rate (14%). IR has been an active NPC since v2.1.1, and its brinkmanship doctrine drives divergent — sometimes nuclear — trajectories. Every other scenario sits at 0% under heuristic play: the v2.0.4 posture system de-escalates at crisis level 4+, keeping conventional confrontations below the nuclear threshold.
+- **Megacity Siege** is the lowest-stability scenario (24.8) — the urban quagmire's persistent attrition grinds military/domestic every turn the front stays hot. **Taiwan** and **Financial Contagion** sit highest (31–32), reflecting recoverable economic/diplomatic crises rather than purely kinetic ones.
+- Latent tail risks rarely fire under heuristic de-escalation: `asat_strike` (Kessler cascade) and `emp_strike` are seldom selected, so the Orbital debris cascade and C4ISR collapse are tail outcomes, not baseline ones.
 - EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
 
 Reproduce:
@@ -323,7 +323,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.9.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.10.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---
