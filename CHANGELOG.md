@@ -1,5 +1,51 @@
 # Changelog
 
+## 2026-06-02 (v2.12.0)
+
+Broadened NPC domain pool — NPCs now proactively pursue the newer Krepinevich domains and the R&D
+track, instead of leaving them player/research-only. Previously the heuristic AI pooled actions only
+from each persona's `priorityDomains` (a five-domain core) plus the active-crisis domain, so
+`supply_chain` / `autonomous` / `space` / `urban` were exercised only reactively in their dedicated
+scenarios, and `technology` (R&D) was never selected by any NPC at all. The reverses the v2.11.0
+"player-facing" stance on R&D: patient powers now invest in delayed capability when calm and solvent.
+This is a **behavioral** change, so it shifts the seeded RNG stream and is **not** byte-identical to
+v2.11.0 (see Baselines).
+
+### Changed
+- **Persona `priorityDomains`** (`js/ai.js`): each persona gains 1–3 secondary domains that fit its
+  character — US `technology`/`autonomous`/`space`; CN `supply_chain`/`technology`/`space`; RU
+  `autonomous`/`space`; EU & IN `supply_chain`/`technology`; GB `supply_chain`; IR & DPRK
+  `autonomous`. The existing top-3 are untouched, so power identity is preserved.
+- **Domain-priority ladder** (`js/ai.js` `scoreAction`): a `+5` floor for any `priorityDomains` entry
+  at index ≥ 3, so extended (and the pre-existing 4th-domain IR/DPRK) actions actually score. The
+  top-three `+30/+20/+10` weights are unchanged.
+- **R&D scoring branch** (`js/ai.js` `scoreAction`): R&D actions are non-escalatory, so they earn no
+  posture/escalation bonus and need an explicit pull. A new `rdProgram` branch values the delayed
+  capability gain — `patience * 30`, `+12` if the program builds a prioritized capability, `+12` to
+  shore up a stat below 50, `−25` when `economic < 40` (can't afford the budget hit), and `−40` when
+  `crisisLevel ≥ 3` (don't start long-term R&D mid-crisis). Net effect: a calm-turn, patient-power,
+  gap-closing behavior — fires ~15% of calm-turn actions when a tech-power has a capability gap, ~2%
+  proactively, and 0% when broke, mid-crisis, or for personas without a `technology` priority.
+
+### Tests
+- Replaced the v2.11.0 guard test ("NPCs do not select technology actions by default") with three
+  tests locking in the new contract: a patient NPC with a capability gap invests in R&D on a calm
+  board; personas without `technology` never pick `rd_*`; NPCs do not start R&D mid-crisis or when
+  the economy is too weak. Full suite: 42 cascade + 15 analytics, all green.
+
+### Baselines
+- Re-baselined all seeded scenarios (100 runs / seed 0) — broadening NPC selection realigns the RNG
+  stream, so byte-identity with v2.11.0 is intentionally **not** preserved (same convention as prior
+  event/RNG additions). Shifts are small and *stabilizing*: Taiwan 32.1→32.7 / 8.3→8.4, Iran
+  28.4→30.2 / 7.9→8.2 (nuclear unchanged at 14%), South China Sea 26.7→27.1, Korean Peninsula
+  26.7→27.1 / 9.6→10.0, Orbital Warfare 27.5→30.3 (nuclear 0%→1%, a single-run tail), Megacity Siege
+  24.8→25.0, Financial Contagion 31.5→32.1. No scenario changed playability; the newly-available
+  escalatory options (`asat_strike`, `drone_swarm_deploy`) remain posture-gated tail events.
+- Natural follow-on: **Arms Race Dynamics** — make one power's sustained R&D/military spending provoke
+  a rival's matching investment, building competitive build-ups on the same `techLevel` ledger.
+
+---
+
 ## 2026-06-02 (v2.11.0)
 
 Technology Development Track — the second engine-realism feature. R&D programs convert economic

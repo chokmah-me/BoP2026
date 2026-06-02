@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.11.0 (2026-06-02)  
+**Current version:** v2.12.0 (2026-06-02)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -29,6 +29,18 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 ---
 
 ## Shipped
+
+### v2.12.x (2026-06-02)
+
+- **Broadened NPC domain pool** `v2.12.0` — the heuristic AI now proactively pursues the newer
+  Krepinevich domains and the R&D track instead of leaving them player/research-only. Each persona's
+  `priorityDomains` gains 1–3 character-fit secondary domains (top-3 identity preserved); a `+5` ladder
+  floor in `scoreAction` makes extended domains score; and a new `rdProgram` scoring branch values the
+  delayed capability gain so patient powers invest in R&D when calm, solvent, and facing a capability
+  gap (~15% of calm-turn actions with a gap, 0% when broke or mid-crisis). Behavioral change → all
+  seeded baselines re-aligned and re-baselined (stabilizing, small; see `CHANGELOG.md`). Guard test
+  replaced with three tests pinning the new contract. **Natural follow-on: Arms Race Dynamics** (make
+  rival spending provoke matching investment on the same `techLevel` ledger).
 
 ### v2.11.x (2026-06-02)
 

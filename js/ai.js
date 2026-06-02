@@ -4,7 +4,7 @@ const AI = (() => {
     US: {
       riskTolerance: 0.55,
       patience: 0.5,
-      priorityDomains: ['military', 'economic', 'diplomatic'],
+      priorityDomains: ['military', 'economic', 'diplomatic', 'technology', 'autonomous', 'space'],
       flavorText: [
         'Washington signals resolve with a forward deployment.',
         'The US leverages its economic network to apply pressure.',
@@ -16,7 +16,7 @@ const AI = (() => {
     CN: {
       riskTolerance: 0.4,
       patience: 0.9,
-      priorityDomains: ['economic', 'diplomatic', 'cyber'],
+      priorityDomains: ['economic', 'diplomatic', 'cyber', 'supply_chain', 'technology', 'space'],
       flavorText: [
         'China makes a calibrated economic move.',
         'Beijing signals displeasure through official channels.',
@@ -27,7 +27,7 @@ const AI = (() => {
     RU: {
       riskTolerance: 0.75,
       patience: 0.35,
-      priorityDomains: ['military', 'info', 'cyber'],
+      priorityDomains: ['military', 'info', 'cyber', 'autonomous', 'space'],
       flavorText: [
         'Russia exploits a perceived gap in deterrence.',
         'Moscow escalates in a domain where costs seem low.',
@@ -38,7 +38,7 @@ const AI = (() => {
     EU: {
       riskTolerance: 0.3,
       patience: 0.7,
-      priorityDomains: ['diplomatic', 'economic'],
+      priorityDomains: ['diplomatic', 'economic', 'supply_chain', 'technology'],
       flavorText: [
         'The EU issues a strongly-worded communiqué.',
         'Brussels moves toward expanded sanctions.',
@@ -49,7 +49,7 @@ const AI = (() => {
     IN: {
       riskTolerance: 0.45,
       patience: 0.7,
-      priorityDomains: ['diplomatic', 'economic'],
+      priorityDomains: ['diplomatic', 'economic', 'supply_chain', 'technology'],
       flavorText: [
         'India hedges, refusing to publicly take sides.',
         'New Delhi opens parallel back-channels.',
@@ -60,7 +60,7 @@ const AI = (() => {
     GB: {
       riskTolerance: 0.5,
       patience: 0.6,
-      priorityDomains: ['economic', 'military'],
+      priorityDomains: ['economic', 'military', 'supply_chain'],
       flavorText: [
         'The Gulf Bloc watches oil futures and adjusts posture.',
         'Gulf states quietly diversify their alignment.',
@@ -71,7 +71,7 @@ const AI = (() => {
     IR: {
       riskTolerance: 0.7,
       patience: 0.65,
-      priorityDomains: ['military', 'info', 'cyber', 'biological'],
+      priorityDomains: ['military', 'info', 'cyber', 'biological', 'autonomous'],
       flavorText: [
         'Iran activates a proxy network with plausible deniability.',
         'The IRGC escalates in a domain where attribution is unclear.',
@@ -83,7 +83,7 @@ const AI = (() => {
     DPRK: {
       riskTolerance: 0.85,
       patience: 0.35,
-      priorityDomains: ['military', 'nuclear', 'cyber', 'emp'],
+      priorityDomains: ['military', 'nuclear', 'cyber', 'emp', 'autonomous'],
       flavorText: [
         'Pyongyang tests a ballistic missile, daring the world to respond.',
         'The DPRK leverages nuclear ambiguity to extract concessions.',
@@ -231,6 +231,7 @@ const AI = (() => {
     if (domainPriority === 0) score += 30;
     else if (domainPriority === 1) score += 20;
     else if (domainPriority === 2) score += 10;
+    else if (domainPriority >= 3) score += 5; // extended priority domains are viable but secondary
 
     // risk-tolerance modifies escalatory actions (baseline)
     if (action.escalationDelta > 0) score += persona.riskTolerance * 25;
@@ -312,6 +313,19 @@ const AI = (() => {
     if (action.cancelsBPI) {
       const bpiActive = world.crises.some(c => c.t_event && c.escalationLevel > 0);
       score += (bpiActive && persona.riskTolerance < 0.4) ? 20 : -20;
+    }
+
+    // R&D: value the delayed, compounding capability gain that scoring otherwise can't see.
+    // Non-escalatory build actions earn no posture/escalation bonus, so they need an explicit
+    // pull to compete with de-escalatory diplomacy in calm "hold" turns.
+    if (action.rdProgram) {
+      const stat = action.rdProgram.stat; // 'military' | 'cyber' | 'space' | 'info'
+      let v = persona.patience * 30; // build appetite scales with patience (delayed payoff)
+      if (persona.priorityDomains.includes(stat)) v += 12; // build toward a prioritized capability
+      if (power.trueState[stat] !== undefined && power.trueState[stat] < 50) v += 12; // shore up a weak stat
+      if (power.trueState.economic < 40) v -= 25; // can't afford the budget hit
+      if (crisisLevel >= 3) v -= 40; // don't sink budget into long-term R&D mid-crisis
+      score += v;
     }
 
     // noise inversely proportional to crisis severity

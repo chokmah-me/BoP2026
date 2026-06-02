@@ -229,24 +229,25 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-Heuristic baseline (default parameters, established at v2.10.0 and byte-identical at v2.11.0; 100 runs, seed 0, all on one engine build so rows are directly comparable):
+Heuristic baseline (default parameters, re-baselined at v2.12.0; 100 runs, seed 0, all on one engine build so rows are directly comparable):
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
-| Taiwan Strait 2026 | 0% | 0% | 32.1 | 8.3 |
-| Iran Nuclear 2026 | 0% | 14% | 28.4 | 7.9 |
-| South China Sea 2026 | 0% | 0% | 26.7 | 8.7 |
-| Korean Peninsula 2026 | 0% | 0% | 26.7 | 9.6 |
-| Orbital Warfare 2026 | 0% | 0% | 27.5 | 8.9 |
-| Megacity Siege 2026 | 0% | 0% | 24.8 | 7.6 |
-| Financial Contagion 2026 | 0% | 0% | 31.5 | 8.6 |
+| Taiwan Strait 2026 | 0% | 0% | 32.7 | 8.4 |
+| Iran Nuclear 2026 | 0% | 14% | 30.2 | 8.2 |
+| South China Sea 2026 | 0% | 0% | 27.1 | 8.7 |
+| Korean Peninsula 2026 | 0% | 0% | 27.1 | 10.0 |
+| Orbital Warfare 2026 | 0% | 1% | 30.3 | 9.0 |
+| Megacity Siege 2026 | 0% | 0% | 25.0 | 7.8 |
+| Financial Contagion 2026 | 0% | 0% | 32.1 | 8.8 |
 
-Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. These numbers were re-baselined at v2.10.0: the enhanced epistemic model adds per-turn perception-noise draws to the shared RNG stream, which realigns every seeded scenario (as with prior event additions). The shifts are small and no scenario changed playability — see the v2.10.0 calibration note in [CHANGELOG.md](CHANGELOG.md).
+Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. These numbers were re-baselined at v2.12.0: broadening the NPC action pool (NPCs now proactively pursue R&D and the newer Krepinevich domains) changes NPC action selection and realigns every seeded scenario (as with prior RNG-stream shifts). The shifts are small — stability mostly ticked up a few tenths and no scenario changed playability — see the v2.12.0 calibration note in [CHANGELOG.md](CHANGELOG.md).
 
 Key findings from the baseline:
 
 - **Iran** carries the only non-zero nuclear rate (14%). IR has been an active NPC since v2.1.1, and its brinkmanship doctrine drives divergent — sometimes nuclear — trajectories. Every other scenario sits at 0% under heuristic play: the v2.0.4 posture system de-escalates at crisis level 4+, keeping conventional confrontations below the nuclear threshold.
-- **Megacity Siege** is the lowest-stability scenario (24.8) — the urban quagmire's persistent attrition grinds military/domestic every turn the front stays hot. **Taiwan** and **Financial Contagion** sit highest (31–32), reflecting recoverable economic/diplomatic crises rather than purely kinetic ones.
+- **Megacity Siege** is the lowest-stability scenario (25.0) — the urban quagmire's persistent attrition grinds military/domestic every turn the front stays hot. **Taiwan** and **Financial Contagion** sit highest (32+), reflecting recoverable economic/diplomatic crises rather than purely kinetic ones.
+- Broadening the NPC pool at v2.12.0 *raised* stability a few tenths in most scenarios rather than lowering it: NPCs now spend some calm-turn action points on non-escalatory R&D and defensive capability-building (`rd_*`, `satellite_hardening`, `debris_remediation_pact`) instead of escalatory cycling, and the posture system keeps the newly-available escalatory options (`asat_strike`, `drone_swarm_deploy`) tail events rather than baseline behavior.
 - Latent tail risks rarely fire under heuristic de-escalation: `asat_strike` (Kessler cascade) and `emp_strike` are seldom selected, so the Orbital debris cascade and C4ISR collapse are tail outcomes, not baseline ones.
 - EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
 
@@ -312,7 +313,7 @@ See [CLAUDE.md](CLAUDE.md) for full architecture notes.
 - Parameters (cascade weights, AI personality values) are calibrated for plausibility, not fit to historical data.
 - No leader-level agents. Powers act as unitary actors.
 - Domestic politics is a single scalar, not a structured political system.
-- No arms race dynamics yet. Technology development is modeled via the R&D track (v2.11.0) — delayed, compounding capability gains — but capability does not yet erode or trigger competitive build-ups.
+- No arms race dynamics yet. Technology development is modeled via the R&D track (v2.11.0), and as of v2.12.0 NPCs proactively invest in it (and the other newer domains) when calm and patient — but capability does not yet erode or trigger *competitive* build-ups (one power's spending does not yet provoke a rival's matching response).
 - Nuclear threshold (crisis level 5) ends the game; actual nuclear use mechanics are not modeled.
 
 See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding and appropriate uses.
@@ -323,7 +324,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.11.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.12.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

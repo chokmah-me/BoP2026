@@ -1,4 +1,4 @@
-# Zenodo Deposit — Balance of Power 2026 v2.11.0
+# Zenodo Deposit — Balance of Power 2026 v2.12.0
 
 **Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
 **Deposit Date:** 24 May 2026 (updated 2 June 2026)  
@@ -28,7 +28,7 @@ Calibrated for face validity against open-source IR literature. Not intended for
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.11.0)
+## Files Included in This Deposit (v2.12.0)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
@@ -68,9 +68,18 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.11.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.12.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
 
 ## Version History
+
+**v2.12.0 (2026-06-02):** Broadened NPC domain pool — the heuristic AI now proactively pursues the
+newer Krepinevich domains and the R&D track instead of leaving them player/research-only. Each
+persona's `priorityDomains` gains 1–3 character-fit secondary domains (the top-3 identity is
+preserved), a `+5` ladder floor in `scoreAction` lets those extended domains score, and a new
+`rdProgram` scoring branch values the delayed capability gain so patient powers invest in R&D when
+calm, solvent, and facing a capability gap (and never mid-crisis, broke, or without a `technology`
+priority). Behavioral change → seeded baselines re-aligned and re-baselined (small, stabilizing
+shifts; not byte-identical to v2.11.0, same convention as prior RNG-stream additions).
 
 **v2.11.0 (2026-06-02):** Technology Development Track — the second engine-realism feature. A new
 `technology` action domain (🔬) with four R&D programs (`rd_military`/`rd_cyber`/`rd_space`/`rd_info`)

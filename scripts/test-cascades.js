@@ -529,13 +529,40 @@ test('sustained R&D compounds: tier-2 gain exceeds tier-1', () => {
   assert.ok(secondGain > firstGain, `tier-2 gain (${secondGain}) should exceed tier-1 (${firstGain})`);
 });
 
-test('NPCs do not select technology actions by default (player/research-facing)', () => {
+test('a patient NPC invests in R&D to close a capability gap on a calm board', () => {
   const world = makeWorld();
-  for (const id of ['CN', 'RU', 'EU', 'IN', 'GB']) {
+  for (const c of world.crises) c.escalationLevel = 0; // calm: no active crisis
+  set(world, 'CN', { cyber: 20 });                     // CN (patience 0.9) now has a cyber gap
+  Math.random = () => 0.5;                              // pin noise term to zero
+  const decided = ctx.AI.decideTurn('CN', world);
+  assert.ok(decided.some(a => a.actionId === 'rd_cyber'),
+    `CN should invest in cyber R&D to close the gap, got ${decided.map(a => a.actionId).join(',')}`);
+});
+
+test('NPCs without a technology priority never select R&D', () => {
+  const world = makeWorld();
+  for (const c of world.crises) c.escalationLevel = 0;
+  Math.random = () => 0.5;
+  for (const id of ['RU', 'GB']) { // RU/GB personas carry no `technology` domain
+    if (!world.powers[id]) continue;
     const decided = ctx.AI.decideTurn(id, world);
     assert.ok(!decided.some(a => a.actionId.startsWith('rd_')),
-      `${id} should not pick an R&D action from the default pool, got ${decided.map(a => a.actionId).join(',')}`);
+      `${id} has no technology priority and must not pick R&D, got ${decided.map(a => a.actionId).join(',')}`);
   }
+});
+
+test('NPCs do not start R&D mid-crisis or when the economy is too weak', () => {
+  Math.random = () => 0.5;
+  // mid-crisis: CN is in the L3 trade war on the default board → long-term R&D suppressed
+  const w1 = makeWorld();
+  assert.ok(!ctx.AI.decideTurn('CN', w1).some(a => a.actionId.startsWith('rd_')),
+    'CN should not launch an R&D program while in an active high-level crisis');
+  // broke: a calm board with a depleted treasury → cannot absorb the budget hit
+  const w2 = makeWorld();
+  for (const c of w2.crises) c.escalationLevel = 0;
+  set(w2, 'CN', { economic: 20, cyber: 20 });
+  assert.ok(!ctx.AI.decideTurn('CN', w2).some(a => a.actionId.startsWith('rd_')),
+    'CN should not fund R&D when the economy is too weak to absorb the cost');
 });
 
 // ── summary ───────────────────────────────────────────────────────────────────
