@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-06-19 (v2.13.0)
+
+Arms Race Dynamics — a rival power's sustained R&D now provokes matching investment on the same
+`techLevel` ledger. The heuristic `scoreAction` R&D branch (`js/ai.js`) gains a catch-up term: a power
+scans rivals' `techLevel[stat]`, and when it falls behind on a calm board it is pulled to fund the
+matching R&D program even with no capability gap of its own. The pull scales with the gap (capped at
+24) and the persona's `riskTolerance`, and is gated to calm turns (`crisisLevel < 3`) so it never
+diverts budget mid-crisis. Builds directly on the v2.11.0 `techLevel` ledger and the v2.12.0 NPC R&D
+pooling. Closes the "Arms Race Dynamics" Medium-Priority roadmap item.
+
+This is a **behavioral** change, so it shifts the seeded RNG stream. Re-baselined (taiwan_strait_2026,
+heuristic, seed 0, 100 runs): avg stability 32.7 → 33.0, avg turns 8.4 → 8.3, avg systemic risk 3.5
+(unchanged), nuclear 0% (unchanged) — a small, stabilizing shift. 3 new contract tests pin the
+behavior (matches a rival lead; no pull without a lead; suppressed mid-crisis).
+
 ## 2026-06-02 (v2.12.0)
 
 Broadened NPC domain pool — NPCs now proactively pursue the newer Krepinevich domains and the R&D

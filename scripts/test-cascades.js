@@ -610,6 +610,45 @@ test('broadening priorityDomains does not displace a persona\'s core identity', 
     `CN's #1 priority domain (economic) should still drive its turn, got domains ${domains.join(',')}`);
 });
 
+// ── arms race dynamics (v2.13.0) ──────────────────────────────────────────────
+// A rival's sustained R&D shows up on their techLevel ledger. Falling behind now
+// pulls a power to match investment on the SAME stat, even with no capability gap
+// of its own. Positive: a rival lead surfaces the matching R&D on a calm board.
+// Negative: no lead → no pull; and the pull is suppressed mid-crisis.
+
+console.log('\n=== arms race dynamics (v2.13.0) ===');
+
+test('a power matches a rival that leads on the techLevel ledger', () => {
+  const world = makeWorld();
+  for (const c of world.crises) c.escalationLevel = 0;                       // calm board
+  set(world, 'CN', { cyber: 75, space: 75, military: 75, economic: 75, info: 75 }); // no gap of its own
+  world.powers.US.techLevel.cyber = 3;                                       // rival has been investing
+  Math.random = () => 0.5;                                                   // pin noise to zero
+  const ids = ctx.AI.decideTurn('CN', world).map(a => a.actionId);
+  assert.ok(ids.includes('rd_cyber'),
+    `CN should match the rival's cyber buildup, got ${ids.join(',')}`);
+});
+
+test('no arms-race pull when no rival leads the ledger', () => {
+  const world = makeWorld();
+  for (const c of world.crises) c.escalationLevel = 0;
+  set(world, 'CN', { cyber: 75, space: 75, military: 75, economic: 75, info: 75 });
+  Math.random = () => 0.5;                                                   // ledger all-equal (zeros)
+  const ids = ctx.AI.decideTurn('CN', world).map(a => a.actionId);
+  assert.ok(!ids.some(id => id.startsWith('rd_')),
+    `with no rival lead and no gap, CN should not fund R&D, got ${ids.join(',')}`);
+});
+
+test('arms-race pull is suppressed mid-crisis', () => {
+  const world = makeWorld();                                                 // CN sits in the L3 trade war
+  set(world, 'CN', { cyber: 75, space: 75, military: 75, economic: 75, info: 75 });
+  world.powers.US.techLevel.cyber = 3;
+  Math.random = () => 0.5;
+  const ids = ctx.AI.decideTurn('CN', world).map(a => a.actionId);
+  assert.ok(!ids.some(id => id.startsWith('rd_')),
+    `CN should not launch arms-race R&D mid-crisis, got ${ids.join(',')}`);
+});
+
 // ── summary ───────────────────────────────────────────────────────────────────
 
 console.log(`\n${'─'.repeat(50)}`);

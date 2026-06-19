@@ -30,6 +30,15 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 
 ## Shipped
 
+### v2.13.x (2026-06-19)
+
+- **Arms Race Dynamics** `v2.13.0` — rival spending now provokes matching investment on the same
+  `techLevel` ledger. `scoreAction`'s R&D branch (`js/ai.js`) gains a catch-up term: falling behind a
+  rival's `techLevel[stat]` pulls a power to fund the matching program on a calm board, scaled by the
+  gap (capped) and `riskTolerance`, gated to `crisisLevel < 3`. Builds on the v2.11.0 ledger and the
+  v2.12.0 R&D pooling. Behavioral change → seeded baselines re-aligned (small, stabilizing; see
+  `CHANGELOG.md`). 3 contract tests added. Closes the Medium-Priority "Arms Race Dynamics" item.
+
 ### v2.12.x (2026-06-02)
 
 - **Broadened NPC domain pool** `v2.12.0` — the heuristic AI now proactively pursues the newer
@@ -242,7 +251,7 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 |---|---|
 | ~~**Enhanced Epistemic Model**~~ | ~~Perception drift + intelligence quality decay. Perceived vs. true state divergence accumulates over time.~~ **Shipped v2.10.0** |
 | ~~**Technology Development Track**~~ | ~~R&D investment with delayed capability gains.~~ **Shipped v2.11.0** |
-| **Arms Race Dynamics** | Military stat growth curves based on sustained spending. |
+| ~~**Arms Race Dynamics**~~ | ~~Military stat growth curves based on sustained spending.~~ **Shipped v2.13.0** |
 | ~~**Space domain**~~ | ~~Attacks on satellites and space assets. New actions + scenario.~~ | **Shipped v2.7.0** |
 | ~~**Urban Operations**~~ | ~~Megacity warfare mechanics (Krepinevich #6).~~ | **Shipped v2.8.0** (urban quagmire attrition cascade; no new stat) |
 

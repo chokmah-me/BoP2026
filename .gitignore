@@ -8,3 +8,4 @@ logs/
 *.local
 # Add any test output files that might contain prompt logs
 debug-*.json
+*.hashlinebak

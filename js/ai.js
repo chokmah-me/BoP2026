@@ -325,6 +325,18 @@ const AI = (() => {
       if (power.trueState[stat] !== undefined && power.trueState[stat] < 50) v += 12; // shore up a weak stat
       if (power.trueState.economic < 40) v -= 25; // can't afford the budget hit
       if (crisisLevel >= 3) v -= 40; // don't sink budget into long-term R&D mid-crisis
+      // Arms-race dynamics: a rival's sustained spending shows up on their techLevel
+      // ledger; falling behind pulls assertive/patient powers to match on the same stat.
+      let rivalLead = 0;
+      for (const [otherId, other] of Object.entries(world.powers)) {
+        if (otherId === powerId) continue;
+        const mine = power.techLevel?.[stat] || 0;
+        const theirs = other.techLevel?.[stat] || 0;
+        if (theirs - mine > rivalLead) rivalLead = theirs - mine;
+      }
+      if (rivalLead > 0 && crisisLevel < 3) {
+        v += Math.min(rivalLead * 8, 24) * (0.5 + persona.riskTolerance * 0.5);
+      }
       score += v;
     }
 
