@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const { chromium } = require('C:/Users/Elke Shayna/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright');
+const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');

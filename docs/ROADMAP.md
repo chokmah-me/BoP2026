@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.12.0 (2026-06-02)  
+**Current version:** v2.13.1 (2026-08-05)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -38,6 +38,10 @@ BoP2026 operationalizes several of these insights through expanded domains and c
   gap (capped) and `riskTolerance`, gated to `crisisLevel < 3`. Builds on the v2.11.0 ledger and the
   v2.12.0 R&D pooling. Behavioral change → seeded baselines re-aligned (small, stabilizing; see
   `CHANGELOG.md`). 3 contract tests added. Closes the Medium-Priority "Arms Race Dynamics" item.
+- **Fixes** `v2.13.1` — `test:browser` no longer depends on a machine-specific Playwright path
+  (now a normal devDependency); `load-engine.js` now asserts every expected engine global attached
+  after load instead of only checking `BoP`, failing loudly with a named module list on regression.
+  See `CHANGELOG.md`.
 
 ### v2.12.x (2026-06-02)
 

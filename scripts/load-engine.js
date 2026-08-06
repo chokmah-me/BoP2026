@@ -52,7 +52,17 @@ function loadEngine() {
 
   MODULES.forEach(load);
 
-  if (!ctx.BoP) throw new Error('Failed to load BoP oracle.');
+  // If a module ever stops matching the `const/let NAME =` rewrite pattern above
+  // (e.g. switches to `class Foo {}`, destructuring, or multi-name `const`), its
+  // singleton silently stays script-scoped and never lands on `ctx`. Fail loudly
+  // here instead of letting it surface later as an unrelated ReferenceError deep
+  // inside cascades.js or ai.js.
+  const EXPECTED_GLOBALS = ['State', 'Domains', 'Cascades', 'Epistemic', 'Events', 'AI', 'BoP'];
+  const missing = EXPECTED_GLOBALS.filter(name => !ctx[name]);
+  if (missing.length) {
+    throw new Error(`load-engine: module(s) failed to attach to global scope: ${missing.join(', ')}. ` +
+      `Check for a top-level declaration in one of ${MODULES.join(', ')} that the const/let rewrite regex doesn't match (e.g. class, destructuring, or multi-name const).`);
+  }
   return ctx;
 }
 

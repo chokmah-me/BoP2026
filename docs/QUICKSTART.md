@@ -157,7 +157,7 @@ npm test
 
 `test-analytics.js` covers schema, delta reconstruction, determinism, post-mortem filename, and
 saveLog payload; `test-cascades.js` covers cascade thresholds and idempotency. Exit 0 = pass.
-(The browser smoke test needs Playwright and runs separately via `npm run test:browser`.)
+(The browser smoke test needs Playwright — run `npm install` once, then `npm run test:browser`.)
 
 ---
 

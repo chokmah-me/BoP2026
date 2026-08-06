@@ -590,7 +590,7 @@ while (!BoP.getState().gameOver) {
 | `scripts/sensitivity-sweep.js` | `node scripts/sensitivity-sweep.js` | Sweeps RU/CN riskTolerance and cascade severity, outputs markdown tables |
 | `scripts/test-analytics.js` | `node scripts/test-analytics.js` | regression tests for export correctness |
 | `scripts/test-cascades.js` | `node scripts/test-cascades.js` | cascade/threshold/idempotency regression tests |
-| `scripts/load-engine.js` | `require('./load-engine').loadEngine()` | shared VM loader; returns the engine context |
+| `scripts/load-engine.js` | `require('./load-engine').loadEngine()` | shared VM loader; returns the engine context; throws if any expected global (`State`/`Domains`/`Cascades`/`Epistemic`/`Events`/`AI`/`BoP`) failed to attach |
 
 `npm test` runs the dependency-free Node tests (`test-cascades.js` + `test-analytics.js`).
 `analyze-results.js` accepts both the legacy `{ result: SimResult }` format and the current `{ analytics }` format.

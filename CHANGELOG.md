@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-08-05 (v2.13.1)
+
+### Fixed
+- **`test:browser` no longer requires a personal machine path** (`scripts/test-browser.js`,
+  `package.json`): `require()`'d Playwright via a hardcoded npx-cache path specific to one
+  machine, so `npm run test:browser` failed with `MODULE_NOT_FOUND` for anyone else. Now a
+  plain `require('playwright')`, with `playwright: ^1.48.0` added as a `devDependency`.
+- **`load-engine.js` fails loudly on a broken module load** (`scripts/load-engine.js`): the
+  Node VM loader only checked that `ctx.BoP` existed after loading all engine IIFEs. If a
+  future engine file used a top-level `class`, destructuring, or multi-name `const` —
+  patterns the `const/let → var` rewrite regex doesn't match — its singleton would silently
+  never attach to the shared global, surfacing later as an unrelated `ReferenceError` deep
+  inside another module. Now asserts `State, Domains, Cascades, Epistemic, Events, AI, BoP`
+  are all present and throws a named error listing exactly what's missing.
+
 ## 2026-06-19 (v2.13.0)
 
 Arms Race Dynamics — a rival power's sustained R&D now provokes matching investment on the same
