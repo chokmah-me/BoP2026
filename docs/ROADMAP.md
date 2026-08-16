@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.13.1 (2026-08-05)  
+**Current version:** v2.13.2 (2026-08-16)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -42,6 +42,9 @@ BoP2026 operationalizes several of these insights through expanded domains and c
   (now a normal devDependency); `load-engine.js` now asserts every expected engine global attached
   after load instead of only checking `BoP`, failing loudly with a named module list on regression.
   See `CHANGELOG.md`.
+- **Fixes** `v2.13.2` — documented `BoP.init({ seed })` now patches mulberry32 before
+  `State.init` (was dead); repeated `BoP.seed()` no longer makes `unseed()` restore a
+  seeded closure; new 27-test engine suite is part of `npm test`. See `CHANGELOG.md`.
 
 ### v2.12.x (2026-06-02)
 

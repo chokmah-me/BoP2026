@@ -30,7 +30,11 @@ const BoP = (() => {
 
   function _patchRNG(seed) {
     if (seed == null) return;
-    _origRandom = Math.random;
+    // Idempotent: only capture the true native RNG once. Repeated seed() calls
+    // without an intervening unseed() must not overwrite _origRandom with a
+    // previous mulberry32 instance, or unseed() would restore a stale seeded
+    // closure instead of the real Math.random.
+    if (_origRandom == null) _origRandom = Math.random;
     Math.random = mulberry32(seed);
   }
 
@@ -190,6 +194,10 @@ const BoP = (() => {
       const ids = doctrines.map(d => d.id).join(', ');
       throw new Error(`Scenario "${scenarioId}" requires a doctrine. Pass options.doctrine (one of: ${ids}).`);
     }
+
+    // Honor the documented init-time seed option. Patch RNG before State.init so
+    // the epistemic noise it applies during world setup is reproducible too.
+    _patchRNG(options.seed);
 
     State.init(_data('POWERS_DATA'), scenario, options.doctrine || null);
     Events.init(_data('EVENT_TABLE'));

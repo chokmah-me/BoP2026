@@ -151,7 +151,8 @@ console.log(result.outcome.turnsPlayed);
 const step = BoP.step();   // one turn, AI decides all actions
 console.log(step.cascadeLog);
 
-// Reproducible runs (mulberry32). runBatch seeds internally.
+// Reproducible (v2.13.2+): init({ seed }) is enough. BoP.seed()/unseed() still work.
+// runBatch seeds each run internally.
 BoP.seed(42);
 BoP.init('taiwan_strait_2026');
 const seeded = BoP.run();

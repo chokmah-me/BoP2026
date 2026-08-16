@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-08-16 (v2.13.2)
+
+### Fixed
+- **`BoP.init({ seed })` now actually seeds** (`js/oracle.js`): the JSDoc and every
+  Oracle example advertised `seed?: number` on `init()`, but the body never read
+  `options.seed`. Callers that relied on the option (including
+  `scripts/sensitivity-sweep.js` and several analytics tests) were not
+  reproducible. `init()` now calls `_patchRNG(options.seed)` before `State.init`,
+  so epistemic setup noise is on the same stream as the run.
+- **Repeated `BoP.seed()` no longer corrupts `unseed()`** (`js/oracle.js`):
+  `_patchRNG` overwrote `_origRandom = Math.random` on every call, so a
+  save/branch workflow that called `seed()` more than once made the next
+  `unseed()` restore a mulberry32 closure instead of native `Math.random`. Now
+  the native RNG is captured only once (`if (_origRandom == null)`).
+- **Engine contract suite** (`scripts/test-engine.js`, `package.json`): 27
+  headless tests cover game-over reasons, GSI rounding, systemic-risk pressure,
+  Oracle determinism/branching/`runBatch`/init overrides, and `decideTurn`
+  budget/patience invariants. `npm test` now runs cascades → engine → analytics.
+
 ## 2026-08-05 (v2.13.1)
 
 ### Fixed

@@ -83,7 +83,7 @@ Initialize a new game. Must be called before `step()` or `run()`.
 |--------|------|-------------|
 | `doctrine` | `string` | Doctrine id (e.g. `'realist'`) |
 | `player` | `string` | Power the AI controls as player (default `'US'`) |
-| `seed` | `number` | RNG seed for reproducibility |
+| `seed` | `number` | RNG seed for reproducibility. Honored since v2.13.2: patches mulberry32 *before* `State.init` so setup noise is on the same stream. Stays installed until `BoP.unseed()`. |
 | `cascadeScale` | `number` | Multiplier on systemic event stat deltas (default `1.0`) |
 | `paramOverrides` | `object` | Per-power overrides — see below |
 | `crisisOverrides` | `object` | `{ [crisisId]: { escalationLevel: n } }` |
@@ -111,8 +111,11 @@ listing the valid doctrine ids.
 ### `BoP.seed(n)` / `BoP.unseed()`
 
 Make a run reproducible by replacing `Math.random` with the engine's mulberry32 PRNG, seeded with
-`n`. Call `unseed()` to restore the original `Math.random`. (`runBatch()` does this internally per
-run; use these only when driving `init`/`run` yourself.)
+`n`. Call `unseed()` to restore the original `Math.random`. Prefer `init(scenarioId, { seed: n })`
+(v2.13.2+), which applies the same patch before world setup. Either form stays installed until
+`unseed()`. (`runBatch()` seeds internally per run; use these only when driving `init`/`run`
+yourself. Repeated `seed()` calls without `unseed()` between them are safe — the native RNG is
+captured once.)
 
 ```js
 BoP.seed(42);
