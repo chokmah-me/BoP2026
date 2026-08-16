@@ -1,6 +1,6 @@
 # Balance of Power 2026
 
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20370930-blue)](https://doi.org/10.5281/zenodo.20370930)  
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20370929-blue)](https://doi.org/10.5281/zenodo.20370929)  
 **Roadmap:** [Development Plan](docs/ROADMAP.md)  
 **Background:** [The Story Behind BoP2026](docs/BACKGROUND.md)  
 **Quickstart:** [Get analysis-ready data in 10 minutes](docs/QUICKSTART.md)  
@@ -325,7 +325,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.12.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370929
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

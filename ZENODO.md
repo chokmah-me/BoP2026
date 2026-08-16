@@ -1,7 +1,10 @@
-# Zenodo Deposit — Balance of Power 2026 v2.12.0
+# Zenodo Deposit — Balance of Power 2026 v2.13.2
 
-**Permanent DOI:** https://doi.org/10.5281/zenodo.20370930  
-**Deposit Date:** 24 May 2026 (updated 2 June 2026)  
+**Concept DOI (always latest):** https://doi.org/10.5281/zenodo.20370929  
+**This version:** v2.13.2 — version DOI assigned by the GitHub→Zenodo release hook  
+**First version DOI (v1.0.1, superseded):** https://doi.org/10.5281/zenodo.20370930  
+**Last minted before this remint:** v2.7.0 — https://doi.org/10.5281/zenodo.20498785  
+**Deposit Date:** 24 May 2026 (updated 16 August 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914
@@ -28,7 +31,7 @@ Calibrated for face validity against open-source IR literature. Not intended for
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.12.0)
+## Files Included in This Deposit (v2.13.2)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
@@ -68,9 +71,20 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.12.0). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370930
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370929
 
 ## Version History
+
+**v2.13.2 (2026-08-16):** `BoP.init({ seed })` now actually patches mulberry32 before `State.init`
+(the documented option was dead). Repeated `BoP.seed()` no longer makes `unseed()` restore a
+seeded closure. New 27-test engine suite is part of `npm test`. No game-logic / baseline change.
+
+**v2.13.1 (2026-08-05):** Portable Playwright `require` for `test:browser`; `load-engine.js` asserts
+every expected engine global attached after load.
+
+**v2.13.0 (2026-06-19):** Arms Race Dynamics — a rival's lead on the `techLevel` ledger pulls a
+calm-board power to fund the matching R&D program. Seeded Taiwan baseline re-aligned (small,
+stabilizing).
 
 **v2.12.0 (2026-06-02):** Broadened NPC domain pool — the heuristic AI now proactively pursues the
 newer Krepinevich domains and the R&D track instead of leaving them player/research-only. Each
