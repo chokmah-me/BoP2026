@@ -1,7 +1,7 @@
 # Zenodo Deposit — Balance of Power 2026 v2.13.2
 
 **Concept DOI (always latest):** https://doi.org/10.5281/zenodo.20370929  
-**This version:** v2.13.2 — version DOI assigned by the GitHub→Zenodo release hook  
+**This version:** v2.13.2 — https://doi.org/10.5281/zenodo.21970518  
 **First version DOI (v1.0.1, superseded):** https://doi.org/10.5281/zenodo.20370930  
 **Last minted before this remint:** v2.7.0 — https://doi.org/10.5281/zenodo.20498785  
 **Deposit Date:** 24 May 2026 (updated 16 August 2026)  
@@ -71,7 +71,7 @@ Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. 
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370929
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.21970518
 
 ## Version History
 
