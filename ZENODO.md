@@ -11,18 +11,26 @@
 
 ## Description
 
-Balance of Power 2026 is a turn-based multipolar crisis simulation for IR research and war-studies pedagogy. Eight great powers (US, China, EU, Russia, India, Gulf Bloc, Iran, North Korea) compete across twelve domains: military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous systems, biological, EMP, space, and urban. Rule-based AI opponents select actions each turn based on risk tolerance, patience, and strategic priorities. Actions cascade through first- to fourth-order effects, with probabilistic second-order outcomes and systemic threshold events.
+Balance of Power 2026 is a turn-based multipolar crisis simulation for international-relations research and war-studies pedagogy. Eight actors (US, China, EU, Russia, India, the Gulf Bloc, Iran, North Korea) compete across thirteen domains: military, economic, cyber, information, diplomatic, domestic, supply chain, autonomous systems, biological, EMP, space, urban, and technology. Each turn, AI-driven powers select actions from risk tolerance, patience, and domain priorities. Actions cascade through first- through fourth-order effects, with probabilistic second-order outcomes and systemic threshold events (financial fragmentation, debt spiral, domestic fragility, pandemic outbreak, C4ISR collapse, Kessler debris cascade, urban quagmire, compound crises).
 
-Eight playable scenarios ship with the engine: Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, Sovereignty Void 2026, Orbital Warfare 2026, Megacity Siege 2026, and Financial Contagion 2026. Together they cover all seven of Krepinevich's *7 Deadly Scenarios* (Financial Contagion closes Krepinevich #7 with a dedicated scenario). The Sovereignty Void scenario operationalizes the AOM latency-governance framework [Zenodo 19368682]: when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves autonomously before the player's action registers. The same engine runs headless via Node.js for batch parameter sweeps and counterfactual branching. Output follows the `bop2026-analytics-v1` schema.
+Eight playable scenarios ship with the engine — Taiwan Strait 2026, Iran Nuclear Threshold 2026, South China Sea 2026, Korean Peninsula 2026, Sovereignty Void 2026, Orbital Warfare 2026, Megacity Siege 2026, and Financial Contagion 2026 — covering all seven of Krepinevich's *7 Deadly Scenarios*. Five doctrines (MAGA, TWELVER, EU_FATALISM, MING, JUCHE) set ratification time and personality. Sovereignty Void operationalizes the AOM latency-governance framework ([10.5281/zenodo.19368682](https://doi.org/10.5281/zenodo.19368682)): when doctrinal ratification time (t_rat) exceeds the boost-phase intercept window (t_event), the system resolves before the player's action registers.
 
-Calibrated for face validity against open-source IR literature. Not intended for forecasting or policy prescription.
+The engine is designed for two uses:
+
+1. **Classroom / wargame** — open `index.html` in a browser; no server, no build, no npm. Play any scenario; Save Log / auto-save writes a post-mortem JSON; the Research panel runs in-browser batches.
+2. **Research companion** — headless Node.js (18+) batch runs, parameter sweeps (`--cn-risk`, `--us-patience`, `--cascade-scale`), counterfactual branching via the Oracle API (`BoP.init` / `step` / `run` / `runBatch`, `getState` / `setState`, NPC and player overrides). Output is `bop2026-analytics-v1` (per-turn state deltas, relationship shifts, crisis levels, systemic-risk index) for Python or R. Optional DeepSeek LLM NPC backend (heuristic fallback; symmetric AOM prompt by default).
+
+Also in this deposit: perishable intelligence (quality decay + perception drift), a delayed-payoff technology / R&D ledger with arms-race catch-up, posture-stable heuristic AI (escalate / hold / de-escalate / consolidate; compound-crisis avoidance; escalation lock), and a 27-test engine contract suite under `npm test`.
+
+Calibrated for face validity against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not regression-fitted to history. **Not intended for forecasting or policy prescription.** What it can do honestly: show how crises cascade; let a researcher ask "what if China is more risk-tolerant" under a fixed seed; generate synthetic trajectories for method work; exercise latency-governance (t_rat vs t_event) as a structural constraint rather than a tunable knob. Those uses need internal consistency, not empirical fit.
 
 ## Intended Use
 
-- IR and war-studies pedagogy (classroom wargaming)
-- Parameter sensitivity analysis and counterfactual exploration
-- Generation of synthetic cascade data for method development
+- IR and war-studies pedagogy (classroom wargaming; no install)
+- Parameter sensitivity analysis and counterfactual branching (Oracle API)
+- Generation of synthetic cascade trajectories (`bop2026-analytics-v1`)
 - Latency-governance research: AOM boost-phase intercept simulation
+- Optional LLM-NPC comparison against the heuristic baseline
 
 **Not intended for:**
 - Forecasting real-world crises
@@ -39,35 +47,11 @@ All parameters are calibrated for **face validity** against open-source IR liter
 - Baseline results for all eight scenarios
 - Model assumptions and known limitations
 
-## Release Notes — v2.4.0
+## Release Notes — v2.13.2
 
-**What is this?**
+v2.13.2 is a reproducibility fix on the Oracle seed path, not a new scenario or cascade rule. `BoP.init({ seed })` now actually patches the mulberry32 stream before `State.init` (the documented option was dead, so Oracle examples and `sensitivity-sweep.js` were not reproducible). Repeated `BoP.seed()` no longer makes `unseed()` restore a seeded closure. A 27-test engine contract suite is part of `npm test`. Game logic and seeded baselines are unchanged from v2.13.0 (Arms Race Dynamics on the `techLevel` ledger).
 
-BoP2026 is a crisis simulation you can play in a browser or run headless from the command line to generate synthetic geopolitical data. v2.4.0 adds the Sovereignty Void scenario and the AOM latency-governance framework, extending the autonomous domain to model boost-phase missile intercept timing constraints.
-
-**Sovereignty Void scenario (v2.4.0)**
-
-`sovereignty_void_2026` operationalizes the latency-governance gap from the AOM paper [Zenodo 19368682]. Golden Dome is online. The DPRK boost-phase window is 90 seconds; the Taiwan hypersonic window is 120 seconds. Your doctrinal ratification time (t_rat) determines whether you can close the window. With EU_FATALISM (t_rat=300s), both crises void every turn. With MING (t_rat=120s), you can close the Taiwan window but not the DPRK one. No human-in-the-loop doctrine closes both — the structural gap is a feature of boost-phase physics, not a parameter to tune.
-
-Three resolution paths: (1) authorize the intercept before the window closes; (2) pre-delegate launch authority to the autonomous system (closes the gap, violates DoDD 3000.09, renders your military stats epistemically opaque — Rice-Theorem mask); (3) revert to midcourse defense (preserves human control, forfeits the intercept advantage, adversary reads the stand-down as hesitation).
-
-**JUCHE doctrine (v2.4.0)**
-
-DPRK is now playable for the first time. Juche Self-Reliance doctrine: t_rat=45s (fastest of any doctrine — closes both boost-phase windows), riskTolerance=0.85, patience=0.35, Expert difficulty. Win condition: nuclear deterrence achieved (nuclear ≥ 4) without exchange and without US military dominance exceeding 30 points.
-
-**AOM-aware AI (v2.4.0)**
-
-Both the heuristic AI and DeepSeek LLM backend understand the latency mechanic. The heuristic scores `boost_phase_intercept` with a large posture-restoring bonus when the window is closeable, suppressing it when the window has already closed. DeepSeek NPCs receive an explicit `LATENCY GOVERNANCE (AOM):` block in their system prompt — player powers see their own t_rat and per-crisis verdicts; NPC powers see the player's t_rat and framing on how to exploit the ratification gap (escalate BPI crises; escalate c2_blackout to widen the gap by 30s).
-
-**Heuristic baseline (v2.4.0, default parameters)**
-
-| Scenario | Nuclear % | Avg stability | Avg turns | Notes |
-|---|---|---|---|---|
-| Taiwan Strait 2026 | 0% | 22.5 | 4.7 | |
-| Iran Nuclear 2026 | 14% | 20.7 | 4.4 | |
-| South China Sea 2026 | 4% | 21.2 | 4.7 | |
-| Korean Peninsula 2026 | 0% | 28.7 | 9.1 | |
-| Sovereignty Void 2026 | 0% | 31.9 | 11.0 | No doctrine — both crises void every turn |
+Full capability inventory is in the Description above; version archaeology is in the Version History below and in `CHANGELOG.md`.
 
 ## Recommended Citation
 

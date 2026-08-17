@@ -6,7 +6,7 @@
 **Quickstart:** [Get analysis-ready data in 10 minutes](docs/QUICKSTART.md)  
 **Oracle reference:** [Headless simulation, full API, output schema](docs/ORACLE.md)
 
-A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Runs in the browser as a playable game and headless via Node.js for batch simulation and parameter sensitivity analysis.
+A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Eight scenarios, thirteen domains, eight actors. Runs in the browser as a playable game and headless via Node.js for batch simulation and parameter sensitivity analysis.
 
 ---
 
