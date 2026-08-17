@@ -402,6 +402,17 @@ const State = (() => {
       return { win: false, failReason: `Economic strength at ${player.trueState.economic}/80. The restoration fell short.` };
     }
 
+    if (d.id === 'JUCHE') {
+      const n = player.trueState.nuclear;
+      const us = world.powers.US;
+      const usLead = us ? (us.trueState.military - player.trueState.military) : 0;
+      if (n >= 4 && usLead <= 30) return { win: true };
+      if (n < 4) {
+        return { win: false, failReason: `Nuclear deterrent stalled at level ${n}. The threshold was not crossed.` };
+      }
+      return { win: false, failReason: `US conventional lead is ${usLead}. The deterrent is not credible.` };
+    }
+
     // fallback: standard GSI check
     const gsi = getGlobalStabilityIndex();
     return gsi >= 40 ? { win: true } : { win: false, failReason: `Global stability: ${gsi}. Not enough.` };

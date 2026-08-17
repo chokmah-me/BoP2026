@@ -29,7 +29,7 @@ node scripts/run-bop.js [options]
 | `--<power>-risk <f>` | persona default | Override riskTolerance (0–1). E.g. `--cn-risk 0.9` |
 | `--<power>-patience <f>` | persona default | Override patience (0–1). E.g. `--ru-patience 0.2` |
 
-Power IDs: `US`, `CN`, `EU`, `RU`, `IN`, `GULF`, `IR`.
+Power IDs: `US`, `CN`, `EU`, `RU`, `IN`, `GB`, `IR`, `DPRK`. (`GB` is the Gulf Bloc. `GULF` is not an engine id.)
 
 **Common workflows:**
 
@@ -320,7 +320,7 @@ require('fs').writeFileSync('out.json', JSON.stringify(analytics, null, 2));
         domestic:  62,
         space:     55
       },
-      relationships: { CN: -55, EU: 65, RU: -40, IN: 40, GULF: 30, IR: -70 },
+      relationships: { CN: -55, EU: 65, RU: -40, IN: 40, GB: 30, IR: -70 },
       riskTolerance: 0.3,
       patience:      0.6
     },
@@ -593,9 +593,14 @@ while (!BoP.getState().gameOver) {
 | `scripts/sensitivity-sweep.js` | `node scripts/sensitivity-sweep.js` | Sweeps RU/CN riskTolerance and cascade severity, outputs markdown tables |
 | `scripts/test-analytics.js` | `node scripts/test-analytics.js` | regression tests for export correctness |
 | `scripts/test-cascades.js` | `node scripts/test-cascades.js` | cascade/threshold/idempotency regression tests |
+| `scripts/test-engine.js` | `node scripts/test-engine.js` | game-over, Oracle API, decideTurn invariants |
+| `scripts/test-catalog.js` | `node scripts/test-catalog.js` | data-contract integrity (scenarios, actions, events, doctrines) |
+| `scripts/test-features.js` | `node scripts/test-features.js` | AOM, EMP, bio, Kessler, urban, compounds, doctrines, posture |
+| `scripts/test-scenarios.js` | `node scripts/test-scenarios.js` | every scenario inits and completes; CLI process smoke |
+| `scripts/test-instrument.js` | `node scripts/test-instrument.js` | shape claims (contrast, fingerprints, cascadeScale sign, 0% default wins) |
 | `scripts/load-engine.js` | `require('./load-engine').loadEngine()` | shared VM loader; returns the engine context; throws if any expected global (`State`/`Domains`/`Cascades`/`Epistemic`/`Events`/`AI`/`BoP`) failed to attach |
 
-`npm test` runs the dependency-free Node tests (`test-cascades.js` + `test-analytics.js`).
+`npm test` runs the dependency-free Node tests (cascades → engine → analytics → catalog → features → scenarios → instrument).
 `analyze-results.js` accepts both the legacy `{ result: SimResult }` format and the current `{ analytics }` format.
 
 ---

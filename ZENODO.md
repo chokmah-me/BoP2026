@@ -1,10 +1,11 @@
-# Zenodo Deposit — Balance of Power 2026 v2.13.2
+# Zenodo Deposit — Balance of Power 2026 v2.13.4
 
 **Concept DOI (always latest):** https://doi.org/10.5281/zenodo.20370929  
-**This version:** v2.13.2 — https://doi.org/10.5281/zenodo.21970518  
+**Repo HEAD:** v2.13.4 (2026-08-17) — not yet a new Zenodo version record  
+**Last minted version:** v2.13.2 — https://doi.org/10.5281/zenodo.21970518  
 **First version DOI (v1.0.1, superseded):** https://doi.org/10.5281/zenodo.20370930  
-**Last minted before this remint:** v2.7.0 — https://doi.org/10.5281/zenodo.20498785  
-**Deposit Date:** 24 May 2026 (updated 16 August 2026)  
+**Last minted before the v2.13.2 remint:** v2.7.0 — https://doi.org/10.5281/zenodo.20498785  
+**Deposit Date:** 24 May 2026 (updated 17 August 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914
@@ -20,7 +21,7 @@ The engine is designed for two uses:
 1. **Classroom / wargame** — open `index.html` in a browser; no server, no build, no npm. Play any scenario; Save Log / auto-save writes a post-mortem JSON; the Research panel runs in-browser batches.
 2. **Research companion** — headless Node.js (18+) batch runs, parameter sweeps (`--cn-risk`, `--us-patience`, `--cascade-scale`), counterfactual branching via the Oracle API (`BoP.init` / `step` / `run` / `runBatch`, `getState` / `setState`, NPC and player overrides). Output is `bop2026-analytics-v1` (per-turn state deltas, relationship shifts, crisis levels, systemic-risk index) for Python or R. Optional DeepSeek LLM NPC backend (heuristic fallback; symmetric AOM prompt by default).
 
-Also in this deposit: perishable intelligence (quality decay + perception drift), a delayed-payoff technology / R&D ledger with arms-race catch-up, posture-stable heuristic AI (escalate / hold / de-escalate / consolidate; compound-crisis avoidance; escalation lock), and a 27-test engine contract suite under `npm test`.
+Also in this deposit: perishable intelligence (quality decay + perception drift), a delayed-payoff technology / R&D ledger with arms-race catch-up, posture-stable heuristic AI (escalate / hold / de-escalate / consolidate; compound-crisis avoidance; escalation lock), and `npm test` covering cascade/engine/analytics contracts, catalog integrity, feature families, scenario smoke, and an instrument eval that gates scenario contrast and personality fingerprints.
 
 Calibrated for face validity against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not regression-fitted to history. **Not intended for forecasting or policy prescription.** What it can do honestly: show how crises cascade; let a researcher ask "what if China is more risk-tolerant" under a fixed seed; generate synthetic trajectories for method work; exercise latency-governance (t_rat vs t_event) as a structural constraint rather than a tunable knob. Those uses need internal consistency, not empirical fit.
 
@@ -39,7 +40,7 @@ Calibrated for face validity against open-source IR literature (Fearon 1995, Jer
 
 All parameters are calibrated for **face validity** against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not statistical fitting.
 
-## Files Included in This Deposit (v2.13.2)
+## Files Included in This Deposit (v2.13.4)
 
 - Full source code (`js/`, `data/`, `scripts/`)
 - Browser interface (`index.html`)
@@ -47,17 +48,21 @@ All parameters are calibrated for **face validity** against open-source IR liter
 - Baseline results for all eight scenarios
 - Model assumptions and known limitations
 
-## Release Notes — v2.13.2
+## Release Notes — v2.13.4
 
-v2.13.2 is a reproducibility fix on the Oracle seed path, not a new scenario or cascade rule. `BoP.init({ seed })` now actually patches the mulberry32 stream before `State.init` (the documented option was dead, so Oracle examples and `sensitivity-sweep.js` were not reproducible). Repeated `BoP.seed()` no longer makes `unseed()` restore a seeded closure. A 27-test engine contract suite is part of `npm test`. Game logic and seeded baselines are unchanged from v2.13.0 (Arms Race Dynamics on the `techLevel` ledger).
+v2.13.4 adds an instrument eval (`scripts/test-instrument.js`) that gates shape claims — Taiwan cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins, CN/EU fingerprints, cascadeScale sign — and banners `docs/findings.md` as a May 2026 snapshot. v2.13.3 implemented the JUCHE `deterrence_achieved` win, clamped DPRK nuclear onto the 0–5 scale, and disambiguated the SCS cable event id. Last Zenodo *version* record remains v2.13.2; cite the concept DOI until a remint.
 
 Full capability inventory is in the Description above; version archaeology is in the Version History below and in `CHANGELOG.md`.
 
 ## Recommended Citation
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.21970518
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.4). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370929
 
 ## Version History
+
+**v2.13.4 (2026-08-17):** Instrument eval in `npm test`. Findings.md bannered as a May 2026 snapshot. Citation metadata points at the concept DOI.
+
+**v2.13.3 (2026-08-17):** JUCHE `deterrence_achieved` now executes. DPRK nuclear start is 5. SCS cable event id is `undersea_cable_severance`. AOM copy: only JUCHE closes the 90s window.
 
 **v2.13.2 (2026-08-16):** `BoP.init({ seed })` now actually patches mulberry32 before `State.init`
 (the documented option was dead). Repeated `BoP.seed()` no longer makes `unseed()` restore a

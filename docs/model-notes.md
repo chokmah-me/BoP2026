@@ -74,7 +74,7 @@ These systemic events are designed to represent non-linear tipping dynamics that
 
 2. **Domestic politics as scalar**: `domestic` (0–100) captures internal stability but says nothing about regime type, political institutions, or legitimacy.
 
-3. **No arms race dynamics**: Military capability (`military`) changes each turn but there are no investment curves, technology development, or procurement timelines.
+3. **No procurement / erosion curves**: R&D programs (v2.11.0) convert economic spend into a delayed, compounding `techLevel` gain, and as of v2.13.0 a rival lead on that ledger pulls matching investment on a calm board. There is still no capability *erosion* and no multi-year procurement timeline.
 
 4. **Static geography**: The SVG map is decorative. No supply lines, no force projection costs, no contested sea lanes beyond what crises represent.
 

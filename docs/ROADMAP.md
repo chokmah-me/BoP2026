@@ -1,6 +1,6 @@
 # Balance of Power 2026 — Development Roadmap
 
-**Current version:** v2.13.2 (2026-08-16)  
+**Current version:** v2.13.4 (2026-08-17)  
 **Principal Investigator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **Status:** Active development
 
@@ -45,6 +45,12 @@ BoP2026 operationalizes several of these insights through expanded domains and c
 - **Fixes** `v2.13.2` — documented `BoP.init({ seed })` now patches mulberry32 before
   `State.init` (was dead); repeated `BoP.seed()` no longer makes `unseed()` restore a
   seeded closure; new 27-test engine suite is part of `npm test`. See `CHANGELOG.md`.
+- **Fixes** `v2.13.3` — JUCHE `deterrence_achieved` now executes (was GSI fallback);
+  DPRK nuclear start clamped to the 0–5 scale; SCS cable event id disambiguated;
+  AOM copy now says only JUCHE closes the 90s DPRK window. See `CHANGELOG.md`.
+- **Instrument eval** `v2.13.4` — `test-instrument.js` gates scenario contrast,
+  personality fingerprints, 0% default-AI wins, and cascadeScale sign. Findings.md
+  bannered as a May 2026 snapshot. See `CHANGELOG.md`.
 
 ### v2.12.x (2026-06-02)
 
@@ -178,8 +184,8 @@ BoP2026 operationalizes several of these insights through expanded domains and c
   `_latencyGate()` in `js/cascades.js` compares doctrinal `t_rat` against crisis `t_event` each
   turn; sovereignty void fires (+2 escalation, player action nullified) when the gap is positive.
   Three resolution paths: intercept (if fast enough), pre-delegate (Rice-Theorem mask on stats),
-  revert to midcourse. Structural gap: no doctrine closes the DPRK window (t_event=90s); MING
-  (t_rat=120s) can close the Taiwan window (t_event=120s).
+  revert to midcourse. JUCHE (`t_rat` 45s) closes both BPI windows; MING (`t_rat` 120s) closes
+  the Taiwan window (`t_event` 120s) only.
 - **JUCHE doctrine** `v2.4.0` — DPRK playable for the first time. t_rat=45s (fastest), Expert
   difficulty. Win condition: nuclear deterrence achieved without triggering exchange.
 - **AOM-aware AI** `v2.4.0` — Heuristic `scoreAction()` and DeepSeek `_buildPrompt()` both

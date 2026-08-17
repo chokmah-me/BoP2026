@@ -1,5 +1,13 @@
 # BoP2026 Baseline Findings
 
+> **Historical snapshot (May 2026, pre-v2.10+ recalibrations).** The percentages
+> and turn counts below describe that snapshot, not HEAD. Shape claims
+> (Taiwan cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins,
+> personality fingerprints, cascadeScale sign) are gated by
+> `node scripts/test-instrument.js` (`npm test`). Current headline triples live
+> in `CHANGELOG.md` (v2.13.0 baselines). `void%` is an AOM/prompt metric, not
+> LLM skill.
+
 **Scenario**: Taiwan Strait 2026 and Iran Nuclear Threshold 2026  
 **Runs**: 100 per scenario, seeds 0–99, default parameters, no doctrine  
 **Generated**: May 2026

@@ -218,7 +218,7 @@ window.EVENT_TABLE = {
       "cascadeRisk": null
     },
     {
-      "id": "undersea_cable_cut", "name": "Undersea Cable Severance",
+      "id": "undersea_cable_severance", "name": "Undersea Cable Severance",
       "description": "Three transpacific data cables are severed in contested waters. Attribution unclear. Global internet rerouting causes 40-hour latency surge.",
       "probability": 0.15, "conditions": [{ "crisis": "scs_sea_lane", "minEscalation": 2 }],
       "effects": { "targets": ["EU", "IN"], "statDeltas": { "info": -8, "economic": -5 } },

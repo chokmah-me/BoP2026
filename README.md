@@ -286,7 +286,7 @@ China seizes a contested reef and drone swarms have replaced coast guard skipper
 DPRK moves tactical warheads to forward positions after the latest ICBM series. Four active crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK is the primary NPC antagonist — highest riskTolerance (0.85) and lowest patience (0.35) in the game. High starting escalation (sum 5) leaves little diplomatic margin.
 
 ### Sovereignty Void, 2026
-Golden Dome is online and boost-phase physics set the clock. The AOM latency mechanic compares your doctrine's ratification time (`t_rat`) against each crisis's intercept window (`t_event`): if `t_rat > t_event`, the sovereignty void fires and your input doesn't register. **Requires a `--doctrine`** (UI hides it until one is chosen; `BoP.init` throws without one) — the headline mechanic is built around `t_rat`, which defaults to 999s with no doctrine. Crises: DPRK boost-phase launch (autonomous, `t_event` 90s — no doctrine closes it), PLA hypersonic strike (autonomous, 120s — MING can close it), C2 comms blackout (cyber, adds 30s to `t_rat`), and a dormant DoDD 3000.09 review triggered by pre-delegation. Resolution paths: intercept if fast enough, pre-delegate authority (Rice-Theorem stat mask, DoDD review), or revert to midcourse (clears delegation, restores human control).
+Golden Dome is online and boost-phase physics set the clock. The AOM latency mechanic compares your doctrine's ratification time (`t_rat`) against each crisis's intercept window (`t_event`): if `t_rat > t_event`, the sovereignty void fires and your input doesn't register. **Requires a `--doctrine`** (UI hides it until one is chosen; `BoP.init` throws without one) — the headline mechanic is built around `t_rat`, which defaults to 999s with no doctrine. Crises: DPRK boost-phase launch (autonomous, `t_event` 90s — only JUCHE closes it), PLA hypersonic strike (autonomous, 120s — MING can close it), C2 comms blackout (cyber, adds 30s to `t_rat`), and a dormant DoDD 3000.09 review triggered by pre-delegation. Resolution paths: intercept if fast enough, pre-delegate authority (Rice-Theorem stat mask, DoDD review), or revert to midcourse (clears delegation, restores human control).
 
 ### Orbital Warfare, 2026
 A destructive ASAT test seeds a debris field as GPS goes dark over a theater and cislunar resource claims harden. Player is US. Four `orbit`-region crises: ASAT Demonstration (space, L1), GNSS Denial (space, L1), Comms Satellite Blackout (cyber, L1), Cislunar Resource Claim (diplomatic, L1). The signature failure mode is the **Kessler-syndrome cascade** — an `asat_strike` seeds orbital debris that bleeds onto bystanders' `space` assets, and once two-plus powers fall below the space threshold, a global `kessler_cascade` renders low Earth orbit unusable (space/military/info degrade for all). Two `orbit`-region crises at level 3 merge into the `orbital_denial` compound. The Space (counterspace) action domain — `satellite_hardening`, `orbital_isr_surge`, `asat_strike`, `debris_remediation_pact` — drives the scenario. Closes Krepinevich's "War for Space" (#5), bringing playable domain coverage to 6 of 7.
@@ -314,7 +314,7 @@ See [CLAUDE.md](CLAUDE.md) for full architecture notes.
 - Parameters (cascade weights, AI personality values) are calibrated for plausibility, not fit to historical data.
 - No leader-level agents. Powers act as unitary actors.
 - Domestic politics is a single scalar, not a structured political system.
-- No arms race dynamics yet. Technology development is modeled via the R&D track (v2.11.0), and as of v2.12.0 NPCs proactively invest in it (and the other newer domains) when calm and patient — but capability does not yet erode or trigger *competitive* build-ups (one power's spending does not yet provoke a rival's matching response).
+- Arms-race catch-up exists on the `techLevel` ledger (v2.13.0): a rival's lead pulls matching R&D on a calm board, gated off mid-crisis. There is still no capability *erosion* and no multi-year procurement timeline.
 - Nuclear threshold (crisis level 5) ends the game; actual nuclear use mechanics are not modeled.
 
 See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding and appropriate uses.
@@ -325,7 +325,7 @@ See [docs/model-notes.md](docs/model-notes.md) for full theoretical grounding an
 
 If you use BoP2026 in research or teaching, please cite it as:
 
-> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.2). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.21970518
+> Bilar, D. Y. (2026). *Balance of Power 2026* (v2.13.4). Open-source multipolar crisis simulation for IR research and war studies pedagogy. Chokmah LLC. Zenodo. https://doi.org/10.5281/zenodo.20370929
 > GitHub: https://github.com/chokmah-me/BoP2026
 
 ---

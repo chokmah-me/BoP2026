@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-08-17 (v2.13.4)
+
+### Added
+- **Instrument eval** (`scripts/test-instrument.js`): gates *shape* claims — Taiwan
+  cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins on those two,
+  CN economic / EU diplomatic fingerprints, US more military than EU, `cascadeScale: 0`
+  relieves Taiwan — not GSI bands or test count. `npm test` runs it last. Observed
+  HEAD (n=20, seed 0): Taiwan 0% nuclear / 8.4 turns; Iran 20% nuclear / 7.3 turns;
+  scale 0 lasts 12.6 turns vs 8.7 at scale 1. `docs/findings.md` is now bannered as
+  a May 2026 snapshot; its 73% Iran figure is not the current engine.
+
+## 2026-08-17 (v2.13.3)
+
+### Fixed
+- **JUCHE win condition now runs** (`js/state.js`): `checkDoctrineWin` had MAGA / TWELVER /
+  EU_FATALISM / MING and then a GSI fallback, so the advertised `deterrence_achieved`
+  rule (turn 20, DPRK nuclear ≥ 4, US military lead ≤ 30) never executed. JUCHE now
+  wins on that rule and fails with a stalled-deterrent or conventional-lead reason.
+  Nuclear exchange remains the existing pre-turn-20 lose.
+- **DPRK nuclear start is on the 0–5 scale** (`data/powers-data.js`): starting nuclear
+  was 7, above the clamp `applyStatDelta` already enforces. Set to 5 (scale max) so a
+  JUCHE game starts with a declared deterrent and the Expert puzzle is surviving 20
+  turns without the US opening a 30+ conventional lead (US 92 vs DPRK 68 = lead 24).
+- **SCS cable event id no longer collides** (`data/events-data.js`): the SCS-gated
+  “Undersea Cable Severance” shared `undersea_cable_cut` with the global Atlantic
+  sabotage event, so analytics could not tell them apart. Renamed to
+  `undersea_cable_severance`. Catalog tests now require unique event ids.
+- **AOM copy said no doctrine closes the 90s DPRK window** (`data/scenarios-data.js`,
+  `README.md`, `docs/ROADMAP.md`): JUCHE `t_rat` 45s does. Engine unchanged; flavor
+  and docs now match v2.4.0 (“closes both BPI windows”).
+
 ## 2026-08-16 (v2.13.2)
 
 ### Fixed

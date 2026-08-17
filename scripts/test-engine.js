@@ -329,6 +329,59 @@ test('decideTurn sets actionPointsRemaining to zero and records memory', () => {
   assert.strictEqual(w.powers[id].memory[0].turn, w.turn);
 });
 
+// ── Oracle extras (overrides, cascadeScale, injected player actions) ────────
+
+console.log('\n=== Oracle: overrides & cascadeScale ===');
+
+test('setNPCOverride replaces CN actions on BoP.step()', () => {
+  runScenario('taiwan_strait_2026', { seed: 1 });
+  BoP.setNPCOverride('CN', (id) => [{ actor: id, actionId: 'force_withdrawal' }]);
+  try {
+    const t = BoP.step([{ actor: 'US', actionId: 'public_statement' }]);
+    const cn = t.npcActions.filter(a => a.actor === 'CN');
+    assert.ok(cn.length >= 1, 'CN produced no actions');
+    assert.ok(cn.every(a => a.actionId === 'force_withdrawal'),
+      `CN actions: ${cn.map(a => a.actionId).join(',')}`);
+  } finally {
+    BoP.clearOverrides();
+  }
+});
+
+test('BoP.step(playerActions) records the injected player action ids', () => {
+  runScenario('taiwan_strait_2026', { seed: 1 });
+  const t = BoP.step([
+    { actor: 'US', actionId: 'public_statement' },
+    { actor: 'US', actionId: 'secret_channel', target: 'CN' }
+  ]);
+  assert.deepStrictEqual(t.playerActions.map(a => a.actionId),
+    ['public_statement', 'secret_channel']);
+});
+
+test('cascadeScale 0 zeroes 4th-order financial_fragmentation deltas', () => {
+  runScenario('taiwan_strait_2026', { seed: 1, cascadeScale: 0 });
+  const w = ctx.State.get();
+  assert.strictEqual(w.sim.cascadeScale, 0);
+  for (const id of ['US', 'CN', 'EU']) w.powers[id].trueState.economic = 30;
+  const before = w.powers.RU.trueState.economic;
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([], w);
+  assert.ok(w.activeSystemicEvents.includes('financial_fragmentation'),
+    `markers: ${JSON.stringify(w.activeSystemicEvents)}`);
+  assert.strictEqual(w.powers.RU.trueState.economic, before,
+    'scale 0 must apply a 0 economic delta');
+});
+
+test('cascadeScale 1 applies the full financial_fragmentation hit', () => {
+  runScenario('taiwan_strait_2026', { seed: 1, cascadeScale: 1 });
+  const w = ctx.State.get();
+  for (const id of ['US', 'CN', 'EU']) w.powers[id].trueState.economic = 30;
+  const before = w.powers.RU.trueState.economic;
+  Math.random = () => 0.99;
+  ctx.Cascades.resolve([], w);
+  assert.ok(w.activeSystemicEvents.includes('financial_fragmentation'));
+  assert.strictEqual(w.powers.RU.trueState.economic, before - 15);
+});
+
 test('a patient power conserves actions in a low-crisis turn', () => {
   runScenario('taiwan_strait_2026');
   const w = ctx.State.get();

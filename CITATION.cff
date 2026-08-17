@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this simulation in research or teaching, please cite it using the following metadata."
 title: "Balance of Power 2026"
 abstract: "A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Eight scenarios across thirteen domains and eight actors; browser wargame and headless Oracle API for batch runs and counterfactuals. Stylized, rule-based AI with cascade dynamics."
-version: "2.13.2"
-date-released: "2026-08-16"
+version: "2.13.4"
+date-released: "2026-08-17"
 license: "MIT"
 repository-code: "https://github.com/chokmah-me/BoP2026"
 identifiers:
@@ -12,7 +12,7 @@ identifiers:
     description: Concept DOI (always resolves to the latest version)
   - type: doi
     value: 10.5281/zenodo.21970518
-    description: This version (v2.13.2)
+    description: Last minted Zenodo version (v2.13.2); repo HEAD is v2.13.4
 keywords:
   - international relations
   - crisis simulation
@@ -48,7 +48,7 @@ preferred-citation:
       given-names: "Daniyel Yaacov"
       affiliation: "Chokmah LLC"
       orcid: "0000-0002-9040-6914"
-  version: "2.13.2"
+  version: "2.13.4"
   year: 2026
   url: "https://github.com/chokmah-me/BoP2026"
-  doi: "10.5281/zenodo.21970518"
+  doi: "10.5281/zenodo.20370929"

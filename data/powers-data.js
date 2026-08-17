@@ -57,7 +57,7 @@ window.POWERS_DATA = {
   },
   "DPRK": {
     "id": "DPRK", "name": "North Korea", "flag": "🇰🇵", "color": "#4a0000",
-    "trueState": { "military": 68, "nuclear": 7, "economic": 18, "cyber": 52, "info": 48, "domestic": 28, "space": 12 },
+    "trueState": { "military": 68, "nuclear": 5, "economic": 18, "cyber": 52, "info": 48, "domestic": 28, "space": 12 },
     "relationships": { "US": -92, "CN": 35, "EU": -55, "IN": -20, "RU": 30, "GB": -50, "IR": 25 },
     "riskTolerance": 0.85, "patience": 0.35,
     "priorityDomains": ["military", "nuclear", "cyber"],

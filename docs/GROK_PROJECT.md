@@ -1,6 +1,6 @@
 # BoP2026 — Grok Project Instructions
 
-Turn-based geopolitical simulation. Rule-based AI NPCs, seven great powers, three crisis scenarios, vanilla JS (no framework, no bundler). Two entry points: browser (`index.html`) and Node headless oracle (`scripts/run-bop.js` / `js/oracle.js`).
+Turn-based geopolitical simulation. Rule-based AI NPCs, eight powers, eight crisis scenarios, vanilla JS (no framework, no bundler). Two entry points: browser (`index.html`) and Node headless oracle (`scripts/run-bop.js` / `js/oracle.js`).
 
 **GitHub repo root:** `BoP2026/`
 
@@ -47,34 +47,22 @@ docs/
 ## Enumerated Values
 
 ### Power IDs
-`US`, `CN`, `EU`, `IN`, `RU`, `GB`, `IR`
+`US`, `CN`, `EU`, `IN`, `RU`, `GB`, `IR`, `DPRK`
 
-> Note: `GULF` appears in some older docs — the correct ID is `GB`.
+`GB` is the Gulf Bloc. `GULF` is not an engine id.
 
 ### Scenario IDs
-`taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`
+`taiwan_strait_2026`, `iran_nuclear_2026`, `south_china_sea_2026`, `korean_peninsula_2026`, `sovereignty_void_2026`, `orbital_warfare_2026`, `megacity_siege_2026`, `financial_contagion_2026`
 
-### Doctrine IDs (player only)
-| Key | Name |
-|-----|------|
-| `0` | MAGA |
-| `1` | TWELVER |
-| `2` | EU_FATALISM |
-| `3` | MING |
+`sovereignty_void_2026` requires `options.doctrine`.
 
-Pass the key as a string to `BoP.init()` doctrine option.
+### Doctrine IDs (pass the id string to `BoP.init()` `doctrine`)
+`MAGA`, `TWELVER`, `EU_FATALISM`, `MING`, `JUCHE`
 
-### Action IDs (from `Domains.getAll()`)
-```
-deploy_forces           military_exercises       arms_sale               force_withdrawal
-sanctions               trade_deal               supply_chain_reshoring  financial_pressure
-bilateral_negotiation   multilateral_forum       public_statement        secret_channel
-cyber_defense_hardening cyber_infrastructure_probe cyber_offensive_reveal attribution_claim
-release_intel           counter_narrative        plant_leak              grid_stabilization
-coalition_shoring       emergency_powers         reform_signal           critical_minerals_deal
-supply_chain_chokepoint tech_export_ban          reshoring_investment    drone_swarm_deploy
-autonomous_defense_net  counter_swarm_ops        ai_surveillance_grid
-```
+Do not pass `"0"`–`"3"`. Those numeric keys are not engine ids.
+
+### Action IDs
+Use `Domains.getAll()` — do not maintain a hand list here. Families: military, economic, diplomatic, cyber, info, domestic, supply_chain, biological, emp, autonomous (incl. AOM: `boost_phase_intercept`, `pre_delegate_authority`, `revert_midcourse_defense`), space, urban, technology (`rd_military` / `rd_cyber` / `rd_space` / `rd_info`).
 
 ### Stat Keys
 `military`, `nuclear`, `economic`, `cyber`, `info`, `domestic`, `space`
@@ -160,7 +148,7 @@ Initialize or reset a game. Call before `step()` / `run()`.
 
 ```js
 BoP.init('taiwan_strait_2026', {
-  doctrine:        '0',              // doctrine key (string), optional
+  doctrine:        'MAGA',           // doctrine id, optional (required for sovereignty_void_2026)
   player:          'US',             // power AI controls as player
   seed:            42,               // RNG seed for reproducibility
   cascadeScale:    1.0,              // systemic event delta multiplier
@@ -319,7 +307,7 @@ fs.writeFileSync('out.json', JSON.stringify(BoP.exportBatchAnalytics(batch), nul
   exportedAt:     '2026-05-26T...',
   scenarioId:     'taiwan_strait_2026',
   player:         'US',
-  doctrine:       null | '0',
+  doctrine:       null | 'MAGA',
   seed:           42 | null,
   paramOverrides: {},
   outcome: {
