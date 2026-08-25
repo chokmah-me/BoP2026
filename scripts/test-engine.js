@@ -401,6 +401,108 @@ test('a patient power conserves actions in a low-crisis turn', () => {
     `hoarded budget ${hoardedAP} should be below full ${power.actionPoints}`);
 });
 
+// ── Doctrine precedence / edge ──────────────────────────────────────────────
+
+console.log('\n=== Doctrine precedence / edge ===');
+
+test('Nuclear exchange beats MAGA win setup', () => {
+  runScenario('taiwan_strait_2026', { doctrine: 'MAGA', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  w.bilateralDeals = 2;
+  w.powers.US.trueState.domestic = 70;
+  w.crises.find(c => c.domain === 'military').escalationLevel = 5;
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'lose');
+  assert.match(w.gameOver.reason, /Nuclear exchange/);
+  assert.notStrictEqual(w.gameOver.reason, w.doctrine.doctrineWinMessage);
+});
+
+test('Nuclear exchange beats JUCHE win setup', () => {
+  runScenario('korean_peninsula_2026', { doctrine: 'JUCHE', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  w.powers.DPRK.trueState.nuclear = 4;
+  w.powers.US.trueState.military = w.powers.DPRK.trueState.military + 30;
+  w.crises.find(c => c.domain === 'military').escalationLevel = 5;
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'lose');
+  assert.match(w.gameOver.reason, /Nuclear exchange/);
+  assert.notStrictEqual(w.gameOver.reason, w.doctrine.doctrineWinMessage);
+});
+
+test('MAGA turn-20 fail: too few bilateral deals', () => {
+  runScenario('taiwan_strait_2026', { doctrine: 'MAGA', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  w.bilateralDeals = 1;
+  w.powers.US.trueState.domestic = 70;
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'lose');
+  assert.match(w.gameOver.reason, /Only 1 deals struck/);
+});
+
+test('MAGA turn-20 fail: domestic below 65', () => {
+  runScenario('taiwan_strait_2026', { doctrine: 'MAGA', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  w.bilateralDeals = 2;
+  w.powers.US.trueState.domestic = 60;
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'lose');
+  assert.match(w.gameOver.reason, /Domestic support collapsed/);
+});
+
+test('EU_FATALISM fail: forums ok, domestic low', () => {
+  runScenario('taiwan_strait_2026', { doctrine: 'EU_FATALISM', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  w.multilateralForums = 3;
+  w.powers.EU.trueState.domestic = 40;
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'lose');
+  assert.match(w.gameOver.reason, /Domestic stability collapsed/);
+});
+
+test('TWELVER boundary fail: nuclear 3 plus one IR crisis at L2', () => {
+  runScenario('iran_nuclear_2026', { doctrine: 'TWELVER', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  w.powers.IR.trueState.nuclear = 3;
+  for (const crisis of w.crises) crisis.escalationLevel = 1;
+  w.crises.find(c => c.involved.includes('IR')).escalationLevel = 2;
+  const activeIRCrises = w.crises.filter(c => c.involved.includes('IR') && c.escalationLevel >= 2);
+  assert.strictEqual(activeIRCrises.length, 1);
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'lose');
+  assert.match(w.gameOver.reason, /Nuclear program stalled at level 3/);
+});
+
+test('TWELVER boundary win: nuclear 4 plus quiet crises', () => {
+  runScenario('iran_nuclear_2026', { doctrine: 'TWELVER', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  w.powers.IR.trueState.nuclear = 4;
+  for (const crisis of w.crises) crisis.escalationLevel = 1;
+  assert.ok(w.crises.every(c => c.escalationLevel < 5));
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'win');
+  assert.strictEqual(w.gameOver.reason, w.doctrine.doctrineWinMessage);
+});
+
+test('JUCHE does not win via high GSI when deterrent incomplete', () => {
+  runScenario('korean_peninsula_2026', { doctrine: 'JUCHE', seed: 1 });
+  const w = ctx.State.get();
+  w.turn = 20;
+  for (const power of Object.values(w.powers)) power.trueState.domestic = 70;
+  w.powers.DPRK.trueState.nuclear = 1;
+  w.powers.US.trueState.military = w.powers.DPRK.trueState.military + 30;
+  assert.ok(ctx.State.getGlobalStabilityIndex() >= 40);
+  assert.strictEqual(ctx.State.checkGameOver(), true);
+  assert.strictEqual(w.gameOver.result, 'lose');
+  assert.match(w.gameOver.reason, /Nuclear deterrent stalled at level 1/);
+});
+
 // ── summary ─────────────────────────────────────────────────────────────────
 
 console.log('\n──────────────────────────────────────────────────');
