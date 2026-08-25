@@ -39,6 +39,11 @@ class DeepSeekBackend {
     this._inputTokens = 0;
     this._inputCacheHit = 0;
     this._outputTokens = 0;
+    this._calls = 0;
+    this._parsedContent = 0;
+    this._parsedReasoning = 0;
+    this._fallback = 0;
+    this._fallbackByPower = {};
   }
 
   /**
@@ -104,6 +109,10 @@ class DeepSeekBackend {
         this._inputTokens += (usage.prompt_tokens || 0) - cacheHit;
         this._inputCacheHit += cacheHit;
         this._outputTokens += usage.completion_tokens || 0;
+        this._calls += 1;
+
+        const validTargets = new Set(Object.keys(world.powers).filter(id => id !== powerId));
+        const resolved = this._resolveActions(responseText, reasoningContent, powerId, pw, validTargets);
 
         if (this.logPrompts && this.logFile) {
           const entry = JSON.stringify({
@@ -112,15 +121,22 @@ class DeepSeekBackend {
             powerId, turn: world.turn, model: this.model,
             systemMsg, userMsg,
             reasoning: reasoningContent || undefined,
-            response: responseText, usage
+            response: responseText,
+            parseSource: resolved.source,
+            usage
           }) + '\n';
           fs.appendFileSync(this.logFile, entry);
         }
 
-        const validTargets = new Set(Object.keys(world.powers).filter(id => id !== powerId));
-        const parsed = this._parseResponse(responseText, powerId, pw, validTargets);
-        if (parsed.length > 0) return parsed;
+        if (resolved.actions.length > 0) {
+          if (resolved.source === 'reasoning') {
+            process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: empty content, parsed reasoning\n`);
+          }
+          return resolved.actions;
+        }
 
+        this._fallback += 1;
+        this._fallbackByPower[powerId] = (this._fallbackByPower[powerId] || 0) + 1;
         process.stderr.write(`[DeepSeek] ${powerId} t${world.turn}: bad parse, using fallback\n`);
         break;
       } catch (err) {
@@ -265,20 +281,63 @@ ${actionLines}`;
     return { systemMsg, userMsg };
   }
 
-  _parseResponse(text, powerId, pw, validTargets) {
-    const ap = pw ? (pw.actionPointsRemaining ?? pw.actionPoints ?? 3) : 3;
-    // Accept either an array or a single object
-    const arrMatch = text.match(/\[[\s\S]*?\]/);
-    const objMatch = text.match(/\{[^{}]+\}/);
-    let items = [];
-    if (arrMatch) {
-      try { items = JSON.parse(arrMatch[0]); } catch { /* fall through */ }
+  /**
+   * Prefer content JSON; if content is empty or unparseable, take the last
+   * valid action array out of reasoning_content (reasoner often spends the
+   * token cap on the trace and never emits message.content).
+   */
+  _resolveActions(contentText, reasoningText, powerId, pw, validTargets) {
+    const fromContent = this._parseResponse(contentText, powerId, pw, validTargets);
+    if (fromContent.length > 0) {
+      this._parsedContent += 1;
+      return { actions: fromContent, source: 'content' };
     }
-    if (!Array.isArray(items) || items.length === 0) {
-      if (objMatch) {
-        try { const o = JSON.parse(objMatch[0]); if (o.actionId) items = [o]; } catch { /* ignore */ }
+    const fromReasoning = this._parseResponse(reasoningText, powerId, pw, validTargets);
+    if (fromReasoning.length > 0) {
+      this._parsedReasoning += 1;
+      return { actions: fromReasoning, source: 'reasoning' };
+    }
+    return { actions: [], source: null };
+  }
+
+  _extractActionItems(text) {
+    if (!text || typeof text !== 'string') return [];
+    const cleaned = text.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '');
+    let lastGood = [];
+    let depth = 0;
+    let start = -1;
+    for (let i = 0; i < cleaned.length; i++) {
+      const ch = cleaned[i];
+      if (ch === '[') {
+        if (depth === 0) start = i;
+        depth++;
+      } else if (ch === ']') {
+        if (depth === 0) continue;
+        depth--;
+        if (depth === 0 && start >= 0) {
+          try {
+            const v = JSON.parse(cleaned.slice(start, i + 1));
+            if (Array.isArray(v) && v.some(o => o && typeof o.actionId === 'string')) lastGood = v;
+          } catch { /* keep scanning — reasoning often has [lvl] fragments */ }
+        }
       }
     }
+    if (lastGood.length > 0) return lastGood;
+    const objMatch = cleaned.match(/\{[^{}]+\}/g);
+    if (objMatch) {
+      for (let k = objMatch.length - 1; k >= 0; k--) {
+        try {
+          const o = JSON.parse(objMatch[k]);
+          if (o && o.actionId) return [o];
+        } catch { /* ignore */ }
+      }
+    }
+    return [];
+  }
+
+  _parseResponse(text, powerId, pw, validTargets) {
+    const ap = pw ? (pw.actionPointsRemaining ?? pw.actionPoints ?? 3) : 3;
+    const items = this._extractActionItems(text);
     if (!Array.isArray(items) || items.length === 0) return [];
 
     const results = [];
@@ -321,7 +380,12 @@ ${actionLines}`;
       inputTokens: this._inputTokens,
       inputCacheHitTokens: this._inputCacheHit,
       outputTokens: this._outputTokens,
-      estimatedCostUSD: parseFloat(cost.toFixed(5))
+      estimatedCostUSD: parseFloat(cost.toFixed(5)),
+      calls: this._calls,
+      parsedContent: this._parsedContent,
+      parsedReasoning: this._parsedReasoning,
+      fallback: this._fallback,
+      fallbackByPower: { ...this._fallbackByPower }
     };
   }
 }

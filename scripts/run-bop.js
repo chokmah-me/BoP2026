@@ -230,6 +230,8 @@ async function runAll() {
       } finally {
         BoP.unseed();
       }
+      // Checkpoint after every run so an abort still leaves finished games on disk.
+      writeBatch(results);
     }
 
     const bar = '='.repeat(30);
@@ -244,6 +246,13 @@ async function runAll() {
     console.log(`  Cache hit tok  : ${cost.inputCacheHitTokens.toLocaleString()}`);
     console.log(`  Output tokens  : ${cost.outputTokens.toLocaleString()}`);
     console.log(`  Estimated cost : $${cost.estimatedCostUSD}`);
+    console.log(`  LLM calls      : ${cost.calls}`);
+    console.log(`  Parsed content : ${cost.parsedContent}`);
+    console.log(`  Parsed reason  : ${cost.parsedReasoning}`);
+    const fbPowers = Object.entries(cost.fallbackByPower || {})
+      .map(([id, n]) => `${id}:${n}`)
+      .join(', ') || 'none';
+    console.log(`  Heuristic fall.: ${cost.fallback} (${fbPowers})`);
     console.log('─'.repeat(40));
     console.log('');
 
@@ -292,9 +301,14 @@ async function runAll() {
   console.log(`  Nuclear events : ${nuclear} (${valid.length ? Math.round(nuclear / valid.length * 100) : 0}%)`);
   console.log('─'.repeat(40));
 
-  // ── Write output ──────────────────────────────────────────────────────────
+  // ── Write output (DeepSeek path already checkpointed per run) ────────────
+  const outPath = writeBatch(results);
+  console.log(`\n  Output written: ${outPath}  (schema: bop2026-analytics-v1)\n`);
+})().catch(err => { console.error('\nFatal:', err.message); process.exit(1); });
+
+function writeBatch(results) {
   const outPath = path.isAbsolute(opts.out) ? opts.out : path.join(process.cwd(), opts.out);
   const analytics = BoP.exportBatchAnalytics(results);
   fs.writeFileSync(outPath, JSON.stringify(analytics, null, 2));
-  console.log(`\n  Output written: ${outPath}  (schema: bop2026-analytics-v1)\n`);
-})().catch(err => { console.error('\nFatal:', err.message); process.exit(1); });
+  return outPath;
+}

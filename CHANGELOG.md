@@ -2,6 +2,16 @@
 
 ## 2026-08-17 (v2.13.4)
 
+### Fixed
+- **Reasoner empty-content no longer silent-heuristic** (`js/ai-deepseek.js`):
+  `deepseek-reasoner` often spends `max_tokens` on `reasoning_content` and leaves
+  `message.content` empty. Parser now takes the last valid `actionId` array out
+  of the reasoning trace before falling back. Footer reports calls / content
+  parses / reasoning recovers / heuristic fallbacks by power.
+- **DeepSeek batch JSON is checkpointed per run** (`scripts/run-bop.js`): aborting
+  a long `--thinking` batch no longer discards finished games. Offline pin:
+  `scripts/test-deepseek-parse.js`.
+
 ### Added
 - **Instrument eval** (`scripts/test-instrument.js`): gates *shape* claims — Taiwan
   cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins on those two,

@@ -8,7 +8,8 @@
 **Deposit Date:** 24 May 2026 (updated 17 August 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
-**ORCID:** 0000-0002-9040-6914
+**ORCID:** 0000-0002-9040-6914  
+**OSF (legacy mirror):** https://osf.io/ay843/ (DOI [10.17605/OSF.IO/AY843](https://doi.org/10.17605/OSF.IO/AY843)) — refreshed for v2.13.2 zip; do not open a new child.
 
 ## Description
 
