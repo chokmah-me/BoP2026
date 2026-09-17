@@ -2,9 +2,12 @@
 
 > **Historical snapshot (May 2026, pre-v2.10+ recalibrations).** The percentages
 > and turn counts below describe that snapshot, not HEAD. They are bound in
-> [`findings-may2026-summary.json`](findings-may2026-summary.json) (original
-> per-run dumps unrecovered). Shape claims
-> (Taiwan cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins,
+> [`findings-may2026-summary.json`](findings-may2026-summary.json). Original
+> per-run dumps were recovered from git commit `62dd916`
+> (`docs/iran-baseline.json` / `docs/taiwan-baseline.json`; extract via
+> `recovery.*.extract` in the ledger — do not confuse with the later overwritten
+> working-tree `docs/*-baseline.json` files). Shape claims (Taiwan
+> cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins,
 > personality fingerprints, cascadeScale sign) are gated by
 > `node scripts/test-instrument.js` (`npm test`). Current 100-run HEAD table:
 > [`docs/baselines/v2.13.4/summary.json`](baselines/v2.13.4/summary.json) and

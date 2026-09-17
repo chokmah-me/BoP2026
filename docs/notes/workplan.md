@@ -12,7 +12,7 @@ Death of this file: replace it when the next milestone ships, or when every open
 ## Frozen facts (do not relitigate)
 
 - Vanilla HTML/CSS/JS. No frameworks, bundler, or npm as a runtime. `package.json` is tests + Playwright only.
-- May 2026 `docs/findings.md` table (Iran **73%** nuclear, Taiwan **1%**, GSI 25.8 / 5.9 turns) is a **snapshot**, not HEAD. Bound in `docs/findings-may2026-summary.json`. Original 100-run dumps: **unrecovered**. Do not overwrite those figures with HEAD rates.
+- May 2026 `docs/findings.md` table (Iran **73%** nuclear, Taiwan **1%**, GSI 25.8 / 5.9 turns) is a **snapshot**, not HEAD. Bound in `docs/findings-may2026-summary.json`. Original 100-run dumps: **recovered** from git `62dd916` (see ledger `recovery`). Do not overwrite those figures with HEAD rates.
 - HEAD heuristic 100-run table (seed 0, n=100, 2026-09-17): `docs/baselines/v2.13.4/summary.json`. Iran nuclear **12%**, all rows **0% wins**. Per-run JSON (~12–18 MB) lives on disk under `docs/baselines/v2.13.4/<scenario>_2026.json` and is **gitignored**.
 - HEAD SV doctrine matrix (seed 0, n=100): `docs/baselines/v2.13.4/sv-summary.json`. Doctrine-conditioned; `void%` ≠ `nuclear%`. Not a row in the seven-scenario table.
 - Instrument eval (`scripts/test-instrument.js`, n=20) gates **shape**, not GSI bands. It may print Iran ~20% nuclear; that is small-n, not the 100-run rate.
@@ -45,13 +45,9 @@ Published: `docs/baselines/v2.13.4/sv-summary.json` (five doctrines, n=100 seed 
 - Done when: workflow installs Playwright Chromium (or a documented skip), `npm run test:browser` runs on ubuntu-latest, still no runtime framework in the game.
 - Cost: slower CI. Ask before enabling if the owner does not want the extra minutes.
 
-### 3. May 2026 73% dump — recover or retire in writing
+### 3. May 2026 73% dump — DONE (recovered)
 
-No in-repo 100-run JSON reproduces Iran 73% / Taiwan 25.8 GSI. Ledger already says `original_run_dumps: unrecovered`.
-
-- Search old Zenodo/OSF/Drive copies; if found, bind `source_path` to that dump and keep findings numbers.
-- If never found: one sentence in `docs/findings-may2026-summary.json` + findings banner stays; **do not** silently replace 73% with 12%.
-- Done when: either a real dump is bound, or “unrecovered, retired as historical-only” is explicit and we stop looking.
+Bound in `docs/findings-may2026-summary.json` → `recovery` (git commit `62dd916`, sha256s, extract commands). Working-tree `docs/*-baseline.json` is a later overwrite (~14% Iran) and stays gitignored. Search closed; do not keep hunting.
 
 ### 4. Bind HEAD table for manuscript I1 (README/CHANGELOG are skipped)
 
@@ -127,7 +123,7 @@ Not default: lean-proof-forge, geometry-mesh, hashline, Cloudflare Workers, omni
 ## Suggested next session (if the owner says “continue”)
 
 1. Resume smoke (`npm test` + both Python gates).  
-2. Pick among open items **2** (Playwright CI — ask first), **3** (May dump recover/retire), **4** (HEAD I1 bind), or **5** (`paper-robustness-check`).  
+2. Pick among open items **2** (Playwright CI — ask first), **4** (HEAD I1 bind), or **5** (`paper-robustness-check`).  
 3. Stop and report; do not start Domestic Factions without a spec.
 
 ## Explicit non-goals until asked

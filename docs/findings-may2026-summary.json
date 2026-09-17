@@ -2,8 +2,48 @@
   "schema": "bop2026-findings-snapshot/v1",
   "snapshot": "May 2026",
   "not_head": true,
-  "original_run_dumps": "unrecovered",
-  "note": "Published May 2026 heuristic 100-run table for Taiwan Strait and Iran Nuclear. Original per-run JSON is not in this repo. Do not treat as HEAD; shape claims are gated by scripts/test-instrument.js.",
+  "original_run_dumps": "recovered",
+  "recovery": {
+    "status": "recovered",
+    "method": "git_blob",
+    "commit": "62dd916c431f4bd5acfcb14514b97fba09f8943a",
+    "commit_subject": "Add 100-run baseline results (seed 0) — Taiwan & Iran — v1.0.0 deposition package",
+    "searched": [
+      "working-tree docs/*-baseline.json (later overwritten; now gitignored; HEAD Iran ~14% nuclear)",
+      "logs/ 100-run dumps (Iran 8–14% nuclear; not the May table)",
+      "Google Drive title search (BoP2026 / iran-baseline): no matching run JSON",
+      "Zenodo v1.0.1 (10.5281/zenodo.20370930) software zip claims 100-run baselines; same era as commit 62dd916",
+      "OSF ay843: software mirror, not a separate May findings dump archive"
+    ],
+    "iran": {
+      "git_path": "docs/iran-baseline.json",
+      "extract": "git show 62dd916c431f4bd5acfcb14514b97fba09f8943a:docs/iran-baseline.json",
+      "bytes": 21500500,
+      "sha256": "aaaff441c506d0fdb00eb306798e695e379342bbf7bc004126e8344ad50891c6",
+      "verified": {
+        "n": 100,
+        "win_pct": 0,
+        "nuclear_pct": 73,
+        "mean_stability": 41.3,
+        "mean_turns": 4.0
+      }
+    },
+    "taiwan": {
+      "git_path": "docs/taiwan-baseline.json",
+      "extract": "git show 62dd916c431f4bd5acfcb14514b97fba09f8943a:docs/taiwan-baseline.json",
+      "bytes": 31750828,
+      "sha256": "0378b7f1740ca3ee8f81a7607e28a3e952fe75cc134d05afe1168f3f08f1d01f",
+      "verified": {
+        "n": 100,
+        "win_pct": 0,
+        "nuclear_pct": 1,
+        "mean_stability": 25.8,
+        "mean_turns": 5.9
+      }
+    },
+    "note": "Dumps match docs/findings.md table rates. Do not re-commit the ~53 MB blobs; working-tree docs/*-baseline.json remains gitignored and is not this snapshot. Search closed 2026-09-17."
+  },
+  "note": "Published May 2026 heuristic 100-run table for Taiwan Strait and Iran Nuclear. Original per-run JSON recovered from git commit 62dd916 (see recovery.*). Do not treat as HEAD; shape claims are gated by scripts/test-instrument.js.",
   "n": 100,
   "seed_lo": 0,
   "seed_hi": 99,

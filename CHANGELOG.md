@@ -31,6 +31,10 @@ Versus v2.12.0: GSI/turns moved by at most a few tenths. Iran nuclear 14% → 12
 
 Rows are different games (different protagonists), not strategy A/B cells.
 
+### May 2026 findings dumps recovered
+
+Original Iran/Taiwan 100-run JSON for the `docs/findings.md` table (Iran **73%** nuclear, Taiwan GSI **25.8**) is bound again in `docs/findings-may2026-summary.json` → `recovery` from git commit `62dd916`. Working-tree `docs/*-baseline.json` remains a later overwrite and is not that snapshot.
+
 ## 2026-08-17 (v2.13.4)
 
 ### Fixed
