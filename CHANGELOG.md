@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-17 (LLM: void-rate CI pilot)
+
+- **Multi seed-base + second player:** `scripts/sv-void-ci-pilot.ps1` +
+  `scripts/sv-void-ci-summary.mjs` (Wilson 95%). Results:
+  [`docs/notes/sv-void-ci-pilot.md`](docs/notes/sv-void-ci-pilot.md) — MING/MAGA × seeds 0,100 ×
+  n=12, `deepseek-chat`, symmetric v1.4. Per-cell CIs still wide; MAGA seed-sensitive.
+
+## 2026-09-17 (LLM: per-turn AOM framing)
+
+- **`PROMPT_VERSION` v1.4** (`js/ai-deepseek.js`): situational `LATENCY GOVERNANCE (AOM)` block
+  moves from the system prompt into the per-turn user message. Role/personality stay in system;
+  `--asymmetric-aom` / symmetric framing unchanged. Offline pins in `scripts/test-deepseek-parse.js`.
+
+## 2026-09-17 (docs/community leftovers)
+
+- **`CONTRIBUTING.md`:** stack rules, gates, May vs HEAD I1, PR expectations.
+- **Citable baselines:** `docs/baselines/DATASET.md` points at v2.13.4 `summary.json` / `sv-summary.json` (per-run JSON stays gitignored).
+- **ROADMAP:** Biological + EMP success metric checked (Iran bio crisis + Korea EMP crisis); community checklist updated; tutorial videos remain open.
+
+## 2026-09-17 (gates: Playwright CI, HEAD I1, Findings 1–4 robustness)
+
+- **CI browser job:** `.github/workflows/ci.yml` runs Playwright Chromium + `npm run test:browser` alongside headless `npm test` (test-only dep; game stays vanilla).
+- **HEAD I1 bag:** `docs/HEAD-baseline.md` + `docs/head-i1/integrity-manifest.json` bind the v2.13.4 summary table separately from the May findings manifest.
+- **Findings 1–4 robustness:** `docs/notes/findings-1-4-robustness.md` — frozen surface R01–R18; shape claims survive; keystones named (no instrument threshold edits).
+
 ## 2026-09-17 (v2.13.4 HEAD rebaseline)
 
 Heuristic 100-run, seed 0, max 20 turns, one engine build. Published table:

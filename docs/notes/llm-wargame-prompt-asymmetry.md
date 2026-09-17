@@ -197,10 +197,19 @@ stability index, which is confounded by how early the game ends. The harness doe
 systemic-survival objective added to every agent; escalation framing gated on the agent's own
 `riskTolerance`/`patience`. Finding 3 is the result.
 
-**Still open.** The situational reasoning still lives in the system prompt. Moving it into the
-per-turn user message — so the model's doctrine and personality shape escalation turn by turn rather
-than via a static block — is the natural next step. And the prompt effect should be separated from
-DeepSeek's own documented hawkishness by repeating the corrected sweep with Claude or GPT-4o.
+**Per-turn AOM (done, `PROMPT_VERSION` v1.4).** Situational AOM latency facts (dormant vs active
+BPI, `t_rat` vs `t_event`, delegation status, symmetric/asymmetric levers) now live in the
+**per-turn user message**. The system prompt keeps role, personality, output contract, and a short
+pointer that an AOM section in the user message is turn-fresh. Logged `systemMsg` / `userMsg` pairs
+in `*-prompts.jsonl` remain the audit trail (`aomMode` unchanged).
+
+**Void-rate CI pilot (done, chat).** `docs/notes/sv-void-ci-pilot.md` — MING/MAGA × seeds 0 & 100 ×
+n=12 under symmetric v1.4. Wilson bands at n=12 remain wide; MAGA void% moved 33%→8% across seed
+bases. Harness: `scripts/sv-void-ci-pilot.ps1`.
+
+**Still open.** The prompt effect should be separated from DeepSeek's own documented hawkishness by
+repeating the corrected sweep with Claude or GPT-4o. Optional: larger n or reasoner (`-Thinking`)
+if a tighter absolute CI is required for citation.
 
 ## Limitations
 

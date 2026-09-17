@@ -1,0 +1,188 @@
+{
+  "schema": "cd-manuscript-integrity/v1",
+  "manuscript": "../HEAD-baseline.md",
+  "i1_policy": "strict",
+  "claimed_tables": ["docs/baselines/v2.13.4/summary.json"],
+  "claimed_numbers": [
+    {
+      "id": "head-taiwan-win-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.0.win_pct"
+    },
+    {
+      "id": "head-taiwan-nuclear-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.0.nuclear_pct"
+    },
+    {
+      "id": "head-taiwan-mean-stability",
+      "value": 33.0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.0.mean_stability"
+    },
+    {
+      "id": "head-taiwan-mean-turns",
+      "value": 8.3,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.0.mean_turns"
+    },
+    {
+      "id": "head-iran-win-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.1.win_pct"
+    },
+    {
+      "id": "head-iran-nuclear-pct",
+      "value": 12,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.1.nuclear_pct"
+    },
+    {
+      "id": "head-iran-mean-stability",
+      "value": 30.1,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.1.mean_stability"
+    },
+    {
+      "id": "head-iran-mean-turns",
+      "value": 8.1,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.1.mean_turns"
+    },
+    {
+      "id": "head-scs-win-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.2.win_pct"
+    },
+    {
+      "id": "head-scs-nuclear-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.2.nuclear_pct"
+    },
+    {
+      "id": "head-scs-mean-stability",
+      "value": 26.9,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.2.mean_stability"
+    },
+    {
+      "id": "head-scs-mean-turns",
+      "value": 8.7,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.2.mean_turns"
+    },
+    {
+      "id": "head-korea-win-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.3.win_pct"
+    },
+    {
+      "id": "head-korea-nuclear-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.3.nuclear_pct"
+    },
+    {
+      "id": "head-korea-mean-stability",
+      "value": 27.1,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.3.mean_stability"
+    },
+    {
+      "id": "head-korea-mean-turns",
+      "value": 10.0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.3.mean_turns"
+    },
+    {
+      "id": "head-orbital-win-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.4.win_pct"
+    },
+    {
+      "id": "head-orbital-nuclear-pct",
+      "value": 1,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.4.nuclear_pct"
+    },
+    {
+      "id": "head-orbital-mean-stability",
+      "value": 30.6,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.4.mean_stability"
+    },
+    {
+      "id": "head-orbital-mean-turns",
+      "value": 9.0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.4.mean_turns"
+    },
+    {
+      "id": "head-megacity-win-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.5.win_pct"
+    },
+    {
+      "id": "head-megacity-nuclear-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.5.nuclear_pct"
+    },
+    {
+      "id": "head-megacity-mean-stability",
+      "value": 25.1,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.5.mean_stability"
+    },
+    {
+      "id": "head-megacity-mean-turns",
+      "value": 7.8,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.5.mean_turns"
+    },
+    {
+      "id": "head-financial-win-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.6.win_pct"
+    },
+    {
+      "id": "head-financial-nuclear-pct",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.6.nuclear_pct"
+    },
+    {
+      "id": "head-financial-mean-stability",
+      "value": 32.0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.6.mean_stability"
+    },
+    {
+      "id": "head-financial-mean-turns",
+      "value": 8.7,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "scenarios.6.mean_turns"
+    },
+    {
+      "id": "head-runs",
+      "value": 100,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "runs"
+    },
+    {
+      "id": "head-seed",
+      "value": 0,
+      "source_path": "docs/baselines/v2.13.4/summary.json",
+      "source_key": "seed"
+    }
+  ]
+}

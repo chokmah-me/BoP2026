@@ -254,9 +254,9 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 | Feature | Description |
 |---|---|
-| **AOM reasoning in the per-turn message** | Move the situational AOM framing out of the static system prompt and into the per-turn user message, so each agent's doctrine and `riskTolerance`/`patience` shape escalation turn by turn rather than via a fixed block. |
+| ~~**AOM reasoning in the per-turn message**~~ | **Done (`PROMPT_VERSION` v1.4)** — situational AOM block is in the per-turn user message; system keeps role/personality + pointer. |
 | **Cross-model replication** | Repeat the corrected role 2×2 / doctrine sweep with Claude or GPT-4o to separate the prompt effect from DeepSeek's own documented hawkishness (CSIS Futures Lab, 2025). |
-| **Tighter void-rate estimates** | DeepSeek sampling is unseeded, so per-cell void rates carry noise. Repeat across multiple seed-bases and a second player power for confidence intervals rather than directional contrasts. |
+| ~~**Tighter void-rate estimates**~~ | **Pilot done** — [`docs/notes/sv-void-ci-pilot.md`](notes/sv-void-ci-pilot.md) (MING/MAGA × seeds 0,100 × n=12). Optional larger n / reasoner for citation-grade CI width. |
 
 ### Medium Priority (future)
 
@@ -272,9 +272,9 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 
 ## Documentation & Community Goals
 
-- Publish baseline dataset from v2.1.x runs for academic use (Taiwan, Iran, SCS — 100-run seed 0)
-- Publish 2–3 tutorial videos (Taiwan scenario walkthrough + sensitivity analysis)
-- Create `CONTRIBUTING.md` and contributor guidelines
+- [x] Publish citable baseline dataset — **HEAD v2.13.4:** [`docs/baselines/v2.13.4/summary.json`](baselines/v2.13.4/summary.json) + [`docs/baselines/DATASET.md`](baselines/DATASET.md) (seven scenarios + SV doctrine matrix; per-run JSON gitignored / reproducible). Supersedes the older “v2.1.x only” wording.
+- [ ] Publish 2–3 tutorial videos (Taiwan scenario walkthrough + sensitivity analysis) — **still open** (no videos in-repo).
+- [x] Create `CONTRIBUTING.md` and contributor guidelines — **root [`CONTRIBUTING.md`](../CONTRIBUTING.md)**
 
 ---
 
@@ -284,7 +284,7 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 - [x] Model at least 3 compound crises with divergent trajectories — **met v2.0.x**
 - [x] Cover at least 4 of 7 Krepinevich scenarios with playable domain content — **met v2.3.0; complete 7/7 as of v2.8.0** (Supply Chain, Autonomous, Financial, Biological, EMP, Space, Urban)
 - [x] Korean Peninsula scenario playable with DPRK as active NPC — **shipped v2.2.0**
-- [ ] Biological + EMP domains complete and integrated into at least one scenario each
+- [x] Biological + EMP domains complete and integrated into at least one scenario each — **met v2.3.0:** Biological actions + `iran_bio_program` on `iran_nuclear_2026`; EMP actions + `dprk_emp_threat` on `korean_peninsula_2026` (confirmed on HEAD)
 
 ---
 

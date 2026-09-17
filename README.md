@@ -4,7 +4,8 @@
 **Roadmap:** [Development Plan](docs/ROADMAP.md)  
 **Background:** [The Story Behind BoP2026](docs/BACKGROUND.md)  
 **Quickstart:** [Get analysis-ready data in 10 minutes](docs/QUICKSTART.md)  
-**Oracle reference:** [Headless simulation, full API, output schema](docs/ORACLE.md)
+**Oracle reference:** [Headless simulation, full API, output schema](docs/ORACLE.md)  
+**Baselines:** [Citable HEAD dataset](docs/baselines/DATASET.md) · **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
 A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Eight scenarios, thirteen domains, eight actors. Runs in the browser as a playable game and headless via Node.js for batch simulation and parameter sensitivity analysis.
 
@@ -347,4 +348,4 @@ If you use BoP2026 in research or teaching, please cite it as:
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).

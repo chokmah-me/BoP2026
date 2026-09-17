@@ -122,6 +122,96 @@ test('getCostSummary exposes parse counters', () => {
   assert.ok(c.parsedReasoning >= 2);
 });
 
+// ── prompt placement (PROMPT_VERSION v1.4: AOM in user message) ─────────────
+
+const aomActions = actions.concat([
+  { id: 'pre_delegate_authority', name: 'Pre-Delegate', cost: 2, requiresTarget: false },
+  { id: 'boost_phase_intercept', name: 'BPI', cost: 2, requiresTarget: false },
+  { id: 'c2_blackout', name: 'C2 Blackout', cost: 2, requiresTarget: true }
+]);
+
+function fixtureWorld(overrides = {}) {
+  return {
+    turn: 2,
+    year: 2026,
+    player: 'CN',
+    doctrine: { profile: { t_rat: 120 } },
+    autonomyDelegated: {},
+    powers: {
+      CN: {
+        trueState: { military: 70, domestic: 50 },
+        relationships: { US: -40, RU: 20 },
+        riskTolerance: 0.55,
+        patience: 0.6,
+        priorityDomains: ['economic', 'military'],
+        actionPoints: 3
+      },
+      US: {
+        trueState: { military: 80, domestic: 55 },
+        relationships: { CN: -40 },
+        riskTolerance: 0.5,
+        patience: 0.5,
+        priorityDomains: ['military'],
+        actionPoints: 3
+      },
+      RU: {
+        trueState: { military: 65, domestic: 40 },
+        relationships: { CN: 20 },
+        riskTolerance: 0.7,
+        patience: 0.3,
+        priorityDomains: ['military'],
+        actionPoints: 3
+      }
+    },
+    crises: [
+      {
+        id: 'boost_phase_intercept_window',
+        t_event: 90,
+        escalationLevel: 0,
+        involved: ['CN', 'US', 'RU']
+      }
+    ],
+    ...overrides
+  };
+}
+
+test('AOM latency block lives in userMsg, not systemMsg (player)', () => {
+  const b = new DeepSeekBackend({ actions: aomActions, symmetricAom: true });
+  const world = fixtureWorld();
+  const { systemMsg, userMsg } = b._buildPrompt('CN', world.powers.CN, world);
+  assert.ok(!systemMsg.includes('LATENCY GOVERNANCE (AOM):'), 'system must not carry turn AOM');
+  assert.ok(systemMsg.includes('LATENCY GOVERNANCE (AOM)'), 'system mentions AOM may appear in user');
+  assert.ok(userMsg.includes('LATENCY GOVERNANCE (AOM):'));
+  assert.ok(userMsg.includes('t_rat=120s'));
+  assert.ok(userMsg.includes('DORMANT boost-phase'));
+});
+
+test('AOM latency block lives in userMsg for adversary (symmetric)', () => {
+  const b = new DeepSeekBackend({ actions: aomActions, symmetricAom: true });
+  const world = fixtureWorld();
+  const { systemMsg, userMsg } = b._buildPrompt('US', world.powers.US, world);
+  assert.ok(!systemMsg.includes('LATENCY GOVERNANCE (AOM):'));
+  assert.ok(userMsg.includes('LATENCY GOVERNANCE (AOM):'));
+  assert.ok(userMsg.includes('Strategic options:'));
+  assert.ok(!userMsg.includes('Exploit paths:'));
+});
+
+test('asymmetric AOM still uses Exploit paths, still in userMsg', () => {
+  const b = new DeepSeekBackend({ actions: aomActions, symmetricAom: false });
+  const world = fixtureWorld();
+  const { systemMsg, userMsg } = b._buildPrompt('US', world.powers.US, world);
+  assert.ok(!systemMsg.includes('LATENCY GOVERNANCE (AOM):'));
+  assert.ok(userMsg.includes('Exploit paths:'));
+});
+
+test('no AOM section when scenario has no t_event crises', () => {
+  const b = new DeepSeekBackend({ actions: aomActions });
+  const world = fixtureWorld({ crises: [{ id: 'trade_war', escalationLevel: 2, involved: ['CN', 'US'] }] });
+  const { systemMsg, userMsg } = b._buildPrompt('CN', world.powers.CN, world);
+  assert.ok(!userMsg.includes('LATENCY GOVERNANCE (AOM):'));
+  assert.ok(systemMsg.includes('LATENCY GOVERNANCE (AOM)')); // pointer only
+});
+
 console.log('');
 console.log(`DeepSeek parse: ${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);

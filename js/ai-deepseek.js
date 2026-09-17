@@ -13,9 +13,11 @@
 const fs = require('fs');
 
 // Bump when prompt structure changes so logged runs stay comparable across experiments.
-// v1.3 adds the symmetricAom variant (neutral framing + shared survival objective,
-// gated on the agent's own riskTolerance/patience). See docs/notes/llm-wargame-prompt-asymmetry.md.
-const PROMPT_VERSION = 'v1.3';
+// v1.3 — symmetricAom variant (neutral framing + shared survival objective).
+// v1.4 — situational AOM latency block moves from system → per-turn user message
+//         (personality/role stay in system; turn-state AOM refreshes each call).
+// See docs/notes/llm-wargame-prompt-asymmetry.md.
+const PROMPT_VERSION = 'v1.4';
 
 // Pricing per 1M tokens (deepseek-v4-flash, used for both deepseek-chat and deepseek-reasoner).
 // DeepSeek bills reasoner at chat prices — confirmed against dashboard usage data 2026-05-27.
@@ -182,7 +184,10 @@ class DeepSeekBackend {
 
     const otherPowers = Object.keys(world.powers).filter(id => id !== powerId).join(', ');
 
-    let systemMsg =
+    // System = stable role/personality/output contract. Situational AOM (dormant vs
+    // active BPI, delegation status, t_rat vs t_event) belongs in the per-turn user
+    // message so it refreshes with world state rather than looking like a fixed charter.
+    const systemMsg =
 `You are ${powerId} in Balance of Power 2026, a turn-based geopolitical simulation.
 Personality: risk_tolerance=${(pw.riskTolerance||0.5).toFixed(2)}, patience=${(pw.patience||0.5).toFixed(2)}.
 Priority domains: ${(pw.priorityDomains||[]).join(', ') || 'military, economic'}.
@@ -190,9 +195,11 @@ Goal: advance national interests. Crisis level 5 = nuclear exchange = game over 
 You have ${ap} AP to spend. Spend as much AP as useful — pick 1 to 3 actions whose costs sum to at most ${ap}.
 If requiresTarget=required, target MUST be one of these exact IDs: ${otherPowers}. No other values are valid.
 Respond ONLY with a JSON array: [{"actionId":"<id>","target":"<powerId or null>"}, ...]
-Pick diverse actions across domains — do not repeat the same actionId more than once.`;
+Pick diverse actions across domains — do not repeat the same actionId more than once.
+When a LATENCY GOVERNANCE (AOM) section appears in the user message, treat it as this turn's
+latency facts and options — it changes as crises activate, escalate, or as delegation status flips.`;
 
-    const userMsg =
+    let userMsg =
 `Turn ${world.turn} (${world.year}). AP=${ap}.
 Stats: ${JSON.stringify(pw.trueState)}.
 Relations: ${rels}.
@@ -201,8 +208,9 @@ Other crises: ${otherCrises}.
 Available actions:
 ${actionLines}`;
 
-    // AOM latency block — injected whenever the scenario has boost-phase crises (t_event set),
-    // even if dormant (lv=0), so LLMs know the mechanic exists and can reason about activating it.
+    // AOM latency block — injected into the *user* message whenever the scenario has
+    // boost-phase crises (t_event set), even if dormant (lv=0), so LLMs see turn-fresh
+    // latency facts. Symmetric vs asymmetric framing still controlled by symmetricAom.
     const allBpiCrises = (world.crises || []).filter(c => c.t_event != null);
     if (allBpiCrises.length > 0) {
       const activeBpi  = allBpiCrises.filter(c => c.escalationLevel > 0);
@@ -275,7 +283,7 @@ ${actionLines}`;
         }
       }
 
-      systemMsg += aom;
+      userMsg += aom;
     }
 
     return { systemMsg, userMsg };
