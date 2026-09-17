@@ -3,6 +3,8 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > Session-recall and hashline conventions live in the global `~/.claude/CLAUDE.md`.
+>
+> **Resume workplan:** [`docs/notes/workplan.md`](docs/notes/workplan.md) — next steps, frozen facts, and gates for a fresh session.
 
 ## Running the game
 

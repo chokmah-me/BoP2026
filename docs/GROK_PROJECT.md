@@ -38,6 +38,7 @@ scripts/
 docs/
   ORACLE.md             API reference
   model-notes.md        Theoretical grounding and limitations
+  notes/workplan.md     Resume workplan (next steps + gates)
   QUICKSTART.md         Browser setup
   findings.md           Research findings log
 ```
