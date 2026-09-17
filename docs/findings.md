@@ -1,7 +1,9 @@
 # BoP2026 Baseline Findings
 
 > **Historical snapshot (May 2026, pre-v2.10+ recalibrations).** The percentages
-> and turn counts below describe that snapshot, not HEAD. Shape claims
+> and turn counts below describe that snapshot, not HEAD. They are bound in
+> [`findings-may2026-summary.json`](findings-may2026-summary.json) (original
+> per-run dumps unrecovered). Shape claims
 > (Taiwan cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins,
 > personality fingerprints, cascadeScale sign) are gated by
 > `node scripts/test-instrument.js` (`npm test`). Current headline triples live

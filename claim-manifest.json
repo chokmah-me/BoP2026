@@ -1,0 +1,11 @@
+{
+  "schema": "cd-claim-gate/v1",
+  "claims": [
+    {
+      "id": "instrument-shape",
+      "description": "Shape claims: Taiwan cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins on those two, CN economic / EU diplomatic fingerprints, US more military than EU, cascadeScale 0 relieves Taiwan. Not GSI bands.",
+      "command": ["node", "scripts/test-instrument.js"],
+      "timeout_sec": 180
+    }
+  ]
+}

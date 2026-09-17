@@ -1,0 +1,38 @@
+{
+  "schema": "bop2026-findings-snapshot/v1",
+  "snapshot": "May 2026",
+  "not_head": true,
+  "original_run_dumps": "unrecovered",
+  "note": "Published May 2026 heuristic 100-run table for Taiwan Strait and Iran Nuclear. Original per-run JSON is not in this repo. Do not treat as HEAD; shape claims are gated by scripts/test-instrument.js.",
+  "n": 100,
+  "seed_lo": 0,
+  "seed_hi": 99,
+  "ai": "heuristic",
+  "engine": "pre-v2.10",
+  "taiwan": {
+    "win_pct": 0,
+    "nuclear_pct": 1,
+    "mean_stability": 25.8,
+    "sd_stability": 3.6,
+    "mean_turns": 5.9,
+    "sd_turns": 0.5,
+    "cascade_driven_pct": 99,
+    "financial_fragmentation_occurrences": 588,
+    "financial_fragmentation_per_run": 5.88
+  },
+  "iran": {
+    "win_pct": 0,
+    "nuclear_pct": 73,
+    "mean_stability": 41.3,
+    "sd_stability": 11.6,
+    "mean_turns": 4.0,
+    "sd_turns": 2.2,
+    "cascade_pct": 37,
+    "gulf_of_fire_pct": 64,
+    "nuclear_ci95_halfwidth_pp": 9
+  },
+  "shared": {
+    "win_pct": 0,
+    "ci95_pct": 95
+  }
+}

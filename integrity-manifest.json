@@ -1,0 +1,104 @@
+{
+  "schema": "cd-manuscript-integrity/v1",
+  "manuscript": "docs/findings.md",
+  "i1_policy": "strict",
+  "claimed_tables": ["docs/findings-may2026-summary.json"],
+  "claimed_numbers": [
+    {
+      "id": "taiwan-win-pct",
+      "value": 0,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "taiwan.win_pct"
+    },
+    {
+      "id": "taiwan-nuclear-pct",
+      "value": 1,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "taiwan.nuclear_pct"
+    },
+    {
+      "id": "taiwan-mean-stability",
+      "value": 25.8,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "taiwan.mean_stability"
+    },
+    {
+      "id": "taiwan-sd-stability",
+      "value": 3.6,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "taiwan.sd_stability"
+    },
+    {
+      "id": "taiwan-mean-turns",
+      "value": 5.9,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "taiwan.mean_turns"
+    },
+    {
+      "id": "taiwan-sd-turns",
+      "value": 0.5,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "taiwan.sd_turns"
+    },
+    {
+      "id": "iran-win-pct",
+      "value": 0,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.win_pct"
+    },
+    {
+      "id": "iran-nuclear-pct",
+      "value": 73,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.nuclear_pct"
+    },
+    {
+      "id": "iran-mean-stability",
+      "value": 41.3,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.mean_stability"
+    },
+    {
+      "id": "iran-sd-stability",
+      "value": 11.6,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.sd_stability"
+    },
+    {
+      "id": "iran-mean-turns",
+      "value": 4.0,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.mean_turns"
+    },
+    {
+      "id": "iran-sd-turns",
+      "value": 2.2,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.sd_turns"
+    },
+    {
+      "id": "taiwan-cascade-driven-pct",
+      "value": 99,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "taiwan.cascade_driven_pct"
+    },
+    {
+      "id": "iran-cascade-pct",
+      "value": 37,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.cascade_pct"
+    },
+    {
+      "id": "iran-gulf-of-fire-pct",
+      "value": 64,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "iran.gulf_of_fire_pct"
+    },
+    {
+      "id": "iran-nuclear-ci95-pct",
+      "value": 95,
+      "source_path": "docs/findings-may2026-summary.json",
+      "source_key": "shared.ci95_pct"
+    }
+  ]
+}
