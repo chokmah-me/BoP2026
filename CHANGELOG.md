@@ -17,6 +17,20 @@ Heuristic 100-run, seed 0, max 20 turns, one engine build. Published table:
 
 Versus v2.12.0: GSI/turns moved by at most a few tenths. Iran nuclear 14% → 12% (n=100); the n=20 instrument eval still reports 20% — shape claim only. 0% heuristic wins on every row.
 
+### Sovereignty Void doctrine matrix (same build)
+
+`sovereignty_void_2026` requires `--doctrine` (doctrine sets player + `t_rat`), so it is **not** a row in the seven-scenario table. Heuristic n=100 seed 0 matrix: [`docs/baselines/v2.13.4/sv-summary.json`](docs/baselines/v2.13.4/sv-summary.json). `void%` = terminal sovereignty-void losses; `nuclear%` = nuclear-exchange losses. Heuristic `void%` is an AOM/physics metric, not LLM skill.
+
+| Doctrine | Player | t_rat | Win % | Nuclear % | Void % | Avg stability | Avg turns |
+|----------|--------|------:|------:|----------:|-------:|--------------:|----------:|
+| MING | CN | 120 | 0 | 0 | 49 | 32.0 | 7.4 |
+| MAGA | US | 180 | 0 | 0 | 20 | 36.1 | 6.0 |
+| JUCHE | DPRK | 45 | 0 | 0 | 23 | 28.2 | 8.0 |
+| TWELVER | IR | 240 | 0 | 0 | 61 | 32.8 | 7.3 |
+| EU_FATALISM | EU | 300 | 0 | 0 | 44 | 31.7 | 7.3 |
+
+Rows are different games (different protagonists), not strategy A/B cells.
+
 ## 2026-08-17 (v2.13.4)
 
 ### Fixed

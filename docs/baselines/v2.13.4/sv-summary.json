@@ -1,0 +1,83 @@
+{
+  "schema": "bop2026-sv-baseline-summary/v1",
+  "engine": "v2.13.4",
+  "generated": "2026-09-17",
+  "scenario": "sovereignty_void_2026",
+  "runs": 100,
+  "seed": 0,
+  "maxTurns": 20,
+  "ai": "heuristic",
+  "note": "Sovereignty Void is doctrine-conditioned (doctrine sets player identity + t_rat). Not comparable to the seven-row heuristic table in summary.json without a doctrine column. void_pct is terminal sovereignty-void losses (outcome.reason); nuclear_pct is nuclear-exchange losses. Heuristic void% is an AOM/physics metric, not LLM skill. Per-run dumps are gitignored (*_2026.json).",
+  "doctrines": [
+    {
+      "id": "MING",
+      "player": "CN",
+      "t_rat": 120,
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "void_pct": 49,
+      "mean_stability": 32,
+      "sd_stability": 8.1,
+      "mean_turns": 7.4,
+      "sd_turns": 1.7,
+      "n": 100,
+      "dump": "docs/baselines/v2.13.4/sovereignty_void_ming_2026.json"
+    },
+    {
+      "id": "MAGA",
+      "player": "US",
+      "t_rat": 180,
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "void_pct": 20,
+      "mean_stability": 36.1,
+      "sd_stability": 8.2,
+      "mean_turns": 6,
+      "sd_turns": 1.4,
+      "n": 100,
+      "dump": "docs/baselines/v2.13.4/sovereignty_void_maga_2026.json"
+    },
+    {
+      "id": "JUCHE",
+      "player": "DPRK",
+      "t_rat": 45,
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "void_pct": 23,
+      "mean_stability": 28.2,
+      "sd_stability": 6.6,
+      "mean_turns": 8,
+      "sd_turns": 1.7,
+      "n": 100,
+      "dump": "docs/baselines/v2.13.4/sovereignty_void_juche_2026.json"
+    },
+    {
+      "id": "TWELVER",
+      "player": "IR",
+      "t_rat": 240,
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "void_pct": 61,
+      "mean_stability": 32.8,
+      "sd_stability": 6.6,
+      "mean_turns": 7.3,
+      "sd_turns": 1.7,
+      "n": 100,
+      "dump": "docs/baselines/v2.13.4/sovereignty_void_twelver_2026.json"
+    },
+    {
+      "id": "EU_FATALISM",
+      "player": "EU",
+      "t_rat": 300,
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "void_pct": 44,
+      "mean_stability": 31.7,
+      "sd_stability": 7.6,
+      "mean_turns": 7.3,
+      "sd_turns": 1.9,
+      "n": 100,
+      "dump": "docs/baselines/v2.13.4/sovereignty_void_eu_fatalism_2026.json"
+    }
+  ]
+}

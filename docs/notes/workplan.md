@@ -1,9 +1,9 @@
 # BoP2026 workplan — resume here
 
-**As of:** 2026-09-17  
-**Repo HEAD when written:** `7667856` (`Rebaseline heuristic 100-run table at v2.13.4 HEAD.`)  
+**As of:** 2026-09-17 (SV matrix complete)  
+**Repo HEAD when written:** post-`0fa890a` worktree with `docs/baselines/v2.13.4/sv-summary.json`  
 **Engine:** v2.13.4  
-**Why this file exists:** handoff for a fresh session. Do not treat chat memory as source of truth; re-read this file, `CHANGELOG.md`, and `docs/baselines/v2.13.4/summary.json`.
+**Why this file exists:** handoff for a fresh session. Do not treat chat memory as source of truth; re-read this file, `CHANGELOG.md`, `docs/baselines/v2.13.4/summary.json`, and `docs/baselines/v2.13.4/sv-summary.json`.
 
 Death of this file: replace it when the next milestone ships, or when every open item below is done or explicitly dropped.
 
@@ -14,6 +14,7 @@ Death of this file: replace it when the next milestone ships, or when every open
 - Vanilla HTML/CSS/JS. No frameworks, bundler, or npm as a runtime. `package.json` is tests + Playwright only.
 - May 2026 `docs/findings.md` table (Iran **73%** nuclear, Taiwan **1%**, GSI 25.8 / 5.9 turns) is a **snapshot**, not HEAD. Bound in `docs/findings-may2026-summary.json`. Original 100-run dumps: **unrecovered**. Do not overwrite those figures with HEAD rates.
 - HEAD heuristic 100-run table (seed 0, n=100, 2026-09-17): `docs/baselines/v2.13.4/summary.json`. Iran nuclear **12%**, all rows **0% wins**. Per-run JSON (~12–18 MB) lives on disk under `docs/baselines/v2.13.4/<scenario>_2026.json` and is **gitignored**.
+- HEAD SV doctrine matrix (seed 0, n=100): `docs/baselines/v2.13.4/sv-summary.json`. Doctrine-conditioned; `void%` ≠ `nuclear%`. Not a row in the seven-scenario table.
 - Instrument eval (`scripts/test-instrument.js`, n=20) gates **shape**, not GSI bands. It may print Iran ~20% nuclear; that is small-n, not the 100-run rate.
 - Standing gates: `npm test`, `npm run test:browser` (Playwright), `claim-manifest.json` → computational-claim-gate, `integrity-manifest.json` → manuscript I1 on findings.
 - CI (`.github/workflows/ci.yml`) runs **only** `npm test` on Node 20. No Playwright install.
@@ -33,17 +34,9 @@ Optional UI: `npm run test:browser` (needs local `node_modules` + Chromium).
 
 ## Open work (priority order)
 
-### 1. Sovereignty Void 100-run matrix (not in the v2.13.4 table)
+### 1. Sovereignty Void 100-run matrix — DONE
 
-SV requires `--doctrine`. Not comparable to the seven-row heuristic table without a doctrine column.
-
-- Run at least `MING` (and ideally MAGA / JUCHE / TWELVER / EU_FATALISM) at n=100 seed 0.
-- Write a **summary** (not 50 MB dumps) under `docs/baselines/v2.13.4/sovereignty_void-<doctrine>.json` or one `sv-summary.json`.
-- Done when: summary committed, CHANGELOG/README note that SV is doctrine-conditioned, void% vs nuclear% distinguished (`void%` is AOM/prompt, not LLM skill).
-
-```
-node scripts/run-bop.js --scenario sovereignty_void_2026 --doctrine MING --runs 100 --seed 0 --out docs/baselines/v2.13.4/sovereignty_void_2026-MING.json
-```
+Published: `docs/baselines/v2.13.4/sv-summary.json` (five doctrines, n=100 seed 0). CHANGELOG/README note doctrine conditioning + void% vs nuclear%. Dumps `sovereignty_void_<doctrine>_2026.json` gitignored.
 
 ### 2. Playwright on CI (optional product gate)
 
@@ -134,7 +127,7 @@ Not default: lean-proof-forge, geometry-mesh, hashline, Cloudflare Workers, omni
 ## Suggested next session (if the owner says “continue”)
 
 1. Resume smoke (`npm test` + both Python gates).  
-2. Item **1** (SV 100-run doctrine matrix) unless they pick CI, robustness, or factions instead.  
+2. Pick among open items **2** (Playwright CI — ask first), **3** (May dump recover/retire), **4** (HEAD I1 bind), or **5** (`paper-robustness-check`).  
 3. Stop and report; do not start Domestic Factions without a spec.
 
 ## Explicit non-goals until asked

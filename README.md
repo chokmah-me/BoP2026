@@ -270,6 +270,20 @@ node scripts/analyze-results.js docs/baselines/v2.13.4/korean_peninsula_2026.jso
 
 Same pattern for `orbital_warfare_2026`, `megacity_siege_2026`, and `financial_contagion_2026`. Per-run JSON is gitignored (~12–18 MB each); the committed table is `docs/baselines/v2.13.4/summary.json`.
 
+**Sovereignty Void** is omitted from that seven-row table: it requires `--doctrine`, and doctrine sets both the player power and `t_rat`, so rows are not strategy A/B cells. Heuristic n=100 seed 0 doctrine matrix (same engine build): [`docs/baselines/v2.13.4/sv-summary.json`](docs/baselines/v2.13.4/sv-summary.json). Report `void%` (terminal sovereignty-void losses) separately from `nuclear%`; heuristic `void%` is an AOM/physics metric, not LLM skill.
+
+| Doctrine | Player | t_rat | Win % | Nuclear % | Void % | Avg stability | Avg turns |
+|----------|--------|------:|------:|----------:|-------:|--------------:|----------:|
+| MING | CN | 120 | 0% | 0% | 49% | 32.0 | 7.4 |
+| MAGA | US | 180 | 0% | 0% | 20% | 36.1 | 6.0 |
+| JUCHE | DPRK | 45 | 0% | 0% | 23% | 28.2 | 8.0 |
+| TWELVER | IR | 240 | 0% | 0% | 61% | 32.8 | 7.3 |
+| EU_FATALISM | EU | 300 | 0% | 0% | 44% | 31.7 | 7.3 |
+
+```bash
+node scripts/run-bop.js --scenario sovereignty_void_2026 --doctrine MING --runs 100 --seed 0 --out docs/baselines/v2.13.4/sovereignty_void_ming_2026.json
+```
+
 ---
 
 ## Scenarios
