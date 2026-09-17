@@ -3,6 +3,7 @@ node_modules/
 results/
 bop-results.json
 docs/*-baseline.json
+docs/baselines/**/*_2026.json
 logs/
 .env
 .env.*

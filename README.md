@@ -230,24 +230,24 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-Heuristic baseline (default parameters, re-baselined at v2.12.0; 100 runs, seed 0, all on one engine build so rows are directly comparable):
+Heuristic baseline (default parameters, re-baselined at v2.13.4 HEAD on 2026-09-17; 100 runs, seed 0, all on one engine build so rows are directly comparable). Published table: [`docs/baselines/v2.13.4/summary.json`](docs/baselines/v2.13.4/summary.json). The May 2026 73% Iran snapshot in [`docs/findings.md`](docs/findings.md) is not this engine.
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
-| Taiwan Strait 2026 | 0% | 0% | 32.7 | 8.4 |
-| Iran Nuclear 2026 | 0% | 14% | 30.2 | 8.2 |
-| South China Sea 2026 | 0% | 0% | 27.1 | 8.7 |
+| Taiwan Strait 2026 | 0% | 0% | 33.0 | 8.3 |
+| Iran Nuclear 2026 | 0% | 12% | 30.1 | 8.1 |
+| South China Sea 2026 | 0% | 0% | 26.9 | 8.7 |
 | Korean Peninsula 2026 | 0% | 0% | 27.1 | 10.0 |
-| Orbital Warfare 2026 | 0% | 1% | 30.3 | 9.0 |
-| Megacity Siege 2026 | 0% | 0% | 25.0 | 7.8 |
-| Financial Contagion 2026 | 0% | 0% | 32.1 | 8.8 |
+| Orbital Warfare 2026 | 0% | 1% | 30.6 | 9.0 |
+| Megacity Siege 2026 | 0% | 0% | 25.1 | 7.8 |
+| Financial Contagion 2026 | 0% | 0% | 32.0 | 8.7 |
 
-Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. These numbers were re-baselined at v2.12.0: broadening the NPC action pool (NPCs now proactively pursue R&D and the newer Krepinevich domains) changes NPC action selection and realigns every seeded scenario (as with prior RNG-stream shifts). The shifts are small — stability mostly ticked up a few tenths and no scenario changed playability — see the v2.12.0 calibration note in [CHANGELOG.md](CHANGELOG.md).
+Default parameters, max 20 turns. "Win" = US player achieves game-over win condition; all runs end in loss under heuristic AI, reflecting how difficult crisis management is by design. Versus the v2.12.0 table, rows moved by at most a few tenths of GSI/turns; Iran nuclear rate is 12% here (14% at v2.12.0; n=20 instrument runs read 20% — small-n noise). Shape is unchanged: 0% heuristic wins, Iran is the nuclear scenario, Taiwan is cascade-dominant.
 
 Key findings from the baseline:
 
-- **Iran** carries the only non-zero nuclear rate (14%). IR has been an active NPC since v2.1.1, and its brinkmanship doctrine drives divergent — sometimes nuclear — trajectories. Every other scenario sits at 0% under heuristic play: the v2.0.4 posture system de-escalates at crisis level 4+, keeping conventional confrontations below the nuclear threshold.
-- **Megacity Siege** is the lowest-stability scenario (25.0) — the urban quagmire's persistent attrition grinds military/domestic every turn the front stays hot. **Taiwan** and **Financial Contagion** sit highest (32+), reflecting recoverable economic/diplomatic crises rather than purely kinetic ones.
+- **Iran** carries the only material nuclear rate (12%). IR has been an active NPC since v2.1.1, and its brinkmanship doctrine drives divergent — sometimes nuclear — trajectories. Orbital is a 1% tail. Every other scenario sits at 0% under heuristic play: the v2.0.4 posture system de-escalates at crisis level 4+, keeping conventional confrontations below the nuclear threshold.
+- **Megacity Siege** is the lowest-stability scenario (25.1) — the urban quagmire's persistent attrition grinds military/domestic every turn the front stays hot. **Taiwan** (33.0) and **Financial Contagion** (32.0) sit highest, reflecting recoverable economic/diplomatic crises rather than purely kinetic ones.
 - Broadening the NPC pool at v2.12.0 *raised* stability a few tenths in most scenarios rather than lowering it: NPCs now spend some calm-turn action points on non-escalatory R&D and defensive capability-building (`rd_*`, `satellite_hardening`, `debris_remediation_pact`) instead of escalatory cycling, and the posture system keeps the newly-available escalatory options (`asat_strike`, `drone_swarm_deploy`) tail events rather than baseline behavior.
 - Latent tail risks rarely fire under heuristic de-escalation: `asat_strike` (Kessler cascade) and `emp_strike` are seldom selected, so the Orbital debris cascade and C4ISR collapse are tail outcomes, not baseline ones.
 - EU and India default to diplomatic actions (secret channels, bilateral negotiation); Russia and the US default to military cycling (force withdrawal → deploy forces). This matches the AI personality calibration.
@@ -255,19 +255,20 @@ Key findings from the baseline:
 Reproduce:
 
 ```bash
-node scripts/run-bop.js --scenario taiwan_strait_2026 --runs 100 --seed 0 --out docs/taiwan-baseline.json
-node scripts/analyze-results.js docs/taiwan-baseline.json
+node scripts/run-bop.js --scenario taiwan_strait_2026 --runs 100 --seed 0 --out docs/baselines/v2.13.4/taiwan_strait_2026.json
+node scripts/analyze-results.js docs/baselines/v2.13.4/taiwan_strait_2026.json
 
-# Iran baseline reflects v2.1.1 (IR active). Prior v2.0.6 baseline is no longer valid.
-node scripts/run-bop.js --scenario iran_nuclear_2026 --runs 100 --seed 0 --out docs/iran-baseline.json
-node scripts/analyze-results.js docs/iran-baseline.json
+node scripts/run-bop.js --scenario iran_nuclear_2026 --runs 100 --seed 0 --out docs/baselines/v2.13.4/iran_nuclear_2026.json
+node scripts/analyze-results.js docs/baselines/v2.13.4/iran_nuclear_2026.json
 
-node scripts/run-bop.js --scenario south_china_sea_2026 --runs 100 --seed 0 --out docs/scs-baseline.json
-node scripts/analyze-results.js docs/scs-baseline.json
+node scripts/run-bop.js --scenario south_china_sea_2026 --runs 100 --seed 0 --out docs/baselines/v2.13.4/south_china_sea_2026.json
+node scripts/analyze-results.js docs/baselines/v2.13.4/south_china_sea_2026.json
 
-node scripts/run-bop.js --scenario korean_peninsula_2026 --runs 100 --seed 0 --out docs/korean-baseline.json
-node scripts/analyze-results.js docs/korean-baseline.json
+node scripts/run-bop.js --scenario korean_peninsula_2026 --runs 100 --seed 0 --out docs/baselines/v2.13.4/korean_peninsula_2026.json
+node scripts/analyze-results.js docs/baselines/v2.13.4/korean_peninsula_2026.json
 ```
+
+Same pattern for `orbital_warfare_2026`, `megacity_siege_2026`, and `financial_contagion_2026`. Per-run JSON is gitignored (~12–18 MB each); the committed table is `docs/baselines/v2.13.4/summary.json`.
 
 ---
 

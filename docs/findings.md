@@ -6,9 +6,9 @@
 > per-run dumps unrecovered). Shape claims
 > (Taiwan cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins,
 > personality fingerprints, cascadeScale sign) are gated by
-> `node scripts/test-instrument.js` (`npm test`). Current headline triples live
-> in `CHANGELOG.md` (v2.13.0 baselines). `void%` is an AOM/prompt metric, not
-> LLM skill.
+> `node scripts/test-instrument.js` (`npm test`). Current 100-run HEAD table:
+> [`docs/baselines/v2.13.4/summary.json`](baselines/v2.13.4/summary.json) and
+> `CHANGELOG.md`. `void%` is an AOM/prompt metric, not LLM skill.
 
 **Scenario**: Taiwan Strait 2026 and Iran Nuclear Threshold 2026  
 **Runs**: 100 per scenario, seeds 0–99, default parameters, no doctrine  

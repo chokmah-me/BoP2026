@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-17 (v2.13.4 HEAD rebaseline)
+
+Heuristic 100-run, seed 0, max 20 turns, one engine build. Published table:
+`docs/baselines/v2.13.4/summary.json`. May 2026 findings snapshot is unchanged.
+
+| Scenario | Win % | Nuclear % | Avg stability | Avg turns |
+|----------|-------|-----------|---------------|-----------|
+| Taiwan Strait 2026 | 0 | 0 | 33.0 | 8.3 |
+| Iran Nuclear 2026 | 0 | 12 | 30.1 | 8.1 |
+| South China Sea 2026 | 0 | 0 | 26.9 | 8.7 |
+| Korean Peninsula 2026 | 0 | 0 | 27.1 | 10.0 |
+| Orbital Warfare 2026 | 0 | 1 | 30.6 | 9.0 |
+| Megacity Siege 2026 | 0 | 0 | 25.1 | 7.8 |
+| Financial Contagion 2026 | 0 | 0 | 32.0 | 8.7 |
+
+Versus v2.12.0: GSI/turns moved by at most a few tenths. Iran nuclear 14% → 12% (n=100); the n=20 instrument eval still reports 20% — shape claim only. 0% heuristic wins on every row.
+
 ## 2026-08-17 (v2.13.4)
 
 ### Fixed

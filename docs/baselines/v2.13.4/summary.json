@@ -1,0 +1,82 @@
+{
+  "schema": "bop2026-baseline-summary/v1",
+  "engine": "v2.13.4",
+  "generated": "2026-09-17",
+  "runs": 100,
+  "seed": 0,
+  "maxTurns": 20,
+  "ai": "heuristic",
+  "note": "HEAD 100-run heuristic rebaseline. Per-run analytics JSON is gitignored (docs/baselines/v2.13.4/<scenario>.json); regenerate with scripts/run-bop.js. Not the May 2026 findings snapshot.",
+  "scenarios": [
+    {
+      "id": "taiwan_strait_2026",
+      "label": "Taiwan Strait 2026",
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "mean_stability": 33.0,
+      "sd_stability": 4.5,
+      "mean_turns": 8.3,
+      "sd_turns": 1.7
+    },
+    {
+      "id": "iran_nuclear_2026",
+      "label": "Iran Nuclear 2026",
+      "win_pct": 0,
+      "nuclear_pct": 12,
+      "mean_stability": 30.1,
+      "sd_stability": 6.0,
+      "mean_turns": 8.1,
+      "sd_turns": 1.8
+    },
+    {
+      "id": "south_china_sea_2026",
+      "label": "South China Sea 2026",
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "mean_stability": 26.9,
+      "sd_stability": 3.5,
+      "mean_turns": 8.7,
+      "sd_turns": 1.9
+    },
+    {
+      "id": "korean_peninsula_2026",
+      "label": "Korean Peninsula 2026",
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "mean_stability": 27.1,
+      "sd_stability": 4.7,
+      "mean_turns": 10.0,
+      "sd_turns": 2.5
+    },
+    {
+      "id": "orbital_warfare_2026",
+      "label": "Orbital Warfare 2026",
+      "win_pct": 0,
+      "nuclear_pct": 1,
+      "mean_stability": 30.6,
+      "sd_stability": 3.9,
+      "mean_turns": 9.0,
+      "sd_turns": 1.8
+    },
+    {
+      "id": "megacity_siege_2026",
+      "label": "Megacity Siege 2026",
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "mean_stability": 25.1,
+      "sd_stability": 4.0,
+      "mean_turns": 7.8,
+      "sd_turns": 2.2
+    },
+    {
+      "id": "financial_contagion_2026",
+      "label": "Financial Contagion 2026",
+      "win_pct": 0,
+      "nuclear_pct": 0,
+      "mean_stability": 32.0,
+      "sd_stability": 4.7,
+      "mean_turns": 8.7,
+      "sd_turns": 1.9
+    }
+  ]
+}
