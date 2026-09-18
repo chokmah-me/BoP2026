@@ -152,12 +152,13 @@ The event log (overlay on the bottom of the map) is scrollable — pause the sim
 
 ```bash
 npm test
-# = node scripts/test-cascades.js && node scripts/test-analytics.js
+# serial: cascades, engine, analytics, catalog, features, scenarios, instrument, deepseek-parse
 ```
 
-`test-analytics.js` covers schema, delta reconstruction, determinism, post-mortem filename, and
-saveLog payload; `test-cascades.js` covers cascade thresholds and idempotency. Exit 0 = pass.
-(The browser smoke test needs Playwright — run `npm install` once, then `npm run test:browser`.)
+Exit 0 = pass. CI job `test` runs the same headless suite (no `npm install`). Browser smoke needs
+Playwright — locally `npm install` once then `npm run test:browser`; CI job `browser` installs
+Chromium. Research number gates (May vs HEAD I1, claim shape): see [`CONTRIBUTING.md`](../CONTRIBUTING.md)
+and [`docs/notes/workplan.md`](notes/workplan.md).
 
 ---
 
@@ -208,7 +209,14 @@ node scripts/run-bop.js --scenario sovereignty_void_2026 --doctrine MING `
   --runs 1 --seed 42 --max-turns 5 --log-prompts --out logs/sv-thinking.json
 ```
 
-**What the LLM does:** each NPC gets a system prompt with its personality, current crisis levels, stat summary, and available actions. Returns a JSON array of up to 3 actions within its AP budget. Invalid targets are dropped silently. Rate-limit errors retry with exponential backoff before falling back to the heuristic.
+**What the LLM does:** each NPC gets a **system** message (role, personality, JSON contract) and a
+**per-turn user** message (stats, crises, actions, and — on Sovereignty Void — the situational
+`LATENCY GOVERNANCE (AOM)` block). Prompt version **`v1.4`**. Default AOM framing is symmetric;
+`--asymmetric-aom` restores the old adversary "Exploit paths" prompt. Returns a JSON array of up to
+3 actions within its AP budget. Invalid targets are dropped silently. Rate-limit errors retry with
+exponential backoff before falling back to the heuristic. Offline parse/placement pins:
+`node scripts/test-deepseek-parse.js`. Multi-seed void CI pilot:
+[`notes/sv-void-ci-pilot.md`](notes/sv-void-ci-pilot.md).
 
 **Approximate cost reference:**
 

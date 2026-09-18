@@ -291,8 +291,9 @@ Both models bill at `deepseek-v4-flash` rates. Cost scales with game length: ~$0
 **Krepinevich coverage is now complete (7 of 7)** as of v2.9.0, with dedicated scenarios for all
 seven scenarios. With the scenario-breadth arc closed, the **Next Milestone** shifts to depth: the
 Domestic Faction System (replace the unitary-actor model with hardliner vs. moderate factions —
-directly attacks the unitary-actor limitation in `docs/findings.md`), and the LLM-agent methodology
-follow-ups above (per-turn AOM framing, cross-model replication, tighter void-rate CIs).
+directly attacks the unitary-actor limitation in `docs/findings.md`; **spec first**, no drive-by
+`ai.js` edits). On the LLM track, per-turn AOM (`PROMPT_VERSION` v1.4) and the multi-seed void-rate
+CI pilot are done; the remaining methodology slice is **cross-model replication** (Claude / GPT-4o).
 
 ---
 

@@ -1,8 +1,8 @@
 # BoP2026 workplan — resume here
 
-**As of:** 2026-09-17 (items 2, 4, 5 done)  
-**Repo HEAD when written:** post-SV matrix worktree; Playwright CI + HEAD I1 + Findings 1–4 robustness  
-**Engine:** v2.13.4  
+**As of:** 2026-09-17 (docs/metadata sync after `730338c`)  
+**Repo HEAD when written:** post-`730338c` (Playwright CI, HEAD I1, robustness, AOM v1.4, void CI pilot) + README/ZENODO/CITATION prose sync  
+**Engine:** v2.13.4 (no package bump; no Zenodo remint)  
 **Why this file exists:** handoff for a fresh session. Do not treat chat memory as source of truth; re-read this file, `CHANGELOG.md`, `docs/baselines/v2.13.4/summary.json`, and `docs/baselines/v2.13.4/sv-summary.json`.
 
 Death of this file: replace it when the next milestone ships, or when every open item below is done or explicitly dropped.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-17 (docs/metadata sync)
+
+- Aligned README, ZENODO, CITATION.cff (`date-released`), ORACLE, QUICKSTART, ROADMAP, and
+  GROK_PROJECT with repo HEAD: `PROMPT_VERSION` **v1.4** (AOM in per-turn user message),
+  Playwright CI `browser` job, HEAD I1 / DATASET / robustness / void CI pilot pointers.
+- Still **v2.13.4** — no `package.json` bump, no Zenodo version mint (cite concept DOI).
+
 ## 2026-09-17 (LLM: void-rate CI pilot)
 
 - **Multi seed-base + second player:** `scripts/sv-void-ci-pilot.ps1` +

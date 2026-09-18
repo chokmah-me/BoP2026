@@ -1,11 +1,11 @@
 # Zenodo Deposit — Balance of Power 2026 v2.13.4
 
 **Concept DOI (always latest):** https://doi.org/10.5281/zenodo.20370929  
-**Repo HEAD:** v2.13.4 (2026-08-17) — not yet a new Zenodo version record  
+**Repo HEAD:** v2.13.4 (2026-09-17 docs/gates sync) — **not** a new Zenodo version record  
 **Last minted version:** v2.13.2 — https://doi.org/10.5281/zenodo.21970518  
 **First version DOI (v1.0.1, superseded):** https://doi.org/10.5281/zenodo.20370930  
 **Last minted before the v2.13.2 remint:** v2.7.0 — https://doi.org/10.5281/zenodo.20498785  
-**Deposit Date:** 24 May 2026 (updated 17 August 2026)  
+**Deposit Date:** 24 May 2026 (metadata refreshed 17 September 2026; last Zenodo *version* mint 16 August 2026)  
 **License:** MIT  
 **Principal Investigator / Originator:** Daniyel Yaacov Bilar, Chokmah LLC  
 **ORCID:** 0000-0002-9040-6914  
@@ -22,7 +22,7 @@ The engine is designed for two uses:
 1. **Classroom / wargame** — open `index.html` in a browser; no server, no build, no npm. Play any scenario; Save Log / auto-save writes a post-mortem JSON; the Research panel runs in-browser batches.
 2. **Research companion** — headless Node.js (18+) batch runs, parameter sweeps (`--cn-risk`, `--us-patience`, `--cascade-scale`), counterfactual branching via the Oracle API (`BoP.init` / `step` / `run` / `runBatch`, `getState` / `setState`, NPC and player overrides). Output is `bop2026-analytics-v1` (per-turn state deltas, relationship shifts, crisis levels, systemic-risk index) for Python or R. Optional DeepSeek LLM NPC backend (heuristic fallback; symmetric AOM prompt by default).
 
-Also in this deposit: perishable intelligence (quality decay + perception drift), a delayed-payoff technology / R&D ledger with arms-race catch-up, posture-stable heuristic AI (escalate / hold / de-escalate / consolidate; compound-crisis avoidance; escalation lock), and `npm test` covering cascade/engine/analytics contracts, catalog integrity, feature families, scenario smoke, and an instrument eval that gates scenario contrast and personality fingerprints.
+Also in this deposit: perishable intelligence (quality decay + perception drift), a delayed-payoff technology / R&D ledger with arms-race catch-up, posture-stable heuristic AI (escalate / hold / de-escalate / consolidate; compound-crisis avoidance; escalation lock), and `npm test` covering cascade/engine/analytics contracts, catalog integrity, feature families, scenario smoke, DeepSeek parse pins, and an instrument eval that gates scenario contrast and personality fingerprints. CI also runs Playwright browser smoke (`test:browser`). DeepSeek LLM prompts use `PROMPT_VERSION` v1.4 (situational AOM in the per-turn user message; symmetric framing by default).
 
 Calibrated for face validity against open-source IR literature (Fearon 1995, Jervis 1976, Waltz 1979), not regression-fitted to history. **Not intended for forecasting or policy prescription.** What it can do honestly: show how crises cascade; let a researcher ask "what if China is more risk-tolerant" under a fixed seed; generate synthetic trajectories for method work; exercise latency-governance (t_rat vs t_event) as a structural constraint rather than a tunable knob. Those uses need internal consistency, not empirical fit.
 
@@ -49,11 +49,18 @@ All parameters are calibrated for **face validity** against open-source IR liter
 - Baseline results for all eight scenarios
 - Model assumptions and known limitations
 
-## Release Notes — v2.13.4
+## Release Notes — v2.13.4 (repo state)
 
-v2.13.4 adds an instrument eval (`scripts/test-instrument.js`) that gates shape claims — Taiwan cascade-dominant, Iran more nuclear than Taiwan, 0% default-AI wins, CN/EU fingerprints, cascadeScale sign — and banners `docs/findings.md` as a May 2026 snapshot. v2.13.3 implemented the JUCHE `deterrence_achieved` win, clamped DPRK nuclear onto the 0–5 scale, and disambiguated the SCS cable event id. Last Zenodo *version* record remains v2.13.2; cite the concept DOI until a remint.
+**Still cite the concept DOI** until a remint. Last Zenodo *version* record remains v2.13.2.
 
-Full capability inventory is in the Description above; version archaeology is in the Version History below and in `CHANGELOG.md`.
+Repo HEAD (2026-09-17) on the v2.13.4 line includes:
+
+- Heuristic 100-run HEAD table + SV doctrine matrix (`docs/baselines/v2.13.4/summary.json`, `sv-summary.json`; see `docs/baselines/DATASET.md`, `docs/HEAD-baseline.md`).
+- Instrument eval in `npm test`; `docs/findings.md` bannered as a May 2026 snapshot (I1-bound separately from HEAD).
+- Playwright CI browser job; HEAD manuscript I1 bag (`docs/head-i1/`); Findings 1–4 robustness note; `CONTRIBUTING.md`.
+- DeepSeek `PROMPT_VERSION` v1.4 (AOM latency block in the per-turn user message); void-rate CI pilot harness/notes (`scripts/sv-void-ci-pilot.ps1`, `docs/notes/sv-void-ci-pilot.md`).
+
+Earlier on the same minor line: v2.13.3 JUCHE `deterrence_achieved` / DPRK nuclear clamp / SCS cable id; v2.13.4 Aug instrument-eval ship. Full archaeology: Version History below and `CHANGELOG.md`.
 
 ## Recommended Citation
 
@@ -61,7 +68,7 @@ Full capability inventory is in the Description above; version archaeology is in
 
 ## Version History
 
-**v2.13.4 (2026-08-17):** Instrument eval in `npm test`. Findings.md bannered as a May 2026 snapshot. Citation metadata points at the concept DOI.
+**v2.13.4 (2026-08-17 → 2026-09-17 repo sync):** Instrument eval in `npm test`; findings.md May snapshot. Sept sync (no Zenodo remint): HEAD rebaseline + SV matrix, Playwright CI, HEAD I1, robustness note, AOM prompt v1.4, void CI pilot, CONTRIBUTING/DATASET. Citation metadata still points at the concept DOI.
 
 **v2.13.3 (2026-08-17):** JUCHE `deterrence_achieved` now executes. DPRK nuclear start is 5. SCS cable event id is `undersea_cable_severance`. AOM copy: only JUCHE closes the 90s window.
 

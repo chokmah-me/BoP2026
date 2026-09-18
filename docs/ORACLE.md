@@ -598,9 +598,13 @@ while (!BoP.getState().gameOver) {
 | `scripts/test-features.js` | `node scripts/test-features.js` | AOM, EMP, bio, Kessler, urban, compounds, doctrines, posture |
 | `scripts/test-scenarios.js` | `node scripts/test-scenarios.js` | every scenario inits and completes; CLI process smoke |
 | `scripts/test-instrument.js` | `node scripts/test-instrument.js` | shape claims (contrast, fingerprints, cascadeScale sign, 0% default wins) |
+| `scripts/test-deepseek-parse.js` | `node scripts/test-deepseek-parse.js` | offline DeepSeek parse + AOM placement pins (`PROMPT_VERSION` v1.4: AOM in user message) |
+| `scripts/test-browser.js` | `npm run test:browser` | Playwright UI smoke (CI `browser` job; needs Chromium) |
+| `scripts/sv-void-ci-pilot.ps1` | `pwsh scripts/sv-void-ci-pilot.ps1 [-DryRun]` | multi seed-base × MING/MAGA void-rate CI pilot (paid DeepSeek) |
+| `scripts/sv-void-ci-summary.mjs` | `node scripts/sv-void-ci-summary.mjs logs/sv-ci-pilot-*.json` | Wilson 95% void% table for CI pilot logs |
 | `scripts/load-engine.js` | `require('./load-engine').loadEngine()` | shared VM loader; returns the engine context; throws if any expected global (`State`/`Domains`/`Cascades`/`Epistemic`/`Events`/`AI`/`BoP`) failed to attach |
 
-`npm test` runs the dependency-free Node tests (cascades → engine → analytics → catalog → features → scenarios → instrument).
+`npm test` runs the dependency-free Node tests (cascades → engine → analytics → catalog → features → scenarios → instrument → deepseek-parse). CI also runs Playwright via `npm run test:browser`. DeepSeek prompts: system = role/personality; per-turn user = state + situational AOM (`PROMPT_VERSION` v1.4). See [notes/llm-wargame-prompt-asymmetry.md](notes/llm-wargame-prompt-asymmetry.md) and [notes/sv-void-ci-pilot.md](notes/sv-void-ci-pilot.md).
 `analyze-results.js` accepts both the legacy `{ result: SimResult }` format and the current `{ analytics }` format.
 
 ---

@@ -5,7 +5,8 @@
 **Background:** [The Story Behind BoP2026](docs/BACKGROUND.md)  
 **Quickstart:** [Get analysis-ready data in 10 minutes](docs/QUICKSTART.md)  
 **Oracle reference:** [Headless simulation, full API, output schema](docs/ORACLE.md)  
-**Baselines:** [Citable HEAD dataset](docs/baselines/DATASET.md) · **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md)
+**Baselines:** [Citable HEAD dataset](docs/baselines/DATASET.md) · [HEAD table (I1)](docs/HEAD-baseline.md) · **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md)  
+**Resume:** [Workplan](docs/notes/workplan.md) · [Findings 1–4 robustness](docs/notes/findings-1-4-robustness.md) · [SV void CI pilot](docs/notes/sv-void-ci-pilot.md)
 
 A turn-based multipolar crisis simulation for IR research and war studies pedagogy. Eight scenarios, thirteen domains, eight actors. Runs in the browser as a playable game and headless via Node.js for batch simulation and parameter sensitivity analysis.
 
@@ -60,8 +61,11 @@ node scripts/run-bop.js --scenario iran_nuclear_2026 --runs 50
 # Analyze batch output
 node scripts/analyze-results.js results.json
 
-# Run the regression tests (CI runs the same)
+# Headless regression suite (CI job `test` — no npm install required)
 npm test
+
+# Browser smoke (CI job `browser` installs Chromium; locally: npm install once)
+npm run test:browser
 ```
 
 **CLI flags:**
@@ -107,9 +111,9 @@ DEEPSEEK_API_KEY=sk-... node scripts/run-bop.js \
   --ai-backend deepseek --runs 50 --dry-run
 ```
 
-LLM NPCs use prompt version `v1.3` (tracked in `js/ai-deepseek.js`). Each NPC receives its own system prompt with personality, active crisis context, and available actions, and returns a JSON array of up to 3 actions within its AP budget. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic.
+LLM NPCs use prompt version **`v1.4`** (tracked in `js/ai-deepseek.js`). The **system** message carries role, personality, and the JSON output contract. **Turn-state** facts (crises, stats, AP, available actions) and the situational `LATENCY GOVERNANCE (AOM)` block live in the **per-turn user** message so latency options refresh as crises activate or delegation flips. Invalid power targets are dropped silently. Rate-limit errors retry with exponential backoff (1s → 2s → 4s → 8s) before falling back to the heuristic. Offline pins: `node scripts/test-deepseek-parse.js`.
 
-**AOM prompt framing (`sovereignty_void_2026`).** In the latency-governance scenario, the system prompt's `LATENCY GOVERNANCE (AOM)` block is, by default (v2.6.0+), *symmetric*: every agent — player and adversary alike — gets neutral "Strategic options" framing, a shared systemic-survival objective, and escalation language gated on its own `riskTolerance`/`patience`. Earlier versions handed LLM adversaries an "Exploit paths" manual the player never saw, which drove an artificially high sovereignty-void rate (the model recited the framing rather than reasoning independently). Pass `--asymmetric-aom` to reproduce that original prompt; each logged call records its `aomMode`. The full before/after study — including a 16-cell, N=12 sweep showing the symmetric prompt collapses the void rate in every cell — is in [docs/notes/llm-wargame-prompt-asymmetry.md](docs/notes/llm-wargame-prompt-asymmetry.md).
+**AOM prompt framing (`sovereignty_void_2026`).** By default (v2.6.0+), AOM framing is *symmetric*: every agent — player and adversary alike — gets neutral "Strategic options" language, a shared systemic-survival objective, and escalation gated on its own `riskTolerance`/`patience` (now delivered in the user-message AOM section under `PROMPT_VERSION` v1.4). Earlier versions handed LLM adversaries an "Exploit paths" manual the player never saw, which drove an artificially high sovereignty-void rate. Pass `--asymmetric-aom` to reproduce that original prompt; each logged call records `aomMode` and `promptVersion`. Study + multi-seed CI pilot: [docs/notes/llm-wargame-prompt-asymmetry.md](docs/notes/llm-wargame-prompt-asymmetry.md), [docs/notes/sv-void-ci-pilot.md](docs/notes/sv-void-ci-pilot.md) (`scripts/sv-void-ci-pilot.ps1`).
 
 **Chat vs. thinking mode:** the default `deepseek-chat` is fast and cheap (about $0.10/50-run, all NPCs). Use it for parameter sweeps and baseline comparison. `--thinking` switches to `deepseek-reasoner`, which generates a chain-of-thought reasoning trace per NPC per turn. Both models bill at `deepseek-v4-flash` rates ($0.14/$0.28 per 1M input/output, with 50x cache-hit discount). Actual cost: ~$1.40/50-run for Korean Peninsula (6–9 turn games), ~$0.70/50-run for Taiwan/Iran (4–5 turns). Use thinking mode when you want to study *how* an LLM agent reasons about crisis escalation — the traces are logged to the `.jsonl` sidecar via `--log-prompts`. Not worth ~14x over chat for bulk sweeps.
 
@@ -231,7 +235,7 @@ const batch = BoP.exportBatchAnalytics(results);
 
 ## Model behavior (face validity)
 
-Heuristic baseline (default parameters, re-baselined at v2.13.4 HEAD on 2026-09-17; 100 runs, seed 0, all on one engine build so rows are directly comparable). Published table: [`docs/baselines/v2.13.4/summary.json`](docs/baselines/v2.13.4/summary.json). The May 2026 73% Iran snapshot in [`docs/findings.md`](docs/findings.md) is not this engine.
+Heuristic baseline (default parameters, re-baselined at v2.13.4 HEAD on 2026-09-17; 100 runs, seed 0, all on one engine build so rows are directly comparable). Published table: [`docs/baselines/v2.13.4/summary.json`](docs/baselines/v2.13.4/summary.json) (human reprint / I1: [`docs/HEAD-baseline.md`](docs/HEAD-baseline.md); dataset note: [`docs/baselines/DATASET.md`](docs/baselines/DATASET.md)). The May 2026 73% Iran snapshot in [`docs/findings.md`](docs/findings.md) is not this engine — shape claims for Findings 1–4 are stress-tested in [`docs/notes/findings-1-4-robustness.md`](docs/notes/findings-1-4-robustness.md).
 
 | Scenario | Win % | Nuclear escalation % | Avg stability | Avg turns |
 |----------|-------|----------------------|---------------|-----------|
@@ -296,7 +300,7 @@ PLA forces mobilize around Taiwan as the US-China trade war peaks. Three active 
 Iran's enrichment crosses 84%. Four active crises: Iran nuclear program (level 1), Hormuz closure threat (level 1), Iran proxy network (level 1), Gulf Bloc fracture (level 1). Iran (IR) is an active NPC — takes actions each turn alongside US, CN, EU, IN, RU, GB. Six scenario-specific stochastic events model the proxy branches: Hezbollah surge/degradation, Houthi Red Sea escalation/degradation, and Gulf Bloc alignment choices (US alignment vs. China hedging).
 
 ### South China Sea, 2026
-China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). The highest direct US-China military confrontation of the conventional scenarios — 4% baseline nuclear rate vs. 0% for Taiwan.
+China seizes a contested reef and drone swarms have replaced coast guard skippers. Four active crises: SCS Island Seizure (military, level 1), Sea Lane Blockade Threat (economic, level 1), Semiconductor Chokepoint (supply_chain, level 1), Autonomous Engagement (autonomous, level 1). Highest direct US–China military confrontation among the conventional scenarios; under the v2.13.4 HEAD heuristic table both SCS and Taiwan sit at **0%** nuclear (early v2.0.x SCS runs once showed a small nuclear tail — do not cite that as HEAD).
 
 ### Korean Peninsula, 2026
 DPRK moves tactical warheads to forward positions after the latest ICBM series. Four active crises: ICBM Test Series (military, L1), Sanctions Regime Collapse (economic, L1), Lazarus Financial Operations (cyber, L1), Forward Nuclear Posture (military, L2). DPRK is the primary NPC antagonist — highest riskTolerance (0.85) and lowest patience (0.35) in the game. High starting escalation (sum 5) leaves little diplomatic margin.

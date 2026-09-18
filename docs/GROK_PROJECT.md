@@ -38,9 +38,14 @@ scripts/
 docs/
   ORACLE.md             API reference
   model-notes.md        Theoretical grounding and limitations
+  QUICKSTART.md         Researcher quickstart
+  HEAD-baseline.md      HEAD 100-run table (I1-gated via head-i1/)
+  baselines/DATASET.md  Citable baseline pointer (summary.json / sv-summary.json)
+  findings.md           May 2026 findings snapshot (not HEAD)
   notes/workplan.md     Resume workplan (next steps + gates)
-  QUICKSTART.md         Browser setup
-  findings.md           Research findings log
+  notes/findings-1-4-robustness.md  Shape-claim survival map
+  notes/sv-void-ci-pilot.md         LLM void-rate CI pilot results
+  notes/llm-wargame-prompt-asymmetry.md  Prompt-role study (AOM v1.4)
 ```
 
 ---
